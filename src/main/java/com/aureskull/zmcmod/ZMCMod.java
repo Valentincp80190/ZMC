@@ -1,22 +1,28 @@
 package com.aureskull.zmcmod;
 
+import com.aureskull.zmcmod.block.ModBlocks;
+import com.aureskull.zmcmod.block.entity.ModBlockEntities;
+import com.aureskull.zmcmod.item.ModItemGroup;
+import com.aureskull.zmcmod.item.ModItems;
+import com.aureskull.zmcmod.networking.ModMessages;
+import com.aureskull.zmcmod.screen.ModScreenHandlers;
 import net.fabricmc.api.ModInitializer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ZMCMod implements ModInitializer {
-	// This logger is used to write text to the console and the log file.
-	// It is considered best practice to use your mod id as the logger's name.
-	// That way, it's clear which mod wrote info, warnings, and errors.
-    public static final Logger LOGGER = LoggerFactory.getLogger("zmcmod");
+	public static final String MOD_ID = "zmcmod";
+	public static final Logger LOGGER = LoggerFactory.getLogger("zmcmod");
 
 	@Override
 	public void onInitialize() {
-		// This code runs as soon as Minecraft is in a mod-load-ready state.
-		// However, some things (like resources) may still be uninitialized.
-		// Proceed with mild caution.
-
-		LOGGER.info("Hello Fabric world!");
+		//LOGGER.info("Hello Fabric world!");
+		ModItemGroup.registerItemGroups();
+		ModItems.registerModItems();
+		ModBlockEntities.registerBlockEntities();
+		ModScreenHandlers.registerScreenHandlers();
+		ModBlocks.registerModBlocks();
+		ModMessages.registerC2SPackets();
 	}
 }

@@ -5,7 +5,7 @@
 	"name": "ZMCMod",
 	"description": "This is an example description! Tell everyone what your mod is about!",
 	"authors": [
-		"Me!"
+		"AureSkull"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
@@ -17,6 +17,9 @@
 	"entrypoints": {
 		"main": [
 			"com.aureskull.zmcmod.ZMCMod"
+		],
+		"client": [
+			"com.aureskull.zmcmod.ZMCModClient"
 		],
 		"fabric-datagen": [
 			"com.aureskull.zmcmod.ZMCModDataGenerator"

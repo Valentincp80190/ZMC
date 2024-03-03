@@ -1,0 +1,13 @@
+{
+  "item.zmcmod.zone_stick": "Zone Stick",
+  "item.zmcmod.linker": "Linker",
+
+  "block.zmcmod.map_controller": "Map Controller",
+
+
+  "itemgroup.zmctools": "Zombie MC",
+
+
+  "key.category.zmcmod": "ZMC",
+  "key.zmcmod.openmapeditor": "Open Map Editor"
+}
