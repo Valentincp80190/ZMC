@@ -13,10 +13,6 @@ import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
 public class ModBlocks {
-
-    //public static final Block MAP_CONTROLLER = registerBlock("map_controller",
-    //       new Block(FabricBlockSettings.copyOf(Blocks.NETHERITE_BLOCK)));
-
     public static final Block MAP_CONTROLLER = registerBlock("map_controller",
             new MapControllerBlock(FabricBlockSettings.copyOf(Blocks.NETHERITE_BLOCK)));
 

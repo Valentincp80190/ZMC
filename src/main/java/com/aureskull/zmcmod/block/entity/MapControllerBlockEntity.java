@@ -1,5 +1,6 @@
 package com.aureskull.zmcmod.block.entity;
 
+import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.screen.MapControllerScreenHandler;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
@@ -27,9 +28,8 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
     @Override
     public void markDirty() {
-        System.out.println("markDirty");
-        world.updateListeners(pos, getCachedState(), getCachedState(), 3);
         super.markDirty();
+        world.updateListeners(pos, getCachedState(), getCachedState(), 3);
     }
 
     @Override
@@ -46,17 +46,13 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
     protected void writeNbt(NbtCompound nbt){
         nbt.putString("map_controller.mapname", this.mapName);
         super.writeNbt(nbt);
-        System.out.println("writeNbt() called. mapName: " + this.mapName);
     }
 
     @Override
     public void readNbt(NbtCompound nbt){
-        System.out.println("Load data");
         super.readNbt(nbt);
-        if (nbt.contains("map_controller.mapname")) {
+        if (nbt.contains("map_controller.mapname"))
             this.mapName = nbt.getString("map_controller.mapname");
-            System.out.println("readNbt() called. mapName loaded: " + this.mapName);
-        }
     }
 
     @Nullable

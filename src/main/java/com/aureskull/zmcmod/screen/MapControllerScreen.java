@@ -20,20 +20,18 @@ public class MapControllerScreen extends HandledScreen<MapControllerScreenHandle
     }
 
     public ButtonWidget saveMapName = ButtonWidget.builder(Text.literal("Save"), button -> {
-                this.handler.updateMapName(mapNameTextField.getText());
-            })
-            .dimensions(width / 2 - 205, 20, 200, 20)
-            .build();
+
+            this.handler.updateMapName(mapNameTextField.getText());
+
+        })
+        .dimensions(width / 2 - 205, 20, 200, 20)
+        .build();
 
     @Override
     protected void init() {
         super.init();
 
-        //TODO : Faire en sorte que l'on puisse saisir un "e" car cette touche ferme le GUI
         this.mapNameTextField = new TextFieldWidget(this.textRenderer, 50,  50, 100, 20, Text.of(this.handler.getMapName()));
-        /*this.mapNameTextField.setChangedListener((newText) -> {
-            this.handler.blockEntity.mapName = newText; // Mettre à jour la valeur de mapName
-        });*/
 
         this.addDrawableChild(this.mapNameTextField);
 

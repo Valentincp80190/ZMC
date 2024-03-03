@@ -2,7 +2,6 @@ package com.aureskull.zmcmod.event;
 
 import com.aureskull.zmcmod.networking.ModMessages;
 import com.aureskull.zmcmod.screen.NoZMCMapSavedScreen;
-import com.aureskull.zmcmod.screen.TutorialScreen;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -28,7 +27,7 @@ public class ModKeyInputHandler {
                     if (exists) {
                         // Si une map ZMC existe, ouvrir le GUI
                         MinecraftClient.getInstance().execute(() -> {//Pourquoi cette ligne ? => s'assurer que le code à l'intérieur du bloc execute() est exécuté sur le thread de rendu principal de Minecraft
-                            MinecraftClient.getInstance().setScreen(new TutorialScreen(MinecraftClient.getInstance().currentScreen));
+
                         });
                     }else{
                         MinecraftClient.getInstance().execute(() -> {
