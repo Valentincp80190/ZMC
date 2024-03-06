@@ -25,6 +25,7 @@ public class ModItemGroup {
                 entries.add(ModItems.ZONESTICK);
                 entries.add(ModItems.LINKER);
                 entries.add(ModBlocks.MAP_CONTROLLER);
+                entries.add(ModBlocks.ZONE_CONTROLLER);
             }))
             .displayName(Text.translatable("itemgroup.zmc"))
             .build());

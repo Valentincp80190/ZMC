@@ -1,7 +1,6 @@
 package com.aureskull.zmcmod.block.entity;
 
-import com.aureskull.zmcmod.ZMCMod;
-import com.aureskull.zmcmod.screen.MapControllerScreenHandler;
+import com.aureskull.zmcmod.screen.mapcontroller.MapControllerScreenHandler;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;

@@ -14,6 +14,11 @@ public class ModBlockEntities {
                     FabricBlockEntityTypeBuilder.create(MapControllerBlockEntity::new,
                             ModBlocks.MAP_CONTROLLER).build());
 
+    public static final BlockEntityType<ZoneControllerBlockEntity> ZONE_CONTROLLER_BLOCK_ENTITY =
+            Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier(ZMCMod.MOD_ID, "zone_controller_be"),
+                    FabricBlockEntityTypeBuilder.create(ZoneControllerBlockEntity::new,
+                            ModBlocks.ZONE_CONTROLLER).build());
+
     public static void registerBlockEntities(){
         ZMCMod.LOGGER.info("Registering Block Entities for " + ZMCMod.MOD_ID);
     }

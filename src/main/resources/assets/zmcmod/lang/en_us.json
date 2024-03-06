@@ -3,6 +3,7 @@
   "item.zmcmod.linker": "Linker",
 
   "block.zmcmod.map_controller": "Map Controller",
+  "block.zmcmod.zone_controller": "Zone Controller",
 
 
   "itemgroup.zmctools": "Zombie MC",

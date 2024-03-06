@@ -1,18 +1,16 @@
-package com.aureskull.zmcmod.screen;
+package com.aureskull.zmcmod.screen.mapcontroller;
 
 import com.aureskull.zmcmod.block.entity.MapControllerBlockEntity;
 import com.aureskull.zmcmod.networking.ModMessages;
+import com.aureskull.zmcmod.screen.ModScreenHandlers;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.server.MinecraftServer;
 
 public class MapControllerScreenHandler extends ScreenHandler {
     public final MapControllerBlockEntity blockEntity;

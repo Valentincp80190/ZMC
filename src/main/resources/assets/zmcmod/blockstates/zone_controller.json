@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "zmcmod:block/zone_controller"
+    }
+  }
+}

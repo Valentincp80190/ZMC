@@ -1,6 +1,8 @@
 package com.aureskull.zmcmod.screen;
 
 import com.aureskull.zmcmod.ZMCMod;
+import com.aureskull.zmcmod.screen.mapcontroller.MapControllerScreenHandler;
+import com.aureskull.zmcmod.screen.zonecontroller.ZoneControllerScreenHandler;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -11,6 +13,10 @@ public class ModScreenHandlers {
     public static final ScreenHandlerType<MapControllerScreenHandler> MAP_CONTROLLER_SCREEN_HANDLER =
         Registry.register(Registries.SCREEN_HANDLER, new Identifier(ZMCMod.MOD_ID, "map_controller"),
             new ExtendedScreenHandlerType<>(MapControllerScreenHandler::new));
+
+    public static final ScreenHandlerType<ZoneControllerScreenHandler> ZONE_CONTROLLER_SCREEN_HANDLER =
+            Registry.register(Registries.SCREEN_HANDLER, new Identifier(ZMCMod.MOD_ID, "zone_controller"),
+                    new ExtendedScreenHandlerType<>(ZoneControllerScreenHandler::new));
 
     public static void registerScreenHandlers() {
         ZMCMod.LOGGER.info("Registering Screen Handlers for " + ZMCMod.MOD_ID);

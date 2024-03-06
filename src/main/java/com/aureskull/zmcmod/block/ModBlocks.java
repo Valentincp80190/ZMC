@@ -2,6 +2,7 @@ package com.aureskull.zmcmod.block;
 
 import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.custom.MapControllerBlock;
+import com.aureskull.zmcmod.block.custom.ZoneControllerBlock;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
@@ -15,6 +16,9 @@ import net.minecraft.util.Identifier;
 public class ModBlocks {
     public static final Block MAP_CONTROLLER = registerBlock("map_controller",
             new MapControllerBlock(FabricBlockSettings.copyOf(Blocks.NETHERITE_BLOCK)));
+
+    public static final Block ZONE_CONTROLLER = registerBlock("zone_controller",
+            new ZoneControllerBlock(FabricBlockSettings.copyOf(Blocks.NETHERITE_BLOCK)));
 
     private static Block registerBlock(String name, Block block){
         registerBlockItem(name, block);
