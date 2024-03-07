@@ -45,6 +45,14 @@ public class ZoneControllerScreenHandler extends ScreenHandler {
         return this.blockEntity.blue;
     }
 
+    public BlockPos getPosA(){
+        return this.blockEntity.posA;
+    }
+
+    public BlockPos getPosB(){
+        return this.blockEntity.posB;
+    }
+
     private void updateZoneColorOnServer(float newColor, String colorVariable) {
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
         buf.writeBlockPos(this.blockEntity.getPos());
