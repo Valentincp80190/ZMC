@@ -26,6 +26,8 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
         BlockPos posA = entity.posA;
         BlockPos posB = entity.posB;
 
+        if(posA == null || posB == null) return;
+
         int x1 = posA.getX();
         int x2 = posB.getX();
 
@@ -60,6 +62,9 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
 
         renderLine(entity, matrices, f_x1, f_x2, f_y1, f_y2, f_z1, f_z2);
         renderSide(entity, matrices, f_x1, f_x2, f_y1, f_y2, f_z1, f_z2);
+
+        renderCube(entity, matrices, entity.posA);
+        renderCube(entity, matrices, entity.posB);
     }
 
     public void renderLine(ZoneControllerBlockEntity entity, MatrixStack matrices, int f_x1, int f_x2, int f_y1, int f_y2, int f_z1, int f_z2){
@@ -173,11 +178,78 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
         RenderSystem.setShaderTexture(0, new Identifier("zmcmod", "test.png"));
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         RenderSystem.disableCull();
+        RenderSystem.depthMask(false);
 
         tessellator.draw();
 
         RenderSystem.enableCull();
         RenderSystem.depthFunc(GL11.GL_LEQUAL);
+        RenderSystem.depthMask(true);
+        matrices.pop();
+    }
+
+    public void renderCube(ZoneControllerBlockEntity entity, MatrixStack matrices, BlockPos blockPos){
+        matrices.push();
+        RenderSystem.enableDepthTest();
+        matrices.translate(-entity.getPos().getX(), -entity.getPos().getY(), -entity.getPos().getZ());
+
+        Matrix4f positionMatrix = matrices.peek().getPositionMatrix();
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+
+        int x = blockPos.getX();
+        int y = blockPos.getY();
+        int z = blockPos.getZ();
+
+        //Faces du cube
+        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+
+        //float alpha = .11f;
+        float alpha = .30f;
+        RenderSystem.enableBlend(); // Enable blending
+
+        buffer.vertex(positionMatrix, x, y+1, z).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, x+1, y+1, z).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, x+1, y, z).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, x, y, z).color(entity.red, entity.green, entity.blue, alpha).next();
+
+        buffer.vertex(positionMatrix, x, y+1, z+1).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, x+1, y+1, z+1).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, x+1, y, z+1).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, x, y, z+1).color(entity.red, entity.green, entity.blue, alpha).next();
+
+        buffer.vertex(positionMatrix, x+1, y+1, z+1).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, x, y+1, z+1).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, x, y+1, z).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, x+1, y+1, z).color(entity.red, entity.green, entity.blue, alpha).next();
+
+        buffer.vertex(positionMatrix, x+1, y, z+1).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, x, y, z+1).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, x, y, z).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, x+1, y, z).color(entity.red, entity.green, entity.blue, alpha).next();
+
+        buffer.vertex(positionMatrix, x+1, y+1, z+1).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, x+1, y+1, z).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, x+1, y, z).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, x+1, y, z+1).color(entity.red, entity.green, entity.blue, alpha).next();
+
+        buffer.vertex(positionMatrix, x, y+1, z+1).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, x, y+1, z).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, x, y, z).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, x, y, z+1).color(entity.red, entity.green, entity.blue, alpha).next();
+
+        RenderSystem.setShader(GameRenderer::getPositionColorTexProgram);
+        //Sans l'image, on ne peut pas afficher les faces du cube => A corriger
+        RenderSystem.setShaderTexture(0, new Identifier("zmcmod", "test.png"));
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+        RenderSystem.disableCull();
+        RenderSystem.depthMask(false);
+
+        tessellator.draw();
+
+        RenderSystem.enableCull();
+        RenderSystem.depthFunc(GL11.GL_LEQUAL);
+        RenderSystem.depthMask(true);
         matrices.pop();
     }
 }

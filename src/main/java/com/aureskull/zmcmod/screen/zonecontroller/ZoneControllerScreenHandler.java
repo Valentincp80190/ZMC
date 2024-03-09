@@ -75,6 +75,8 @@ public class ZoneControllerScreenHandler extends ScreenHandler {
                 blockEntity.blue = newColor;
                 break;
         }
+
+        blockEntity.markDirty();
     }
 
     private void updatePosOnServer(BlockPos newPos, String posVariable) {
@@ -88,10 +90,12 @@ public class ZoneControllerScreenHandler extends ScreenHandler {
     public void updatePos(BlockPos newPos, String posVariable){
         updatePosOnServer(newPos, posVariable);
 
-        if(new String(posVariable).equals("posA")){
+        if(posVariable.equals("posA")){
             blockEntity.posA = newPos;
         }else{
             blockEntity.posB = newPos;
         }
+
+        blockEntity.markDirty();
     }
 }

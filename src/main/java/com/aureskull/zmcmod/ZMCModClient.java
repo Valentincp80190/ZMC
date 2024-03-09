@@ -1,26 +1,19 @@
 package com.aureskull.zmcmod;
 
-import com.aureskull.zmcmod.block.entity.ModBlockEntities;
 import com.aureskull.zmcmod.block.entity.ZoneControllerBlockEntity;
-import com.aureskull.zmcmod.block.entity.renderer.ZoneControllerEntityRenderer;
+import com.aureskull.zmcmod.block.entity.renderer.ModBlockEntityRenderers;
+import com.aureskull.zmcmod.block.ModBlockRenderLayerMaps;
+import com.aureskull.zmcmod.client.ModColorProviders;
 import com.aureskull.zmcmod.event.ModKeyInputHandler;
 import com.aureskull.zmcmod.networking.ModMessages;
-import com.aureskull.zmcmod.screen.mapcontroller.MapControllerScreen;
-import com.aureskull.zmcmod.screen.ModScreenHandlers;
-import com.aureskull.zmcmod.screen.zonecontroller.ZoneControllerScreen;
+import com.aureskull.zmcmod.screen.ModScreens;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.render.*;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
@@ -34,29 +27,10 @@ public class ZMCModClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		ModMessages.registerS2CPackets();
 		ModKeyInputHandler.register();
-
-		HandledScreens.register(ModScreenHandlers.MAP_CONTROLLER_SCREEN_HANDLER, MapControllerScreen::new);
-		HandledScreens.register(ModScreenHandlers.ZONE_CONTROLLER_SCREEN_HANDLER, ZoneControllerScreen::new);
-
-		BlockEntityRendererFactories.register(ModBlockEntities.ZONE_CONTROLLER_BLOCK_ENTITY, ZoneControllerEntityRenderer::new);
-
-		//drawCube(null);
-		/*//For each ZoneControllerBlockEntity in the loaded client's chunk, draw a cube based on the posA and posB of the ZoneControllerBlockEntity
-		WorldRenderEvents.AFTER_ENTITIES.register(context -> {
-			Camera camera = context.camera();
-			ClientWorld world = MinecraftClient.getInstance().world;
-			PlayerEntity player = MinecraftClient.getInstance().player;
-			if (world == null || player == null) return;
-
-			ChunkPos playerChunkPos = new ChunkPos(new BlockPos(camera.getBlockPos()));
-
-			// Iterate over block entities in the player's current chunk
-			world.getChunk(playerChunkPos.x, playerChunkPos.z).getBlockEntities().values().forEach(be -> {
-				if (be instanceof ZoneControllerBlockEntity) {
-					drawCube((ZoneControllerBlockEntity) be);
-				}
-			});
-		});*/
+		ModScreens.registerScreens();
+		ModBlockEntityRenderers.registerBlockEntityRenderers();
+		ModBlockRenderLayerMaps.putBlocks();
+		ModColorProviders.registerColorProviders();
 	}
 
 	//Créer une classe ShapeRendererManager

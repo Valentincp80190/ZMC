@@ -1,5 +1,6 @@
 package com.aureskull.zmcmod.block.entity;
 
+import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.screen.zonecontroller.ZoneControllerScreenHandler;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
@@ -19,8 +20,8 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory {
-    public BlockPos posA = new BlockPos(5, -56, -4);
-    public BlockPos posB = new BlockPos(12, -53, -11);
+    public BlockPos posA = new BlockPos(pos.getX() - 5, pos.getY() + 1, pos.getZ() - 5);
+    public BlockPos posB = new BlockPos(pos.getX() + 5, pos.getY() + 5, pos.getZ() + 5);
 
     public float red = 1f;
     public float green = 1f;
@@ -75,19 +76,23 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
         if (nbt.contains("zone_controller.blue"))
             this.blue = nbt.getFloat("zone_controller.blue");
 
-        if (nbt.contains("zone_controller.posa.x") &&
-                nbt.contains("zone_controller.posa.y") &&
-                nbt.contains("zone_controller.posa.z"))
-            this.posA = new BlockPos((int)nbt.getFloat("zone_controller.posa.x"),
-                                     (int)nbt.getFloat("zone_controller.posa.y"),
-                                     (int)nbt.getFloat("zone_controller.posa.z"));
+        if (nbt.contains("zone_controller.posa.x", 99) ||
+                nbt.contains("zone_controller.posa.y", 99) ||
+                nbt.contains("zone_controller.posa.z", 99)) { // The '99' checks for any numeric tag type
+            this.posA = new BlockPos(
+                    nbt.getInt("zone_controller.posa.x"),
+                    nbt.getInt("zone_controller.posa.y"),
+                    nbt.getInt("zone_controller.posa.z"));
+        }
 
-        if (nbt.contains("zone_controller.posb.x") &&
-                nbt.contains("zone_controller.posb.y") &&
-                nbt.contains("zone_controller.posb.z"))
-            this.posB = new BlockPos((int)nbt.getFloat("zone_controller.posb.x"),
-                                     (int)nbt.getFloat("zone_controller.posb.y"),
-                                     (int)nbt.getFloat("zone_controller.posb.z"));
+        if (nbt.contains("zone_controller.posb.x", 99) ||
+                nbt.contains("zone_controller.posb.y", 99) ||
+                nbt.contains("zone_controller.posb.z", 99)) { // The '99' checks for any numeric tag type
+            this.posB = new BlockPos(
+                    nbt.getInt("zone_controller.posb.x"),
+                    nbt.getInt("zone_controller.posb.y"),
+                    nbt.getInt("zone_controller.posb.z"));
+        }
     }
 
     @Nullable
