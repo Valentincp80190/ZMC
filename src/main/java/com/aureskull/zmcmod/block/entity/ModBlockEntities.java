@@ -19,6 +19,11 @@ public class ModBlockEntities {
                     FabricBlockEntityTypeBuilder.create(ZoneControllerBlockEntity::new,
                             ModBlocks.ZONE_CONTROLLER).build());
 
+    public static final BlockEntityType<SmallZombieDoorwayBlockEntity> SMALL_ZOMBIE_DOORWAY_BLOCK_ENTITY =
+            Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier(ZMCMod.MOD_ID, "small_zombie_doorway_be"),
+                    FabricBlockEntityTypeBuilder.create(SmallZombieDoorwayBlockEntity::new,
+                            ModBlocks.SMALL_ZOMBIE_DOORWAY).build());
+
     public static void registerBlockEntities(){
         ZMCMod.LOGGER.info("Registering Block Entities for " + ZMCMod.MOD_ID);
     }

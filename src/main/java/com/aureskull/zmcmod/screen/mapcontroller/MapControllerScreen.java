@@ -31,6 +31,7 @@ public class MapControllerScreen extends HandledScreen<MapControllerScreenHandle
         super.init();
 
         this.mapNameTextField = new TextFieldWidget(this.textRenderer, width/2 - 60,  51, 100, 18, Text.of(this.handler.getMapName()));
+        mapNameTextField.setText(String.valueOf(this.handler.getMapName()));
 
         this.addDrawableChild(this.mapNameTextField);
 

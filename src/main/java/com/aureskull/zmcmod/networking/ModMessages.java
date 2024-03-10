@@ -3,6 +3,7 @@ package com.aureskull.zmcmod.networking;
 import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.networking.packet.ExampleC2SPacket;
 import com.aureskull.zmcmod.networking.packet.ExistZMCMapC2SPacket;
+import com.aureskull.zmcmod.networking.packet.TriggerInteractionC2SPacket;
 import com.aureskull.zmcmod.networking.packet.mapcontroller.MapControllerUpdateMapNameC2SPacket;
 import com.aureskull.zmcmod.networking.packet.zonecontroller.*;
 import io.netty.buffer.Unpooled;
@@ -20,6 +21,9 @@ public class ModMessages {
     public static final Identifier ZONE_CONTROLLER_UPDATE_ZONE_COLOR = new Identifier(ZMCMod.MOD_ID, "zonecontroller_update_color");
     public static final Identifier ZONE_CONTROLLER_UPDATE_POS = new Identifier(ZMCMod.MOD_ID, "zonecontroller_update_pos");
 
+    //INTERACTION
+    public static final Identifier TRIGGER_INTERACTION = new Identifier(ZMCMod.MOD_ID, "trigger_interaction");
+
 
     //OTHER
     public static final Identifier EXAMPLE_ID = new Identifier(ZMCMod.MOD_ID, "example");
@@ -33,6 +37,8 @@ public class ModMessages {
 
         ServerPlayNetworking.registerGlobalReceiver(ZONE_CONTROLLER_UPDATE_ZONE_COLOR, ZoneControllerUpdateZoneColorC2SPacket::receive);
         ServerPlayNetworking.registerGlobalReceiver(ZONE_CONTROLLER_UPDATE_POS, ZoneControllerUpdatePosC2SPacket::receive);
+
+        ServerPlayNetworking.registerGlobalReceiver(TRIGGER_INTERACTION, TriggerInteractionC2SPacket::receive);
     }
 
     public static void registerS2CPackets(){

@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "zmcmod:block/small_zombie_doorway", "y": 0 },
+    "facing=south": { "model": "zmcmod:block/small_zombie_doorway", "y": 180 },
+    "facing=west": { "model": "zmcmod:block/small_zombie_doorway", "y": 270 },
+    "facing=east": { "model": "zmcmod:block/small_zombie_doorway", "y": 90 }
+  }
+}

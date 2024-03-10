@@ -18,6 +18,9 @@ public class ZMCMod implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		//LOGGER.info("Hello Fabric world!");
+		//TODO: Retirer le droit de drop des items lorsqu'une game est en cours (pour les joueurs qui jouent dans la map bien sûr).
+		//TODO: Faire en sorte qu'un joueur ne perde pas son inventaire lorsqu'une game est en cours (pour les joueurs qui jouent dans la map toujours).
+
 		ModItemGroup.registerItemGroups();
 		ModItems.registerModItems();
 		ModBlockEntities.registerBlockEntities();

@@ -4,11 +4,13 @@
 
   "block.zmcmod.map_controller": "Map Controller",
   "block.zmcmod.zone_controller": "Zone Controller",
+  "block.zmcmod.small_zombie_doorway": "Small Zombie Doorway",
 
 
   "itemgroup.zmctools": "Zombie MC",
 
 
   "key.category.zmcmod": "ZMC",
-  "key.zmcmod.openmapeditor": "Open Map Editor"
+  "key.zmcmod.openmapeditor": "Open Map Editor",
+  "key.zmcmod.interact": "Interact"
 }

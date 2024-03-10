@@ -3,12 +3,14 @@ package com.aureskull.zmcmod;
 import com.aureskull.zmcmod.block.entity.ZoneControllerBlockEntity;
 import com.aureskull.zmcmod.block.entity.renderer.ModBlockEntityRenderers;
 import com.aureskull.zmcmod.block.ModBlockRenderLayerMaps;
+import com.aureskull.zmcmod.client.MessageHudOverlay;
 import com.aureskull.zmcmod.client.ModColorProviders;
 import com.aureskull.zmcmod.event.ModKeyInputHandler;
 import com.aureskull.zmcmod.networking.ModMessages;
 import com.aureskull.zmcmod.screen.ModScreens;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
@@ -31,6 +33,7 @@ public class ZMCModClient implements ClientModInitializer {
 		ModBlockEntityRenderers.registerBlockEntityRenderers();
 		ModBlockRenderLayerMaps.putBlocks();
 		ModColorProviders.registerColorProviders();
+		HudRenderCallback.EVENT.register(new MessageHudOverlay());
 	}
 
 	//Créer une classe ShapeRendererManager

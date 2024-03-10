@@ -204,9 +204,8 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
         //Faces du cube
         buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
-        //float alpha = .11f;
         float alpha = .30f;
-        RenderSystem.enableBlend(); // Enable blending
+        RenderSystem.enableBlend();
 
         buffer.vertex(positionMatrix, x, y+1, z).color(entity.red, entity.green, entity.blue, alpha).next();
         buffer.vertex(positionMatrix, x+1, y+1, z).color(entity.red, entity.green, entity.blue, alpha).next();
