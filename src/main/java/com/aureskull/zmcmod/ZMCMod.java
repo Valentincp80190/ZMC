@@ -6,6 +6,7 @@ import com.aureskull.zmcmod.item.ModItemGroup;
 import com.aureskull.zmcmod.item.ModItems;
 import com.aureskull.zmcmod.networking.ModMessages;
 import com.aureskull.zmcmod.screen.ModScreenHandlers;
+import com.aureskull.zmcmod.sound.ModSounds;
 import net.fabricmc.api.ModInitializer;
 
 import org.slf4j.Logger;
@@ -27,5 +28,6 @@ public class ZMCMod implements ModInitializer {
 		ModScreenHandlers.registerScreenHandlers();
 		ModBlocks.registerModBlocks();
 		ModMessages.registerC2SPackets();
+		ModSounds.registerModSounds();
 	}
 }

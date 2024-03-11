@@ -12,5 +12,9 @@
 
   "key.category.zmcmod": "ZMC",
   "key.zmcmod.openmapeditor": "Open Map Editor",
-  "key.zmcmod.interact": "Interact"
+  "key.zmcmod.interact": "Interact",
+
+
+
+  "sounds.zmcmod.rebuild_door": "Rebuild Door"
 }

@@ -20,6 +20,7 @@ public class ModKeyInputHandler {
 
     public static KeyBinding OPEN_MAP_EDITOR_GUI;
     public static KeyBinding INTERACT;
+    private static long lastActionTime = 0;
 
     public static void registerKeyInputs(){
         ClientTickEvents.START_CLIENT_TICK.register(client -> {
@@ -46,9 +47,14 @@ public class ModKeyInputHandler {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (INTERACT.wasPressed()) {
                 if (client.player != null) {
-                    PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-                    buf.writeBlockPos(client.player.getBlockPos());
-                    ClientPlayNetworking.send(ModMessages.TRIGGER_INTERACTION, buf);
+                    long currentTime = System.currentTimeMillis();
+                    if (currentTime - lastActionTime >= 1000) {
+                        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+                        buf.writeBlockPos(client.player.getBlockPos());
+                        ClientPlayNetworking.send(ModMessages.TRIGGER_INTERACTION, buf);
+
+                        lastActionTime = currentTime;
+                    }
                 }
             }
         });

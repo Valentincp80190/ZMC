@@ -27,37 +27,14 @@ public class TriggerInteractionC2SPacket {
         BlockPos playerBlockPos = buf.readBlockPos();
 
         server.execute(() -> {
-            boolean found = false;
-
             Direction playerDirection = InteractionHelper.getLookDirection(player);
 
             BlockPos checkPos = playerBlockPos.offset(playerDirection);
             BlockEntity blockEntity = world.getBlockEntity(checkPos);
 
             if (blockEntity instanceof SmallZombieDoorwayBlockEntity) {
-                found = true;
                 ((SmallZombieDoorwayBlockEntity) blockEntity).rebuild();
                 player.sendMessage(Text.literal("nbr planks : " + ((SmallZombieDoorwayBlockEntity) blockEntity).plank), false);
-            }
-            /*boolean found = false;
-            Direction[] directions = {Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
-
-            for (Direction direction : directions) {
-                BlockPos checkPos = playerBlockPos.offset(direction);
-                BlockEntity blockEntity = world.getBlockEntity(checkPos);
-
-                if (blockEntity instanceof SmallZombieDoorwayBlockEntity) {
-                    // An instance of SmallZombieDoorwayBlockEntity was found within one block distance in one of the cardinal directions
-                    found = true;
-                    // Perform your interaction logic here...
-                    player.sendMessage(Text.literal("Repair"), false);
-                    //send packet to client to display message
-                    break; // Stop checking further if we've found an instance
-                }
-            }*/
-
-            if (!found) {
-                player.sendMessage(Text.literal("Nothing found"), false);
             }
         });
     }
