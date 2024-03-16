@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "zmcmod:block/zombie_spawner"
+    }
+  }
+}

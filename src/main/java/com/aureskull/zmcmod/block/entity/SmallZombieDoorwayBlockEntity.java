@@ -83,6 +83,8 @@ public class SmallZombieDoorwayBlockEntity extends BlockEntity implements Extend
         if(world.isClient()) {
             return;
         }
+
+        //Show if the player can rebuild the barrier
         if(plank < MAX_PLANK){
             Direction facing = state.get(SmallZombieDoorwayBlock.FACING);
             Box searchArea = getSearchArea(pos, facing);
@@ -92,7 +94,6 @@ public class SmallZombieDoorwayBlockEntity extends BlockEntity implements Extend
                 if(InteractionHelper.isFacingInteractable(player, facing) &&
                     Math.abs(player.getY() - pos.getY()) <= 1.5) {
                         MessageHudOverlay.setMessage("Hold [" + ModKeyInputHandler.INTERACT.getBoundKeyLocalizedText().getLiteralString() + "] to Rebuild Barrier", 100);
-
                 }
             }
         }
@@ -126,9 +127,10 @@ public class SmallZombieDoorwayBlockEntity extends BlockEntity implements Extend
             markDirty();
 
             assert world != null;
-            if (!world.isClient()) {
-                ZMCMod.LOGGER.info("Playsound");
-                world.playSound(null, pos, ModSounds.REBUILD_DOOR, SoundCategory.BLOCKS, 1.0f, 1.0f);
+            if (!world.isClient) {
+                world.setBlockState(pos, world.getBlockState(pos).with(SmallZombieDoorwayBlock.PLANKS, Integer.valueOf(plank)), 3);
+                world.playSound(null, pos, ModSounds.REBUILD_DOOR, SoundCategory.BLOCKS, 0.5f, 1.0f);
+                world.playSound(null, pos, ModSounds.REBUILD_DOOR_MONEY, SoundCategory.BLOCKS, 0.5f, 1.0f);
             }
         }
     }

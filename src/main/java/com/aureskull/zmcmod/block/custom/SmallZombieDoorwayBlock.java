@@ -9,6 +9,7 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
@@ -24,24 +25,26 @@ import net.minecraft.state.StateManager.Builder;
 public class SmallZombieDoorwayBlock extends BlockWithEntity implements BlockEntityProvider {
     public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
 
+    public static final IntProperty PLANKS = IntProperty.of("planks", 0, 6);
+
     public static final MapCodec<SmallZombieDoorwayBlock> CODEC = SmallZombieDoorwayBlock.createCodec(SmallZombieDoorwayBlock::new);
 
     public SmallZombieDoorwayBlock(Settings settings){
         super(settings);
-        setDefaultState(this.stateManager.getDefaultState().with(FACING, Direction.NORTH));
+        setDefaultState(this.stateManager.getDefaultState().with(FACING, Direction.NORTH).with(PLANKS, 0));
     }
 
     @Override
     protected void appendProperties(Builder<Block, BlockState> builder) {
         super.appendProperties(builder);
         // Add the FACING property to the block's state
-        builder.add(FACING);
+        builder.add(FACING, PLANKS);
     }
 
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
         // Set the block orientation based on the direction the player is facing
-        return this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing().getOpposite());
+        return this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing().getOpposite()).with(PLANKS, 0);
     }
 
     @Override

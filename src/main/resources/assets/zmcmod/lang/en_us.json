@@ -5,6 +5,7 @@
   "block.zmcmod.map_controller": "Map Controller",
   "block.zmcmod.zone_controller": "Zone Controller",
   "block.zmcmod.small_zombie_doorway": "Small Zombie Doorway",
+  "block.zmcmod.zombie_spawner": "Zombie Spawner",
 
 
   "itemgroup.zmctools": "Zombie MC",

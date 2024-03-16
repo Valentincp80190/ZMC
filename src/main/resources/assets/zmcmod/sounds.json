@@ -2,9 +2,13 @@
   "rebuild_door": {
     "subtitle": "sounds.zmcmod.rebuild_door",
     "sounds": [
-      "zmcmod:rebuild_door/rebuild_door_0",
-      "zmcmod:rebuild_door/rebuild_door_1",
-      "zmcmod:rebuild_door/rebuild_door_2"
+      "zmcmod:rebuild_door/rebuild_door"
+    ]
+  },
+  "rebuild_door_money": {
+    "subtitle": "sounds.zmcmod.rebuild_door_money",
+    "sounds": [
+      "zmcmod:rebuild_door/rebuild_door_money"
     ]
   }
 }
