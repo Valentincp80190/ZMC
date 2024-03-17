@@ -35,5 +35,6 @@ public class ZMCModClient implements ClientModInitializer {
 		EntityModelLayerRegistry.registerModelLayer(ModModelLayers.STANDING_ZOMBIE, StandingZombieModel::getTexturedModelData);
 
 		//ctrl e + h
+		//Si un bug dans le debug arrive, il faut pull le projet dans un nouveau dossier.
 	}
 }

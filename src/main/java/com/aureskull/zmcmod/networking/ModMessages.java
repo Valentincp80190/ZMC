@@ -3,14 +3,21 @@ package com.aureskull.zmcmod.networking;
 import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.networking.packet.ExampleC2SPacket;
 import com.aureskull.zmcmod.networking.packet.ExistZMCMapC2SPacket;
+import com.aureskull.zmcmod.networking.packet.RemoveLinkS2CPacket;
 import com.aureskull.zmcmod.networking.packet.TriggerInteractionC2SPacket;
 import com.aureskull.zmcmod.networking.packet.mapcontroller.MapControllerUpdateMapNameC2SPacket;
 import com.aureskull.zmcmod.networking.packet.zonecontroller.*;
 import io.netty.buffer.Unpooled;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class ModMessages {
 
@@ -30,6 +37,8 @@ public class ModMessages {
     public static final Identifier EXIST_ZMC_MAP_CHECKER = new Identifier(ZMCMod.MOD_ID, "existzmcmapchecker");
     public static final Identifier EXIST_ZMC_MAP_CHECKER_RESPONSE = new Identifier(ZMCMod.MOD_ID, "existzmcmapchecker_response");
 
+    public static final Identifier REMOVE_LINK_FROM_BLOCK_ENTITY = new Identifier(ZMCMod.MOD_ID, "remove_link_from_block_entity");
+
     public static void registerC2SPackets(){
         ServerPlayNetworking.registerGlobalReceiver(EXAMPLE_ID, ExampleC2SPacket::receive);
         ServerPlayNetworking.registerGlobalReceiver(EXIST_ZMC_MAP_CHECKER, ExistZMCMapC2SPacket::receive);
@@ -42,12 +51,22 @@ public class ModMessages {
     }
 
     public static void registerS2CPackets(){
-
+        ClientPlayNetworking.registerGlobalReceiver(REMOVE_LINK_FROM_BLOCK_ENTITY, RemoveLinkS2CPacket::receive);
     }
 
     public static void sendExistZMCMapCheckerResponse(ServerPlayerEntity player, boolean exists) {
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
         buf.writeBoolean(exists);
         ServerPlayNetworking.send(player, EXIST_ZMC_MAP_CHECKER_RESPONSE, buf);
+    }
+
+    public static void sendRemoveLinkPacket(World world, BlockPos blockPos) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeBlockPos(blockPos);
+
+        // Send this packet to all players in the world
+        PlayerLookup.tracking((ServerWorld) world, blockPos).forEach(player -> {
+            ServerPlayNetworking.send(player, ModMessages.REMOVE_LINK_FROM_BLOCK_ENTITY, buf);
+        });
     }
 }

@@ -3,9 +3,7 @@ package com.aureskull.zmcmod.block.custom;
 import com.aureskull.zmcmod.block.entity.ModBlockEntities;
 import com.aureskull.zmcmod.block.entity.SmallZombieDoorwayBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZombieSpawnerBlockEntity;
-import com.aureskull.zmcmod.block.entity.ZoneControllerBlockEntity;
-import com.aureskull.zmcmod.entity.ModEntities;
-import com.aureskull.zmcmod.entity.custom.StandingZombieEntity;
+import com.aureskull.zmcmod.networking.ModMessages;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;
@@ -14,17 +12,7 @@ import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtHelper;
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -49,7 +37,7 @@ public class ZombieSpawnerBlock extends BlockWithEntity implements BlockEntityPr
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state){
-        return new ZoneControllerBlockEntity(pos, state);
+        return new ZombieSpawnerBlockEntity(pos, state);
     }
 
     @Nullable
@@ -60,6 +48,30 @@ public class ZombieSpawnerBlock extends BlockWithEntity implements BlockEntityPr
     }
 
     @Override
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        System.out.println("onBreak called, isClient: " + world.isClient());
+
+        if (!world.isClient()) { // Server side
+            BlockEntity be = world.getBlockEntity(pos);
+            if (be instanceof ZombieSpawnerBlockEntity) {
+                ZombieSpawnerBlockEntity spawnerEntity = (ZombieSpawnerBlockEntity) be;
+                BlockPos linkedDoorwayPos = spawnerEntity.getLinkedDoorway();
+                if (linkedDoorwayPos != null) {
+                    BlockEntity linkedBE = world.getBlockEntity(linkedDoorwayPos);
+                    if (linkedBE instanceof SmallZombieDoorwayBlockEntity) {
+                        ((SmallZombieDoorwayBlockEntity) linkedBE).setLinkedSpawner(null);
+                        linkedBE.markDirty();
+
+                        ModMessages.sendRemoveLinkPacket(world, linkedDoorwayPos);
+                    }
+                }
+            }
+        }
+        super.onBreak(world, pos, state, player);
+        return state;
+    }
+
+    /*@Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (!world.isClient) {
             BlockEntity entity = world.getBlockEntity(pos);
@@ -69,7 +81,7 @@ public class ZombieSpawnerBlock extends BlockWithEntity implements BlockEntityPr
             }
         }
         return ActionResult.PASS;
-    }
+    }*/
 
     /*@Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {

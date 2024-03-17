@@ -2,11 +2,14 @@ package com.aureskull.zmcmod.block.custom;
 
 import com.aureskull.zmcmod.block.entity.ModBlockEntities;
 import com.aureskull.zmcmod.block.entity.SmallZombieDoorwayBlockEntity;
+import com.aureskull.zmcmod.block.entity.ZombieSpawnerBlockEntity;
+import com.aureskull.zmcmod.networking.ModMessages;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.IntProperty;
@@ -83,5 +86,27 @@ public class SmallZombieDoorwayBlock extends BlockWithEntity implements BlockEnt
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext ctx) {
         return VoxelShapes.cuboid(0.0D, 0.0D, 0.0D, 1.0f, 2.0f, 1.0f);
+    }
+
+    @Override
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        if (!world.isClient) { // Server side
+            BlockEntity be = world.getBlockEntity(pos);
+            if (be instanceof SmallZombieDoorwayBlockEntity) {
+                SmallZombieDoorwayBlockEntity smallZombieDoorway = (SmallZombieDoorwayBlockEntity) be;
+                BlockPos linkedSpawnerPos = smallZombieDoorway.getLinkedSpawner();
+                if (linkedSpawnerPos != null) {
+                    BlockEntity linkedBE = world.getBlockEntity(linkedSpawnerPos);
+                    if (linkedBE instanceof ZombieSpawnerBlockEntity) {
+                        ((ZombieSpawnerBlockEntity) linkedBE).setLinkedDoorway(null);
+                        linkedBE.markDirty();
+
+                        ModMessages.sendRemoveLinkPacket(world, linkedSpawnerPos);
+                    }
+                }
+            }
+        }
+        super.onBreak(world, pos, state, player);
+        return state;
     }
 }

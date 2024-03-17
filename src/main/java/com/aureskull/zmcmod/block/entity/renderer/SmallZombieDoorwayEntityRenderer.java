@@ -9,9 +9,11 @@ import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 
 public class SmallZombieDoorwayEntityRenderer  implements BlockEntityRenderer<SmallZombieDoorwayBlockEntity> {
+    //TODO : Dessiner une texture de 1*3 pixels qui représente un fil
 
     public SmallZombieDoorwayEntityRenderer(BlockEntityRendererFactory.Context context){
 
@@ -20,44 +22,32 @@ public class SmallZombieDoorwayEntityRenderer  implements BlockEntityRenderer<Sm
     @Override
     public void render(SmallZombieDoorwayBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
         if(entity.getLinkedSpawner() != null){
-            ZMCMod.LOGGER.info("DISPLAY LINE");
             renderLine(entity.getPos(), entity.getLinkedSpawner(), matrices);
         }
     }
 
     private void renderLine(BlockPos posA, BlockPos posB, MatrixStack matrices) {
-        matrices.push();
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         RenderSystem.enableDepthTest();
-        matrices.translate(-posA.getX(), -posA.getY(), -posA.getZ());
+
+        double deltaX = posB.getX() - posA.getX();
+        double deltaY = posB.getY() - posA.getY();
+        double deltaZ = posB.getZ() - posA.getZ();
 
         Matrix4f positionMatrix = matrices.peek().getPositionMatrix();
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-
-        int x1 = posA.getX();
-        int x2 = posB.getX();
-
-        int y1 = posA.getY();
-        int y2 = posB.getY();
-
-        int z1 = posA.getZ();
-        int z2 = posB.getZ();
+        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 
         buffer.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
 
-        RenderSystem.setShader(GameRenderer::getPositionColorTexProgram);
+        float red = 1.0F;
+        float green = 0.0F;
+        float blue = 0.0F;
+        float alpha = 1.0F;
 
-        buffer.vertex(positionMatrix, x1, y1, z1).color(1f, 0f, 0f, 1f).next();
-        buffer.vertex(positionMatrix, x2, y2, z2).color(0f, 1f, 0f, 1f).next();
+        buffer.vertex(positionMatrix, 0.5F, 1F, 0.5F).color(red, green, blue, alpha).next();
+        buffer.vertex(positionMatrix, (float) deltaX + 0.5F, (float) deltaY + 0.5F, (float) deltaZ + 0.5F).color(red, green, blue, alpha).next();
 
-        //Sans l'image, on ne peut pas afficher les faces du cube => A corriger
-        RenderSystem.setShaderTexture(0, new Identifier("zmcmod", "test.png"));
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-        RenderSystem.disableCull();
-
-        tessellator.draw();
-
-        RenderSystem.enableCull();
-        matrices.pop();
+        Tessellator.getInstance().draw();
     }
+
 }

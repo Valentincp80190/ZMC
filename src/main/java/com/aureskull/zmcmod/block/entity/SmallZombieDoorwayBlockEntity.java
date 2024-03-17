@@ -5,9 +5,9 @@ import com.aureskull.zmcmod.block.custom.SmallZombieDoorwayBlock;
 import com.aureskull.zmcmod.client.InteractionHelper;
 import com.aureskull.zmcmod.client.MessageHudOverlay;
 import com.aureskull.zmcmod.event.ModKeyInputHandler;
-import com.aureskull.zmcmod.screen.mapcontroller.MapControllerScreenHandler;
 import com.aureskull.zmcmod.sound.ModSounds;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -21,12 +21,10 @@ import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,7 +43,7 @@ public class SmallZombieDoorwayBlockEntity extends BlockEntity implements Extend
     @Override
     public void markDirty() {
         super.markDirty();
-        world.updateListeners(pos, getCachedState(), getCachedState(), 3);
+        world.updateListeners(pos, getCachedState(), getCachedState(), 3); //sends an update to clients.
     }
 
     @Override
@@ -147,7 +145,7 @@ public class SmallZombieDoorwayBlockEntity extends BlockEntity implements Extend
 
     public void setLinkedSpawner(BlockPos pos) {
         this.linkedSpawnerPos = pos;
-        markDirty();
+        this.markDirty();
     }
 
     public BlockPos getLinkedSpawner() {
