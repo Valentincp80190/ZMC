@@ -2,6 +2,8 @@ package com.aureskull.zmcmod;
 
 import com.aureskull.zmcmod.block.ModBlocks;
 import com.aureskull.zmcmod.block.entity.ModBlockEntities;
+import com.aureskull.zmcmod.entity.ModEntities;
+import com.aureskull.zmcmod.entity.custom.StandingZombieEntity;
 import com.aureskull.zmcmod.item.ModItemGroup;
 import com.aureskull.zmcmod.item.ModItems;
 import com.aureskull.zmcmod.networking.ModMessages;
@@ -9,6 +11,7 @@ import com.aureskull.zmcmod.screen.ModScreenHandlers;
 import com.aureskull.zmcmod.sound.ModSounds;
 import net.fabricmc.api.ModInitializer;
 
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,5 +33,8 @@ public class ZMCMod implements ModInitializer {
 		ModBlocks.registerModBlocks();
 		ModMessages.registerC2SPackets();
 		ModSounds.registerModSounds();
+
+		ModEntities.registerModEntities();
+		FabricDefaultAttributeRegistry.register(ModEntities.STANDING_ZOMBIE, StandingZombieEntity.createStandingZombieAttributes());
 	}
 }

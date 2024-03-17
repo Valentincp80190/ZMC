@@ -10,5 +10,6 @@ public class ModBlockEntityRenderers {
         ZMCMod.LOGGER.info("Registering Block Entity Renderer for " + ZMCMod.MOD_ID);
 
         BlockEntityRendererFactories.register(ModBlockEntities.ZONE_CONTROLLER_BLOCK_ENTITY, ZoneControllerEntityRenderer::new);
+        BlockEntityRendererFactories.register(ModBlockEntities.SMALL_ZOMBIE_DOORWAY_BLOCK_ENTITY, SmallZombieDoorwayEntityRenderer::new);
     }
 }

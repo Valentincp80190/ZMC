@@ -10,5 +10,31 @@
     "sounds": [
       "zmcmod:rebuild_door/rebuild_door_money"
     ]
+  },
+  "standing_zombie_death": {
+    "subtitle": "sounds.zmcmod.standing_zombie_death",
+    "sounds": [
+      "zmcmod:standing_zombie/death/death_0",
+      "zmcmod:standing_zombie/death/death_1",
+      "zmcmod:standing_zombie/death/death_2",
+      "zmcmod:standing_zombie/death/death_3",
+      "zmcmod:standing_zombie/death/death_4",
+      "zmcmod:standing_zombie/death/death_5",
+      "zmcmod:standing_zombie/death/death_6",
+      "zmcmod:standing_zombie/death/death_7",
+      "zmcmod:standing_zombie/death/death_8",
+      "zmcmod:standing_zombie/death/death_9"
+    ]
+  },
+  "standing_zombie_amb": {
+    "subtitle": "sounds.zmcmod.standing_zombie_amb",
+    "sounds": [
+      "zmcmod:standing_zombie/amb/amb_0",
+      "zmcmod:standing_zombie/amb/amb_1",
+      "zmcmod:standing_zombie/amb/amb_2",
+      "zmcmod:standing_zombie/amb/amb_3",
+      "zmcmod:standing_zombie/amb/amb_4",
+      "zmcmod:standing_zombie/amb/amb_5"
+    ]
   }
 }

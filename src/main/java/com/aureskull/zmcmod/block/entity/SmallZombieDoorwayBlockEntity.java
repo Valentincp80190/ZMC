@@ -13,6 +13,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtHelper;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
@@ -34,6 +35,8 @@ import java.util.List;
 public class SmallZombieDoorwayBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory {
     public final int MAX_PLANK = 6;
     public int plank = 0;
+
+    private BlockPos linkedSpawnerPos;
 
     public SmallZombieDoorwayBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.SMALL_ZOMBIE_DOORWAY_BLOCK_ENTITY, pos, state);
@@ -58,14 +61,21 @@ public class SmallZombieDoorwayBlockEntity extends BlockEntity implements Extend
     @Override
     protected void writeNbt(NbtCompound nbt){
         nbt.putInt("small_zombie_doorway.plank", plank);
+        if (linkedSpawnerPos != null) {
+            nbt.put("linked_spawner", NbtHelper.fromBlockPos(linkedSpawnerPos));
+        }
         super.writeNbt(nbt);
     }
 
     @Override
     public void readNbt(NbtCompound nbt){
         super.readNbt(nbt);
+
         if (nbt.contains("small_zombie_doorway.plank"))
             this.plank = nbt.getInt("small_zombie_doorway.plank");
+        if (nbt.contains("linked_spawner")) {
+            this.linkedSpawnerPos = NbtHelper.toBlockPos(nbt.getCompound("linked_spawner"));
+        }
     }
 
     @Nullable
@@ -133,5 +143,14 @@ public class SmallZombieDoorwayBlockEntity extends BlockEntity implements Extend
                 world.playSound(null, pos, ModSounds.REBUILD_DOOR_MONEY, SoundCategory.BLOCKS, 0.5f, 1.0f);
             }
         }
+    }
+
+    public void setLinkedSpawner(BlockPos pos) {
+        this.linkedSpawnerPos = pos;
+        markDirty();
+    }
+
+    public BlockPos getLinkedSpawner() {
+        return this.linkedSpawnerPos;
     }
 }

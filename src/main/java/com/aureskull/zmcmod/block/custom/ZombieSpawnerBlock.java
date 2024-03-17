@@ -1,7 +1,11 @@
 package com.aureskull.zmcmod.block.custom;
 
 import com.aureskull.zmcmod.block.entity.ModBlockEntities;
+import com.aureskull.zmcmod.block.entity.SmallZombieDoorwayBlockEntity;
+import com.aureskull.zmcmod.block.entity.ZombieSpawnerBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZoneControllerBlockEntity;
+import com.aureskull.zmcmod.entity.ModEntities;
+import com.aureskull.zmcmod.entity.custom.StandingZombieEntity;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;
@@ -57,21 +61,33 @@ public class ZombieSpawnerBlock extends BlockWithEntity implements BlockEntityPr
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (!world.isClient) {
+            BlockEntity entity = world.getBlockEntity(pos);
+            if (entity instanceof ZombieSpawnerBlockEntity) {
+                ((ZombieSpawnerBlockEntity) entity).spawnZombie(pos);
+                return ActionResult.SUCCESS;
+            }
+        }
+        return ActionResult.PASS;
+    }
+
+    /*@Override
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (!world.isClient && hand == Hand.MAIN_HAND) {
             // Call the summon method when the player right-clicks the block
             summon(world, pos);
             return ActionResult.SUCCESS;
         }
         return ActionResult.CONSUME;
-    }
+    }*/
 
-    public void summon(World world, BlockPos spawnerPos) {
+    /*public void summon(World world, BlockPos spawnerPos) {
         if (!world.isClient) {
             // Define the spawn position (just above the spawner block)
             BlockPos spawnPos = spawnerPos.up();
 
             // Create a new zombie entity
-            ZombieEntity zombie = EntityType.ZOMBIE.create(world);
+            StandingZombieEntity zombie = ModEntities.STANDING_ZOMBIE.create(world);
             if (zombie != null) {
                 // Set the zombie's position
                 zombie.refreshPositionAndAngles((double)spawnPos.getX() + 0.5, (double)spawnPos.getY(), (double)spawnPos.getZ() + 0.5, 0.0F, 0.0F);
@@ -81,11 +97,11 @@ public class ZombieSpawnerBlock extends BlockWithEntity implements BlockEntityPr
                 NbtCompound compound = zombie.writeNbt(new NbtCompound());
                 compound.put("BlockPosToGo", NbtHelper.fromBlockPos(targetPos));
 
-                zombie.readNbt(compound); 
+                zombie.readNbt(compound);
                 world.spawnEntity(zombie);
 
                 world.playSound(null, spawnPos, SoundEvents.ENTITY_ZOMBIE_AMBIENT, SoundCategory.HOSTILE, 1.0F, 1.0F);
             }
         }
-    }
+    }*/
 }

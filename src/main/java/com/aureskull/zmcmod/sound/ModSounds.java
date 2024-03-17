@@ -11,12 +11,17 @@ public class ModSounds {
     public static final SoundEvent REBUILD_DOOR_MONEY = registerSoundEvent("rebuild_door_money");
 
 
+    //Standing zombie
+    public static final SoundEvent STANDING_ZOMBIE_DEATH= registerSoundEvent("standing_zombie_death");
+    public static final SoundEvent STANDING_ZOMBIE_AMB= registerSoundEvent("standing_zombie_amb");
+
+
     private static SoundEvent registerSoundEvent(String name){
         Identifier id = new Identifier(ZMCMod.MOD_ID, name);
         return Registry.register(Registries.SOUND_EVENT, id, SoundEvent.of(id));
     }
 
     public static void registerModSounds(){
-        ZMCMod.LOGGER.info("Registering MobSounds for " + ZMCMod.MOD_ID);
+        ZMCMod.LOGGER.info("Registering ModSounds for " + ZMCMod.MOD_ID);
     }
 }
