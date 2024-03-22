@@ -166,7 +166,7 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
         markDirty();
     }
 
-    public List<BlockPos> getLinkedDoorways() {
+    public List<BlockPos> getLinkedDoorway() {
         return linkedDoorways;
     }
 
@@ -180,6 +180,20 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
                 existingMapControllerBE.markDirty();
 
                 ModMessages.sendRemoveLinkPacket(world, existingMapController);
+            }
+        }
+    }
+
+    public void unlinkAllExistingDoorway(World world) {
+        List<BlockPos> existingDoorway = getLinkedDoorway();
+
+        for(BlockPos doorway : existingDoorway) {
+            BlockEntity doorwayBE = world.getBlockEntity(doorway);
+            if (doorwayBE instanceof SmallZombieDoorwayBlockEntity) {
+                ((SmallZombieDoorwayBlockEntity) doorwayBE).setLinkedZonePos(null);
+                doorwayBE.markDirty();
+
+                ModMessages.sendRemoveZoneLinkFromDoorwayPacket(world, doorway);
             }
         }
     }

@@ -77,16 +77,8 @@ public class ZoneControllerBlock extends BlockWithEntity implements BlockEntityP
             BlockEntity be = world.getBlockEntity(pos);
             if (be instanceof ZoneControllerBlockEntity) {
                 ZoneControllerBlockEntity zoneControllerBE = (ZoneControllerBlockEntity) be;
-                BlockPos linkedMapControllerPos = zoneControllerBE.getLinkedMapController();
-                if (linkedMapControllerPos != null) {
-                    BlockEntity linkedBE = world.getBlockEntity(linkedMapControllerPos);
-                    if (linkedBE instanceof MapControllerBlockEntity) {
-                        ((MapControllerBlockEntity) linkedBE).setLinkedZoneController(null);
-                        linkedBE.markDirty();
-
-                        ModMessages.sendRemoveLinkPacket(world, linkedMapControllerPos);
-                    }
-                }
+                zoneControllerBE.unlinkExistingMapController(world);
+                zoneControllerBE.unlinkAllExistingDoorway(world);
             }
         }
         super.onBreak(world, pos, state, player);

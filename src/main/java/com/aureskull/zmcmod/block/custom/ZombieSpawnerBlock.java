@@ -53,16 +53,8 @@ public class ZombieSpawnerBlock extends BlockWithEntity implements BlockEntityPr
             BlockEntity be = world.getBlockEntity(pos);
             if (be instanceof ZombieSpawnerBlockEntity) {
                 ZombieSpawnerBlockEntity spawnerEntity = (ZombieSpawnerBlockEntity) be;
-                BlockPos linkedDoorwayPos = spawnerEntity.getLinkedDoorway();
-                if (linkedDoorwayPos != null) {
-                    BlockEntity linkedBE = world.getBlockEntity(linkedDoorwayPos);
-                    if (linkedBE instanceof SmallZombieDoorwayBlockEntity) {
-                        ((SmallZombieDoorwayBlockEntity) linkedBE).setLinkedSpawner(null);
-                        linkedBE.markDirty();
 
-                        ModMessages.sendRemoveLinkPacket(world, linkedDoorwayPos);
-                    }
-                }
+                spawnerEntity.unlinkExistingDoorway(world);
             }
         }
         super.onBreak(world, pos, state, player);

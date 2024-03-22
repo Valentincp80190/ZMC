@@ -97,31 +97,8 @@ public class SmallZombieDoorwayBlock extends BlockWithEntity implements BlockEnt
             if (be instanceof SmallZombieDoorwayBlockEntity) {
                 SmallZombieDoorwayBlockEntity smallZombieDoorway = (SmallZombieDoorwayBlockEntity) be;
 
-
                 smallZombieDoorway.unlinkExistingZombieSpawner(world);
-                /*BlockPos linkedSpawnerPos = smallZombieDoorway.getLinkedSpawner();
-                if (linkedSpawnerPos != null) {
-                    BlockEntity linkedBE = world.getBlockEntity(linkedSpawnerPos);
-                    if (linkedBE instanceof ZombieSpawnerBlockEntity) {
-                        ((ZombieSpawnerBlockEntity) linkedBE).setLinkedDoorway(null);
-                        linkedBE.markDirty();
-
-                        ModMessages.sendRemoveLinkPacket(world, linkedSpawnerPos);
-                    }
-                }*/
-
                 smallZombieDoorway.unlinkExistingZoneController(world);
-                /*if (linkedZonePos != null) {
-                    BlockEntity zoneControllerBE = world.getBlockEntity(linkedZonePos);
-                    if (zoneControllerBE instanceof ZoneControllerBlockEntity) {
-                        ((ZoneControllerBlockEntity) zoneControllerBE).removeLinkedDoorway(be.getPos());
-                        zoneControllerBE.markDirty();
-
-                        //A refaire pour relation 1 - 0..*
-                        ZMCMod.LOGGER.info("Try Unlink Zone " + linkedZonePos + " from door " + be.getPos());
-                        ModMessages.sendRemoveDoorwayLinkFromZonePacket(world, linkedZonePos, be.getPos());
-                    }
-                }*/
             }
         }
         super.onBreak(world, pos, state, player);

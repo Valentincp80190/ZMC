@@ -134,8 +134,8 @@ public class Linker extends Item {
             //((ZoneControllerBlockEntity) firstEntity).unlinkExistingMapController(world);
             ((SmallZombieDoorwayBlockEntity) secondEntity).unlinkExistingZoneController(world);
 
-            ((ZoneControllerBlockEntity) firstEntity).addLinkedDoorway(firstPos);
-            ((SmallZombieDoorwayBlockEntity) secondEntity).setLinkedZonePos(secondPos);
+            ((ZoneControllerBlockEntity) firstEntity).addLinkedDoorway(secondPos);
+            ((SmallZombieDoorwayBlockEntity) secondEntity).setLinkedZonePos(firstPos);
         }
     }
 }

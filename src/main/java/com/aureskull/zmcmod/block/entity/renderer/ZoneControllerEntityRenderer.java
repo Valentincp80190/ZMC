@@ -256,7 +256,7 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
     }
 
     public void drawLinesToDoorways(ZoneControllerBlockEntity entity, MatrixStack matrices){
-        if(entity.getLinkedDoorways().size() == 0) return;
+        if(entity.getLinkedDoorway().size() == 0) return;
 
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         RenderSystem.enableDepthTest();
@@ -267,7 +267,7 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
 
         buffer.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
 
-        for (BlockPos posB: entity.getLinkedDoorways()) {
+        for (BlockPos posB: entity.getLinkedDoorway()) {
             double deltaX = posB.getX() - entity.getPos().getX();
             double deltaY = posB.getY() - entity.getPos().getY();
             double deltaZ = posB.getZ() - entity.getPos().getZ();
