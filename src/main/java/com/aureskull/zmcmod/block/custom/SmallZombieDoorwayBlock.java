@@ -1,8 +1,10 @@
 package com.aureskull.zmcmod.block.custom;
 
+import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.entity.ModBlockEntities;
 import com.aureskull.zmcmod.block.entity.SmallZombieDoorwayBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZombieSpawnerBlockEntity;
+import com.aureskull.zmcmod.block.entity.ZoneControllerBlockEntity;
 import com.aureskull.zmcmod.networking.ModMessages;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
@@ -90,11 +92,14 @@ public class SmallZombieDoorwayBlock extends BlockWithEntity implements BlockEnt
 
     @Override
     public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        if (!world.isClient) { // Server side
+        if (!world.isClient()) { // Server side
             BlockEntity be = world.getBlockEntity(pos);
             if (be instanceof SmallZombieDoorwayBlockEntity) {
                 SmallZombieDoorwayBlockEntity smallZombieDoorway = (SmallZombieDoorwayBlockEntity) be;
-                BlockPos linkedSpawnerPos = smallZombieDoorway.getLinkedSpawner();
+
+
+                smallZombieDoorway.unlinkExistingZombieSpawner(world);
+                /*BlockPos linkedSpawnerPos = smallZombieDoorway.getLinkedSpawner();
                 if (linkedSpawnerPos != null) {
                     BlockEntity linkedBE = world.getBlockEntity(linkedSpawnerPos);
                     if (linkedBE instanceof ZombieSpawnerBlockEntity) {
@@ -103,7 +108,20 @@ public class SmallZombieDoorwayBlock extends BlockWithEntity implements BlockEnt
 
                         ModMessages.sendRemoveLinkPacket(world, linkedSpawnerPos);
                     }
-                }
+                }*/
+
+                smallZombieDoorway.unlinkExistingZoneController(world);
+                /*if (linkedZonePos != null) {
+                    BlockEntity zoneControllerBE = world.getBlockEntity(linkedZonePos);
+                    if (zoneControllerBE instanceof ZoneControllerBlockEntity) {
+                        ((ZoneControllerBlockEntity) zoneControllerBE).removeLinkedDoorway(be.getPos());
+                        zoneControllerBE.markDirty();
+
+                        //A refaire pour relation 1 - 0..*
+                        ZMCMod.LOGGER.info("Try Unlink Zone " + linkedZonePos + " from door " + be.getPos());
+                        ModMessages.sendRemoveDoorwayLinkFromZonePacket(world, linkedZonePos, be.getPos());
+                    }
+                }*/
             }
         }
         super.onBreak(world, pos, state, player);

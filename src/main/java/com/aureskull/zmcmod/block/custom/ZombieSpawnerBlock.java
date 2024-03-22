@@ -49,8 +49,6 @@ public class ZombieSpawnerBlock extends BlockWithEntity implements BlockEntityPr
 
     @Override
     public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        System.out.println("onBreak called, isClient: " + world.isClient());
-
         if (!world.isClient()) { // Server side
             BlockEntity be = world.getBlockEntity(pos);
             if (be instanceof ZombieSpawnerBlockEntity) {

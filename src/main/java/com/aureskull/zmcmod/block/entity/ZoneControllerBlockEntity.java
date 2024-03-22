@@ -1,6 +1,7 @@
 package com.aureskull.zmcmod.block.entity;
 
 import com.aureskull.zmcmod.ZMCMod;
+import com.aureskull.zmcmod.networking.ModMessages;
 import com.aureskull.zmcmod.screen.zonecontroller.ZoneControllerScreenHandler;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
@@ -8,6 +9,8 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtHelper;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
@@ -19,6 +22,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory {
     public BlockPos posA = new BlockPos(pos.getX() - 5, pos.getY() + 1, pos.getZ() - 5);
     public BlockPos posB = new BlockPos(pos.getX() + 5, pos.getY() + 5, pos.getZ() + 5);
@@ -26,6 +32,11 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
     public float red = 1f;
     public float green = 1f;
     public float blue = 1f;
+
+    private BlockPos linkedMapController = null;
+    private BlockPos linkedZoneController = null;
+
+    private List<BlockPos> linkedDoorways = new ArrayList<>();
 
     public ZoneControllerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.ZONE_CONTROLLER_BLOCK_ENTITY, pos, state);
@@ -60,6 +71,21 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
         nbt.putFloat("zone_controller.posb.x", posB.getX());
         nbt.putFloat("zone_controller.posb.y", posB.getY());
         nbt.putFloat("zone_controller.posb.z", posB.getZ());
+
+        if (linkedMapController != null) {
+            nbt.put("zone_controller.linked_map_controller", NbtHelper.fromBlockPos(linkedMapController));
+        }
+
+        if (linkedZoneController != null) {
+            nbt.put("zone_controller.linked_zone_controller", NbtHelper.fromBlockPos(linkedZoneController));
+        }
+
+        NbtList doorwaysList = new NbtList();
+        for (BlockPos pos : linkedDoorways)
+            doorwaysList.add(NbtHelper.fromBlockPos(pos));
+        if(doorwaysList.size() > 0)
+            nbt.put("zone_controller.linked_doorways", doorwaysList);
+
         super.writeNbt(nbt);
     }
 
@@ -93,6 +119,19 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
                     nbt.getInt("zone_controller.posb.y"),
                     nbt.getInt("zone_controller.posb.z"));
         }
+
+        if (nbt.contains("zone_controller.linked_map_controller")) {
+            this.linkedMapController = NbtHelper.toBlockPos(nbt.getCompound("zone_controller.linked_map_controller"));
+        }
+
+        if (nbt.contains("zone_controller.linked_zone_controller")) {
+            this.linkedZoneController = NbtHelper.toBlockPos(nbt.getCompound("zone_controller.linked_zone_controller"));
+        }
+
+        NbtList doorwaysList = nbt.getList("zone_controller.linked_doorways", 10);
+        for (int i = 0; i < doorwaysList.size(); i++) {
+            linkedDoorways.add(NbtHelper.toBlockPos(doorwaysList.getCompound(i)));
+        }
     }
 
     @Nullable
@@ -116,5 +155,44 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
         return new ZoneControllerScreenHandler(syncId, this);
+    }
+
+    public BlockPos getLinkedMapController() {
+        return this.linkedMapController;
+    }
+
+    public void setLinkedMapController(BlockPos pos) {
+        this.linkedMapController = pos;
+        markDirty();
+    }
+
+    public List<BlockPos> getLinkedDoorways() {
+        return linkedDoorways;
+    }
+
+
+    public void unlinkExistingMapController(World world) {
+        BlockPos existingMapController = getLinkedMapController();
+        if (existingMapController != null) {
+            BlockEntity existingMapControllerBE = world.getBlockEntity(existingMapController);
+            if (existingMapControllerBE instanceof MapControllerBlockEntity) {
+                ((MapControllerBlockEntity) existingMapControllerBE).setLinkedZoneController(null);
+                existingMapControllerBE.markDirty();
+
+                ModMessages.sendRemoveLinkPacket(world, existingMapController);
+            }
+        }
+    }
+
+    public void removeLinkedDoorway(BlockPos doorwayPos) {
+        if(this.linkedDoorways.contains(doorwayPos)){
+            this.linkedDoorways.remove(doorwayPos);
+            markDirty();
+        }
+    }
+
+    public void addLinkedDoorway(BlockPos doorwayPos){
+        this.linkedDoorways.add(doorwayPos);
+        markDirty();
     }
 }

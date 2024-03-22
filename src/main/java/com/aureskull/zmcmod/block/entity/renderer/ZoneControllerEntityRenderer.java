@@ -23,6 +23,8 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
 
     @Override
     public void render(ZoneControllerBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+        drawLinesToDoorways(entity, matrices);
+
         BlockPos posA = entity.posA;
         BlockPos posB = entity.posB;
 
@@ -189,6 +191,7 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
     }
 
     public void renderCube(ZoneControllerBlockEntity entity, MatrixStack matrices, BlockPos blockPos){
+        //Render entire cube including faces and lines
         matrices.push();
         RenderSystem.enableDepthTest();
         matrices.translate(-entity.getPos().getX(), -entity.getPos().getY(), -entity.getPos().getZ());
@@ -250,5 +253,29 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
         RenderSystem.depthFunc(GL11.GL_LEQUAL);
         RenderSystem.depthMask(true);
         matrices.pop();
+    }
+
+    public void drawLinesToDoorways(ZoneControllerBlockEntity entity, MatrixStack matrices){
+        if(entity.getLinkedDoorways().size() == 0) return;
+
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.enableDepthTest();
+
+
+        Matrix4f positionMatrix = matrices.peek().getPositionMatrix();
+        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
+
+        buffer.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+
+        for (BlockPos posB: entity.getLinkedDoorways()) {
+            double deltaX = posB.getX() - entity.getPos().getX();
+            double deltaY = posB.getY() - entity.getPos().getY();
+            double deltaZ = posB.getZ() - entity.getPos().getZ();
+
+            buffer.vertex(positionMatrix, 0.5F, .5F, 0.5F).color(0f, 1f, 0f, 1f).next();
+            buffer.vertex(positionMatrix, (float) deltaX + 0.5F, (float) deltaY + 1.0F, (float) deltaZ + 0.5F).color(1f, 0f, 0f, 1f).next();
+        }
+
+        Tessellator.getInstance().draw();
     }
 }

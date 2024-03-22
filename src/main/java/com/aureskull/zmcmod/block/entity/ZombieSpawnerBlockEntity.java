@@ -3,6 +3,7 @@ package com.aureskull.zmcmod.block.entity;
 import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.entity.ModEntities;
 import com.aureskull.zmcmod.entity.custom.StandingZombieEntity;
+import com.aureskull.zmcmod.networking.ModMessages;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -107,6 +108,19 @@ public class ZombieSpawnerBlockEntity extends BlockEntity implements ExtendedScr
                         linkedDoorwayPos.getY(),
                         linkedDoorwayPos.getZ() + 0.5,
                         1.0);
+            }
+        }
+    }
+
+    public void unlinkExistingDoorway(World world) {
+        BlockPos existingLinkedDoorway = getLinkedDoorway();
+        if (existingLinkedDoorway != null) {
+            BlockEntity existingDoorwayEntity = world.getBlockEntity(existingLinkedDoorway);
+            if (existingDoorwayEntity instanceof SmallZombieDoorwayBlockEntity) {
+                ((SmallZombieDoorwayBlockEntity) existingDoorwayEntity).setLinkedSpawner(null);
+                existingDoorwayEntity.markDirty();
+
+                ModMessages.sendRemoveLinkPacket(world, existingLinkedDoorway);
             }
         }
     }

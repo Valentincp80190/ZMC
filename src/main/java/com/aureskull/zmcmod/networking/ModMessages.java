@@ -3,7 +3,8 @@ package com.aureskull.zmcmod.networking;
 import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.networking.packet.ExampleC2SPacket;
 import com.aureskull.zmcmod.networking.packet.ExistZMCMapC2SPacket;
-import com.aureskull.zmcmod.networking.packet.RemoveLinkS2CPacket;
+import com.aureskull.zmcmod.networking.packet.link.RemoveDoorwayLinkFromZoneS2CPacket;
+import com.aureskull.zmcmod.networking.packet.link.RemoveLinkS2CPacket;
 import com.aureskull.zmcmod.networking.packet.TriggerInteractionC2SPacket;
 import com.aureskull.zmcmod.networking.packet.mapcontroller.MapControllerUpdateMapNameC2SPacket;
 import com.aureskull.zmcmod.networking.packet.zonecontroller.*;
@@ -37,7 +38,10 @@ public class ModMessages {
     public static final Identifier EXIST_ZMC_MAP_CHECKER = new Identifier(ZMCMod.MOD_ID, "existzmcmapchecker");
     public static final Identifier EXIST_ZMC_MAP_CHECKER_RESPONSE = new Identifier(ZMCMod.MOD_ID, "existzmcmapchecker_response");
 
+
+    //LINKER
     public static final Identifier REMOVE_LINK_FROM_BLOCK_ENTITY = new Identifier(ZMCMod.MOD_ID, "remove_link_from_block_entity");
+    public static final Identifier REMOVE_DOORWAY_LINK_FROM_ZONE = new Identifier(ZMCMod.MOD_ID, "remove_doorway_link_from_zone");
 
     public static void registerC2SPackets(){
         ServerPlayNetworking.registerGlobalReceiver(EXAMPLE_ID, ExampleC2SPacket::receive);
@@ -52,6 +56,7 @@ public class ModMessages {
 
     public static void registerS2CPackets(){
         ClientPlayNetworking.registerGlobalReceiver(REMOVE_LINK_FROM_BLOCK_ENTITY, RemoveLinkS2CPacket::receive);
+        ClientPlayNetworking.registerGlobalReceiver(REMOVE_DOORWAY_LINK_FROM_ZONE, RemoveDoorwayLinkFromZoneS2CPacket::receive);
     }
 
     public static void sendExistZMCMapCheckerResponse(ServerPlayerEntity player, boolean exists) {
@@ -67,6 +72,17 @@ public class ModMessages {
         // Send this packet to all players in the world
         PlayerLookup.tracking((ServerWorld) world, blockPos).forEach(player -> {
             ServerPlayNetworking.send(player, ModMessages.REMOVE_LINK_FROM_BLOCK_ENTITY, buf);
+        });
+    }
+
+    public static void sendRemoveDoorwayLinkFromZonePacket(World world, BlockPos zonePos, BlockPos doorwayPos) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeBlockPos(zonePos);
+        buf.writeBlockPos(doorwayPos);
+
+        // Send this packet to all players in the world
+        PlayerLookup.tracking((ServerWorld) world, zonePos).forEach(player -> {
+            ServerPlayNetworking.send(player, ModMessages.REMOVE_DOORWAY_LINK_FROM_ZONE, buf);
         });
     }
 }

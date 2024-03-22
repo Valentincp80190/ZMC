@@ -5,9 +5,9 @@ import com.aureskull.zmcmod.block.custom.SmallZombieDoorwayBlock;
 import com.aureskull.zmcmod.client.InteractionHelper;
 import com.aureskull.zmcmod.client.MessageHudOverlay;
 import com.aureskull.zmcmod.event.ModKeyInputHandler;
+import com.aureskull.zmcmod.networking.ModMessages;
 import com.aureskull.zmcmod.sound.ModSounds;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -36,6 +36,8 @@ public class SmallZombieDoorwayBlockEntity extends BlockEntity implements Extend
 
     private BlockPos linkedSpawnerPos;
 
+    private BlockPos linkedZonePos;
+
     public SmallZombieDoorwayBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.SMALL_ZOMBIE_DOORWAY_BLOCK_ENTITY, pos, state);
     }
@@ -60,7 +62,11 @@ public class SmallZombieDoorwayBlockEntity extends BlockEntity implements Extend
     protected void writeNbt(NbtCompound nbt){
         nbt.putInt("small_zombie_doorway.plank", plank);
         if (linkedSpawnerPos != null) {
-            nbt.put("linked_spawner", NbtHelper.fromBlockPos(linkedSpawnerPos));
+            nbt.put("small_zombie_doorway.linked_spawner", NbtHelper.fromBlockPos(linkedSpawnerPos));
+        }
+
+        if (linkedZonePos != null) {
+            nbt.put("small_zombie_doorway.linked_zone", NbtHelper.fromBlockPos(linkedZonePos));
         }
         super.writeNbt(nbt);
     }
@@ -71,8 +77,13 @@ public class SmallZombieDoorwayBlockEntity extends BlockEntity implements Extend
 
         if (nbt.contains("small_zombie_doorway.plank"))
             this.plank = nbt.getInt("small_zombie_doorway.plank");
-        if (nbt.contains("linked_spawner")) {
-            this.linkedSpawnerPos = NbtHelper.toBlockPos(nbt.getCompound("linked_spawner"));
+
+        if (nbt.contains("small_zombie_doorway.linked_spawner")) {
+            this.linkedSpawnerPos = NbtHelper.toBlockPos(nbt.getCompound("small_zombie_doorway.linked_spawner"));
+        }
+
+        if (nbt.contains("small_zombie_doorway.linked_zone")) {
+            linkedZonePos = NbtHelper.toBlockPos(nbt.getCompound("small_zombie_doorway.linked_zone"));
         }
     }
 
@@ -150,5 +161,44 @@ public class SmallZombieDoorwayBlockEntity extends BlockEntity implements Extend
 
     public BlockPos getLinkedSpawner() {
         return this.linkedSpawnerPos;
+    }
+
+    public BlockPos getLinkedZonePos() {
+        return linkedZonePos;
+    }
+
+    public void setLinkedZonePos(BlockPos linkedZonePos) {
+        this.linkedZonePos = linkedZonePos;
+        this.markDirty();
+    }
+
+    public void unlinkExistingZombieSpawner(World world) {
+        ZMCMod.LOGGER.info(world.toString());
+        BlockPos existingZombieSpawner = getLinkedSpawner();
+        if (existingZombieSpawner != null) {
+            BlockEntity existingZombieSpawnerBE = world.getBlockEntity(existingZombieSpawner);
+            if (existingZombieSpawnerBE instanceof ZombieSpawnerBlockEntity) {
+                ((ZombieSpawnerBlockEntity) existingZombieSpawnerBE).setLinkedDoorway(null);
+                existingZombieSpawnerBE.markDirty();
+
+                ModMessages.sendRemoveLinkPacket(world, existingZombieSpawner);
+            }
+        }
+    }
+
+    public void unlinkExistingZoneController(World world) {
+        BlockPos existingZoneController = getLinkedZonePos();
+
+        if (existingZoneController != null) {
+            BlockEntity existingZoneControllerBE = world.getBlockEntity(existingZoneController);
+            if (existingZoneControllerBE instanceof ZoneControllerBlockEntity) {
+                ((ZoneControllerBlockEntity) existingZoneControllerBE).removeLinkedDoorway(this.getPos());
+                existingZoneControllerBE.markDirty();
+
+                //A refaire pour relation 1 - 0..*
+                ZMCMod.LOGGER.info("Try Unlink Zone " + existingZoneController + " from door " + this.getPos());
+                ModMessages.sendRemoveDoorwayLinkFromZonePacket(world, existingZoneController, this.getPos());
+            }
+        }
     }
 }

@@ -1,10 +1,14 @@
 package com.aureskull.zmcmod.item.custom;
 
 import com.aureskull.zmcmod.ZMCMod;
+import com.aureskull.zmcmod.block.custom.MapControllerBlock;
 import com.aureskull.zmcmod.block.custom.SmallZombieDoorwayBlock;
 import com.aureskull.zmcmod.block.custom.ZombieSpawnerBlock;
+import com.aureskull.zmcmod.block.custom.ZoneControllerBlock;
+import com.aureskull.zmcmod.block.entity.MapControllerBlockEntity;
 import com.aureskull.zmcmod.block.entity.SmallZombieDoorwayBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZombieSpawnerBlockEntity;
+import com.aureskull.zmcmod.block.entity.ZoneControllerBlockEntity;
 import com.aureskull.zmcmod.networking.ModMessages;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
@@ -32,14 +36,9 @@ public class Linker extends Item {
         super(settings);
     }
 
-    /*@Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity playerEntity, Hand hand) {
-        playerEntity.playSound(SoundEvents.BLOCK_AMETHYST_BLOCK_HIT, 1.0F, 1.0F);
-        return TypedActionResult.success(playerEntity.getStackInHand(hand));
-    }*/
-
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
+        ZMCMod.LOGGER.info("Triggered");
         World world = context.getWorld();
         PlayerEntity playerEntity = context.getPlayer();
         BlockPos pos = context.getBlockPos();
@@ -54,7 +53,10 @@ public class Linker extends Item {
 
             BlockState state = world.getBlockState(pos);
             ZMCMod.LOGGER.info(state.getBlock().toString());
-            if (state.getBlock() instanceof ZombieSpawnerBlock || state.getBlock() instanceof SmallZombieDoorwayBlock) {
+            if (state.getBlock() instanceof ZombieSpawnerBlock
+                    || state.getBlock() instanceof SmallZombieDoorwayBlock
+                    || state.getBlock() instanceof MapControllerBlock
+                    || state.getBlock() instanceof ZoneControllerBlock) {
                 handleBlockLinking(world, pos, itemStack, playerEntity);
                 return ActionResult.SUCCESS;
             }
@@ -86,45 +88,54 @@ public class Linker extends Item {
         BlockEntity firstEntity = world.getBlockEntity(firstPos);
         BlockEntity secondEntity = world.getBlockEntity(secondPos);
 
+        //SmallZombieDoorway <=> ZombieSpawner
         if (firstEntity instanceof ZombieSpawnerBlockEntity && secondEntity instanceof SmallZombieDoorwayBlockEntity) {
-            unlinkExistingDoorway(world, (ZombieSpawnerBlockEntity) firstEntity);
-            unlinkExistingZombieSpawner(world, (SmallZombieDoorwayBlockEntity) secondEntity);
+            ((ZombieSpawnerBlockEntity) firstEntity).unlinkExistingDoorway(world);
+            ((SmallZombieDoorwayBlockEntity) secondEntity).unlinkExistingZombieSpawner(world);
 
             ((ZombieSpawnerBlockEntity) firstEntity).setLinkedDoorway(secondPos);
             ((SmallZombieDoorwayBlockEntity) secondEntity).setLinkedSpawner(firstPos);
 
         } else if (firstEntity instanceof SmallZombieDoorwayBlockEntity && secondEntity instanceof ZombieSpawnerBlockEntity) {
-            unlinkExistingDoorway(world, (ZombieSpawnerBlockEntity) secondEntity);
-            unlinkExistingZombieSpawner(world, (SmallZombieDoorwayBlockEntity) firstEntity);
+            ((SmallZombieDoorwayBlockEntity) firstEntity).unlinkExistingZombieSpawner(world);
+            ((ZombieSpawnerBlockEntity) secondEntity).unlinkExistingDoorway(world);
 
             ((SmallZombieDoorwayBlockEntity) firstEntity).setLinkedSpawner(secondPos);
             ((ZombieSpawnerBlockEntity) secondEntity).setLinkedDoorway(firstPos);
         }
-    }
 
-    private void unlinkExistingDoorway(World world, ZombieSpawnerBlockEntity spawnerEntity) {
-        BlockPos existingLinkedDoorway = spawnerEntity.getLinkedDoorway();
-        if (existingLinkedDoorway != null) {
-            BlockEntity existingDoorwayEntity = world.getBlockEntity(existingLinkedDoorway);
-            if (existingDoorwayEntity instanceof SmallZombieDoorwayBlockEntity) {
-                ((SmallZombieDoorwayBlockEntity) existingDoorwayEntity).setLinkedSpawner(null);
-                existingDoorwayEntity.markDirty();
 
-                ModMessages.sendRemoveLinkPacket(world, existingLinkedDoorway);
-            }
+        //ZoneController <=> MapController
+        else if (firstEntity instanceof MapControllerBlockEntity && secondEntity instanceof ZoneControllerBlockEntity) {
+            ((MapControllerBlockEntity) firstEntity).unlinkExistingZoneController(world);
+            ((ZoneControllerBlockEntity) secondEntity).unlinkExistingMapController(world);
+
+            ((MapControllerBlockEntity) firstEntity).setLinkedZoneController(secondPos);
+            ((ZoneControllerBlockEntity) secondEntity).setLinkedMapController(firstPos);
+
+        } else if (firstEntity instanceof ZoneControllerBlockEntity && secondEntity instanceof MapControllerBlockEntity) {
+            ((ZoneControllerBlockEntity) firstEntity).unlinkExistingMapController(world);
+            ((MapControllerBlockEntity) secondEntity).unlinkExistingZoneController(world);
+
+            ((ZoneControllerBlockEntity) firstEntity).setLinkedMapController(secondPos);
+            ((MapControllerBlockEntity) secondEntity).setLinkedZoneController(firstPos);
         }
-    }
 
-    private void unlinkExistingZombieSpawner(World world, SmallZombieDoorwayBlockEntity ZombieDoorwayBE) {
-        BlockPos existingZombieSpawner = ZombieDoorwayBE.getLinkedSpawner();
-        if (existingZombieSpawner != null) {
-            BlockEntity existingZombieSpawnerBE = world.getBlockEntity(existingZombieSpawner);
-            if (existingZombieSpawnerBE instanceof ZombieSpawnerBlockEntity) {
-                ((ZombieSpawnerBlockEntity) existingZombieSpawnerBE).setLinkedDoorway(null);
-                existingZombieSpawnerBE.markDirty();
 
-                ModMessages.sendRemoveLinkPacket(world, existingZombieSpawner);
-            }
+        //ZoneController <=> SmallZombieDoorway
+        else if (firstEntity instanceof SmallZombieDoorwayBlockEntity && secondEntity instanceof ZoneControllerBlockEntity) {
+            ((SmallZombieDoorwayBlockEntity) firstEntity).unlinkExistingZoneController(world);
+            //((ZoneControllerBlockEntity) secondEntity).unlinkExistingMapController(world);
+
+            ((SmallZombieDoorwayBlockEntity) firstEntity).setLinkedZonePos(secondPos);
+            ((ZoneControllerBlockEntity) secondEntity).addLinkedDoorway(firstPos);
+
+        } else if (firstEntity instanceof ZoneControllerBlockEntity && secondEntity instanceof SmallZombieDoorwayBlockEntity) {
+            //((ZoneControllerBlockEntity) firstEntity).unlinkExistingMapController(world);
+            ((SmallZombieDoorwayBlockEntity) secondEntity).unlinkExistingZoneController(world);
+
+            ((ZoneControllerBlockEntity) firstEntity).addLinkedDoorway(firstPos);
+            ((SmallZombieDoorwayBlockEntity) secondEntity).setLinkedZonePos(secondPos);
         }
     }
 }

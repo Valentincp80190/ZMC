@@ -1,7 +1,9 @@
-package com.aureskull.zmcmod.networking.packet;
+package com.aureskull.zmcmod.networking.packet.link;
 
+import com.aureskull.zmcmod.block.entity.MapControllerBlockEntity;
 import com.aureskull.zmcmod.block.entity.SmallZombieDoorwayBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZombieSpawnerBlockEntity;
+import com.aureskull.zmcmod.block.entity.ZoneControllerBlockEntity;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
@@ -28,6 +30,14 @@ public class RemoveLinkS2CPacket {
                 } else if (blockEntity instanceof ZombieSpawnerBlockEntity) {
                     ZombieSpawnerBlockEntity spawnerEntity = (ZombieSpawnerBlockEntity) blockEntity;
                     spawnerEntity.setLinkedDoorway(null);
+
+                } else if (blockEntity instanceof MapControllerBlockEntity) {
+                    MapControllerBlockEntity mapControllerEntity = (MapControllerBlockEntity) blockEntity;
+                    mapControllerEntity.setLinkedZoneController(null);
+
+                } else if (blockEntity instanceof ZoneControllerBlockEntity) {
+                    ZoneControllerBlockEntity zoneControllerEntity = (ZoneControllerBlockEntity) blockEntity;
+                    zoneControllerEntity.setLinkedMapController(null);
                 }
             }
         });

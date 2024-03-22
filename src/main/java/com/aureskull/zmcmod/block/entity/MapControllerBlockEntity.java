@@ -1,5 +1,7 @@
 package com.aureskull.zmcmod.block.entity;
 
+import com.aureskull.zmcmod.ZMCMod;
+import com.aureskull.zmcmod.networking.ModMessages;
 import com.aureskull.zmcmod.screen.mapcontroller.MapControllerScreenHandler;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
@@ -7,6 +9,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtHelper;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
@@ -20,6 +23,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class MapControllerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory {
     public String mapName = "";
+
+    private BlockPos linkedZoneController = null;
 
     public MapControllerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.MAP_CONTROLLER_BLOCK_ENTITY, pos, state);
@@ -44,6 +49,14 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
     @Override
     protected void writeNbt(NbtCompound nbt){
         nbt.putString("map_controller.mapname", this.mapName);
+
+        if (nbt.contains("map_controller.linked_zone_controller")) {
+            this.linkedZoneController = NbtHelper.toBlockPos(nbt.getCompound("map_controller.linked_zone_controller"));
+        }
+
+        if (linkedZoneController != null) {
+            nbt.put("map_controller.linked_zone_controller", NbtHelper.fromBlockPos(linkedZoneController));
+        }
         super.writeNbt(nbt);
     }
 
@@ -52,6 +65,10 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         super.readNbt(nbt);
         if (nbt.contains("map_controller.mapname"))
             this.mapName = nbt.getString("map_controller.mapname");
+
+        if (nbt.contains("map_controller.linked_zone_controller")) {
+            this.linkedZoneController = NbtHelper.toBlockPos(nbt.getCompound("map_controller.linked_zone_controller"));
+        }
     }
 
     @Nullable
@@ -75,5 +92,27 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
         return new MapControllerScreenHandler(syncId, this);
+    }
+
+    public BlockPos getLinkedZoneController() {
+        return linkedZoneController;
+    }
+
+    public void setLinkedZoneController(BlockPos linkedZoneController) {
+        this.linkedZoneController = linkedZoneController;
+        markDirty();
+    }
+
+    public void unlinkExistingZoneController(World world) {
+        BlockPos existingZoneController = getLinkedZoneController();
+        if (existingZoneController != null) {
+            BlockEntity existingZoneControllerEntity = world.getBlockEntity(existingZoneController);
+            if (existingZoneControllerEntity instanceof ZoneControllerBlockEntity) {
+                ((ZoneControllerBlockEntity) existingZoneControllerEntity).setLinkedMapController(null);
+                existingZoneControllerEntity.markDirty();
+
+                ModMessages.sendRemoveLinkPacket(world, existingZoneController);
+            }
+        }
     }
 }
