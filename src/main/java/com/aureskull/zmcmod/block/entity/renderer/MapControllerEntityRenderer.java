@@ -2,6 +2,7 @@ package com.aureskull.zmcmod.block.entity.renderer;
 
 import com.aureskull.zmcmod.block.entity.MapControllerBlockEntity;
 import com.aureskull.zmcmod.block.entity.SmallZombieDoorwayBlockEntity;
+import com.aureskull.zmcmod.block.entity.ZoneControllerBlockEntity;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
@@ -19,8 +20,8 @@ public class MapControllerEntityRenderer implements BlockEntityRenderer<MapContr
 
     @Override
     public void render(MapControllerBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-        if(entity.getLinkedZoneController() != null){
-            renderLine(entity.getPos(), entity.getLinkedZoneController(), matrices);
+        if(entity.getLinkedBlock(ZoneControllerBlockEntity.class) != null){
+            renderLine(entity.getPos(), entity.getLinkedBlock(ZoneControllerBlockEntity.class), matrices);
         }
     }
 

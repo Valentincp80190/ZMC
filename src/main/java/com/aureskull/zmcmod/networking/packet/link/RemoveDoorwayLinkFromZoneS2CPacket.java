@@ -23,7 +23,7 @@ public class RemoveDoorwayLinkFromZoneS2CPacket {
                 if (zone instanceof ZoneControllerBlockEntity) {
                     //Don't check if doorway exist because in case we destroy the block it doesn't exist in the world in this state
                     ZoneControllerBlockEntity zoneBE = (ZoneControllerBlockEntity) zone;
-                    zoneBE.removeLinkedDoorway(DoorwayPos);
+                    zoneBE.removeLinkedBlock(DoorwayPos, SmallZombieDoorwayBlockEntity.class);
                 }
             }
         });

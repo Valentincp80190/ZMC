@@ -156,68 +156,13 @@ public class SmallZombieDoorwayBlockEntity extends BlockEntity implements Extend
         }
     }
 
-    /*public void setLinkedSpawner(BlockPos pos) {
-        this.linkedSpawnerPos = pos;
-        this.markDirty();
-    }
-
-    public BlockPos getLinkedSpawner() {
-        return this.linkedSpawnerPos;
-    }*/
-
-    /*public BlockPos getLinkedZonePos() {
-        return linkedZonePos;
-    }*/
-
-    /*public void setLinkedZonePos(BlockPos linkedZonePos) {
-        this.linkedZonePos = linkedZonePos;
-        this.markDirty();
-    }*/
-
-    /*public void unlinkExistingZombieSpawner(World world) {
-        ZMCMod.LOGGER.info(world.toString());
-        BlockPos existingZombieSpawner = getLinkedSpawner();
-        if (existingZombieSpawner != null) {
-            BlockEntity existingZombieSpawnerBE = world.getBlockEntity(existingZombieSpawner);
-            if (existingZombieSpawnerBE instanceof ZombieSpawnerBlockEntity) {
-                ((ZombieSpawnerBlockEntity) existingZombieSpawnerBE).setLinkedDoorway(null);
-                existingZombieSpawnerBE.markDirty();
-
-                ModMessages.sendRemoveLinkPacket(world, existingZombieSpawner);
-            }
-        }
-    }
-
-    public void unlinkExistingZoneController(World world) {
-        BlockPos existingZoneController = getLinkedZonePos();
-
-        if (existingZoneController != null) {
-            BlockEntity existingZoneControllerBE = world.getBlockEntity(existingZoneController);
-            if (existingZoneControllerBE instanceof ZoneControllerBlockEntity) {
-                ((ZoneControllerBlockEntity) existingZoneControllerBE).removeLinkedDoorway(this.getPos());
-                existingZoneControllerBE.markDirty();
-
-                ModMessages.sendRemoveDoorwayLinkFromZonePacket(world, existingZoneController, this.getPos());
-            }
-        }
-    }*/
-
-    @Override
-    public void unlink(World world, Class<? extends BlockEntity> linkType) {
-        if (ZombieSpawnerBlockEntity.class.isAssignableFrom(linkType) && linkedSpawnerPos != null) {
-            unlinkSpawner(world);
-        } else if (ZoneControllerBlockEntity.class.isAssignableFrom(linkType) && linkedZonePos != null) {
-            unlinkZoneController(world);
-        }
-    }
-
     private void unlinkSpawner(World world) {
         ModMessages.sendRemoveLinkPacket(world, this.getLinkedBlock(ZombieSpawnerBlockEntity.class));
 
         //Remove from ZombieSpawner the doorway
         BlockEntity existingZombieSpawnerBE = world.getBlockEntity(this.getLinkedBlock(ZombieSpawnerBlockEntity.class));
         if(existingZombieSpawnerBE instanceof ZombieSpawnerBlockEntity)
-            ((ZombieSpawnerBlockEntity) existingZombieSpawnerBE).setLinkedDoorway(null);
+            ((ZombieSpawnerBlockEntity) existingZombieSpawnerBE).setLinkedBlock(null, SmallZombieDoorwayBlockEntity.class);
 
         setLinkedBlock(null, ZombieSpawnerBlockEntity.class);
     }
@@ -230,11 +175,21 @@ public class SmallZombieDoorwayBlockEntity extends BlockEntity implements Extend
         //Remove from ZoneController the doorway
         BlockEntity zoneControllerBE = world.getBlockEntity(getLinkedBlock(ZoneControllerBlockEntity.class));
         if(zoneControllerBE instanceof ZoneControllerBlockEntity)
-            ((ZoneControllerBlockEntity) zoneControllerBE).removeLinkedDoorway(this.getPos());
+            ((ZoneControllerBlockEntity) zoneControllerBE).removeLinkedBlock(this.getPos(), SmallZombieDoorwayBlockEntity.class);
 
         //Remove from server at the end
         setLinkedBlock(null, ZoneControllerBlockEntity.class);
     }
+
+    @Override
+    public void unlink(World world, Class<? extends BlockEntity> linkType) {
+        if (ZombieSpawnerBlockEntity.class.isAssignableFrom(linkType) && linkedSpawnerPos != null) {
+            unlinkSpawner(world);
+        } else if (ZoneControllerBlockEntity.class.isAssignableFrom(linkType) && linkedZonePos != null) {
+            unlinkZoneController(world);
+        }
+    }
+
 
     @Override
     public void setLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
@@ -253,6 +208,21 @@ public class SmallZombieDoorwayBlockEntity extends BlockEntity implements Extend
         } else if (ZoneControllerBlockEntity.class.isAssignableFrom(linkType)) {
             return linkedZonePos;
         }
+        return null;
+    }
+
+    @Override
+    public void addLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
+
+    }
+
+    @Override
+    public void removeLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
+
+    }
+
+    @Override
+    public List<BlockPos> getAllLinkedBlocks(Class<? extends BlockEntity> linkType) {
         return null;
     }
 }

@@ -1,6 +1,6 @@
 package com.aureskull.zmcmod.block.entity;
 
-import com.aureskull.zmcmod.ZMCMod;
+import com.aureskull.zmcmod.block.ILinkable;
 import com.aureskull.zmcmod.entity.ModEntities;
 import com.aureskull.zmcmod.entity.custom.StandingZombieEntity;
 import com.aureskull.zmcmod.networking.ModMessages;
@@ -22,7 +22,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class ZombieSpawnerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory {
+import java.util.List;
+
+public class ZombieSpawnerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ILinkable {
 
     private BlockPos linkedDoorwayPos;
 
@@ -85,14 +87,14 @@ public class ZombieSpawnerBlockEntity extends BlockEntity implements ExtendedScr
         return null;
     }
 
-    public void setLinkedDoorway(BlockPos pos) {
+    /*public void setLinkedDoorway(BlockPos pos) {
         this.linkedDoorwayPos = pos;
         this.markDirty();
     }
 
     public BlockPos getLinkedDoorway() {
         return this.linkedDoorwayPos;
-    }
+    }*/
 
     public void spawnZombie(BlockPos spawnerPos) {
         if (!world.isClient && linkedDoorwayPos != null) {
@@ -112,16 +114,53 @@ public class ZombieSpawnerBlockEntity extends BlockEntity implements ExtendedScr
         }
     }
 
-    public void unlinkExistingDoorway(World world) {
-        BlockPos existingLinkedDoorway = getLinkedDoorway();
-        if (existingLinkedDoorway != null) {
-            BlockEntity existingDoorwayEntity = world.getBlockEntity(existingLinkedDoorway);
-            if (existingDoorwayEntity instanceof SmallZombieDoorwayBlockEntity) {
-                ((SmallZombieDoorwayBlockEntity) existingDoorwayEntity).unlink(null, ZombieSpawnerBlockEntity.class);
-                existingDoorwayEntity.markDirty();
+    public void unlinkDoorway(World world) {
+        ModMessages.sendRemoveLinkPacket(world, this.getLinkedBlock(SmallZombieDoorwayBlockEntity.class));
 
-                ModMessages.sendRemoveLinkPacket(world, existingLinkedDoorway);
-            }
+        BlockEntity existingDoorwayEntity = world.getBlockEntity(this.getLinkedBlock(SmallZombieDoorwayBlockEntity.class));
+        if (existingDoorwayEntity instanceof SmallZombieDoorwayBlockEntity)
+            ((SmallZombieDoorwayBlockEntity) existingDoorwayEntity).setLinkedBlock(null, ZombieSpawnerBlockEntity.class);
+
+        setLinkedBlock(null, SmallZombieDoorwayBlockEntity.class);
+    }
+
+    @Override
+    public void unlink(World world, Class<? extends BlockEntity> linkType) {
+        if(SmallZombieDoorwayBlockEntity.class.isAssignableFrom(linkType) && linkedDoorwayPos != null){
+            unlinkDoorway(world);
         }
+    }
+
+    @Override
+    public void setLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
+        if(SmallZombieDoorwayBlockEntity.class.isAssignableFrom(linkType)) {
+            this.linkedDoorwayPos = linkedBlockPos;
+        }
+
+        markDirty();
+    }
+
+    @Override
+    public @Nullable BlockPos getLinkedBlock(Class<? extends BlockEntity> linkType) {
+        if(SmallZombieDoorwayBlockEntity.class.isAssignableFrom(linkType)) {
+            return this.linkedDoorwayPos;
+        }
+
+        return null;
+    }
+
+    @Override
+    public void addLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
+
+    }
+
+    @Override
+    public void removeLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
+
+    }
+
+    @Override
+    public List<BlockPos> getAllLinkedBlocks(Class<? extends BlockEntity> linkType) {
+        return null;
     }
 }

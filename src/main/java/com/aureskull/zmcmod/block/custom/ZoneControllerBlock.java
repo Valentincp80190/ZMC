@@ -77,8 +77,8 @@ public class ZoneControllerBlock extends BlockWithEntity implements BlockEntityP
             BlockEntity be = world.getBlockEntity(pos);
             if (be instanceof ZoneControllerBlockEntity) {
                 ZoneControllerBlockEntity zoneControllerBE = (ZoneControllerBlockEntity) be;
-                zoneControllerBE.unlinkExistingMapController(world);
-                zoneControllerBE.unlinkAllExistingDoorway(world);
+                zoneControllerBE.unlink(world, MapControllerBlockEntity.class);
+                zoneControllerBE.unlink(world, SmallZombieDoorwayBlockEntity.class);
             }
         }
         super.onBreak(world, pos, state, player);

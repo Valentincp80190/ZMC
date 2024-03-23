@@ -1,6 +1,7 @@
 package com.aureskull.zmcmod.block.entity;
 
 import com.aureskull.zmcmod.ZMCMod;
+import com.aureskull.zmcmod.block.ILinkable;
 import com.aureskull.zmcmod.networking.ModMessages;
 import com.aureskull.zmcmod.screen.zonecontroller.ZoneControllerScreenHandler;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
@@ -25,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory {
+public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ILinkable {
     public BlockPos posA = new BlockPos(pos.getX() - 5, pos.getY() + 1, pos.getZ() - 5);
     public BlockPos posB = new BlockPos(pos.getX() + 5, pos.getY() + 5, pos.getZ() + 5);
 
@@ -129,6 +130,7 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
         }
 
         NbtList doorwaysList = nbt.getList("zone_controller.linked_doorways", 10);
+        linkedDoorways = new ArrayList<>();
         for (int i = 0; i < doorwaysList.size(); i++) {
             linkedDoorways.add(NbtHelper.toBlockPos(doorwaysList.getCompound(i)));
         }
@@ -157,56 +159,95 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
         return new ZoneControllerScreenHandler(syncId, this);
     }
 
-    public BlockPos getLinkedMapController() {
-        return this.linkedMapController;
+    private void unlinkMapController(World world){
+        ModMessages.sendRemoveLinkPacket(world, getLinkedBlock(MapControllerBlockEntity.class));
+
+        //Remove from MapController the ZoneController
+        BlockEntity existingMapControllerBE = world.getBlockEntity(this.getLinkedBlock(MapControllerBlockEntity.class));
+        if(existingMapControllerBE instanceof MapControllerBlockEntity)
+            ((MapControllerBlockEntity) existingMapControllerBE).setLinkedBlock(null, ZoneControllerBlockEntity.class);
+
+        setLinkedBlock(null, MapControllerBlockEntity.class);
     }
 
-    public void setLinkedMapController(BlockPos pos) {
-        this.linkedMapController = pos;
-        markDirty();
+    private void unlinkSmallZombieDoorway(World world, BlockPos doorway){
+        ModMessages.sendRemoveZoneLinkFromDoorwayPacket(world, doorway);
+
+        //Remove from SmallZombieDoorway the zone
+        BlockEntity doorwayBE = world.getBlockEntity(doorway);
+        if (doorwayBE instanceof SmallZombieDoorwayBlockEntity)
+            ((SmallZombieDoorwayBlockEntity) doorwayBE).setLinkedBlock(null, ZoneControllerBlockEntity.class);
+
+        removeLinkedBlock(doorway, SmallZombieDoorwayBlockEntity.class);
     }
 
-    public List<BlockPos> getLinkedDoorway() {
-        return linkedDoorways;
+    private List<BlockPos> getLinkedDoorways() {
+        return new ArrayList<>(linkedDoorways);
     }
 
-
-    public void unlinkExistingMapController(World world) {
-        BlockPos existingMapController = getLinkedMapController();
-        if (existingMapController != null) {
-            BlockEntity existingMapControllerBE = world.getBlockEntity(existingMapController);
-            if (existingMapControllerBE instanceof MapControllerBlockEntity) {
-                ((MapControllerBlockEntity) existingMapControllerBE).setLinkedZoneController(null);
-                existingMapControllerBE.markDirty();
-
-                ModMessages.sendRemoveLinkPacket(world, existingMapController);
-            }
-        }
-    }
-
-    public void unlinkAllExistingDoorway(World world) {
-        List<BlockPos> existingDoorway = getLinkedDoorway();
-
-        for(BlockPos doorway : existingDoorway) {
-            BlockEntity doorwayBE = world.getBlockEntity(doorway);
-            if (doorwayBE instanceof SmallZombieDoorwayBlockEntity) {
-                ((SmallZombieDoorwayBlockEntity) doorwayBE).unlink(null, ZoneControllerBlockEntity.class);
-                doorwayBE.markDirty();
-
-                ModMessages.sendRemoveZoneLinkFromDoorwayPacket(world, doorway);
-            }
-        }
-    }
-
-    public void removeLinkedDoorway(BlockPos doorwayPos) {
-        if(this.linkedDoorways.contains(doorwayPos)){
+    private void removeLinkedDoorway(BlockPos doorwayPos) {
+        if(this.linkedDoorways.contains(doorwayPos))
             this.linkedDoorways.remove(doorwayPos);
-            markDirty();
+    }
+
+
+    private void addLinkedDoorway(BlockPos doorwayPos) {
+        if (!linkedDoorways.contains(doorwayPos)) {
+            ZMCMod.LOGGER.info("Number of door before : " + linkedDoorways.size());
+            linkedDoorways.add(doorwayPos);
+            ZMCMod.LOGGER.info("Doors add : " + doorwayPos);
+            ZMCMod.LOGGER.info("Number of door after : " + linkedDoorways.size());
         }
     }
 
-    public void addLinkedDoorway(BlockPos doorwayPos){
-        this.linkedDoorways.add(doorwayPos);
+    @Override
+    public void unlink(World world, Class<? extends BlockEntity> linkType) {
+        if(MapControllerBlockEntity.class.isAssignableFrom(linkType) && this.linkedMapController != null){
+            unlinkMapController(world);
+
+        }else if(SmallZombieDoorwayBlockEntity.class.isAssignableFrom(linkType) && this.getLinkedDoorways() != null){
+            List<BlockPos> doorways = this.getLinkedDoorways();
+            for(BlockPos doorway : doorways)
+                unlinkSmallZombieDoorway(world, doorway);
+        }
+    }
+
+    @Override
+    public void setLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
+        if(MapControllerBlockEntity.class.isAssignableFrom(linkType))
+            this.linkedMapController = linkedBlockPos;
+
         markDirty();
+    }
+
+    @Override
+    public @Nullable BlockPos getLinkedBlock(Class<? extends BlockEntity> linkType) {
+        if(MapControllerBlockEntity.class.isAssignableFrom(linkType))
+            return this.linkedMapController;
+        return null;
+    }
+
+    @Override
+    public void addLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
+        if(SmallZombieDoorwayBlockEntity.class.isAssignableFrom(linkType))
+            addLinkedDoorway(linkedBlockPos);
+
+        markDirty();
+    }
+
+    @Override
+    public void removeLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
+        if(SmallZombieDoorwayBlockEntity.class.isAssignableFrom(linkType))
+            removeLinkedDoorway(linkedBlockPos);
+
+        markDirty();
+    }
+
+    @Override
+    public List<BlockPos> getAllLinkedBlocks(Class<? extends BlockEntity> linkType) {
+        if(SmallZombieDoorwayBlockEntity.class.isAssignableFrom(linkType) && this.linkedDoorways != null)
+            return this.getLinkedDoorways();
+
+        return null;
     }
 }

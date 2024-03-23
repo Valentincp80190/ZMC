@@ -29,15 +29,15 @@ public class RemoveLinkS2CPacket {
 
                 } else if (blockEntity instanceof ZombieSpawnerBlockEntity) {
                     ZombieSpawnerBlockEntity spawnerEntity = (ZombieSpawnerBlockEntity) blockEntity;
-                    spawnerEntity.setLinkedDoorway(null);
+                    spawnerEntity.setLinkedBlock(null, SmallZombieDoorwayBlockEntity.class);
 
                 } else if (blockEntity instanceof MapControllerBlockEntity) {
                     MapControllerBlockEntity mapControllerEntity = (MapControllerBlockEntity) blockEntity;
-                    mapControllerEntity.setLinkedZoneController(null);
+                    mapControllerEntity.setLinkedBlock(null, ZoneControllerBlockEntity.class);
 
                 } else if (blockEntity instanceof ZoneControllerBlockEntity) {
                     ZoneControllerBlockEntity zoneControllerEntity = (ZoneControllerBlockEntity) blockEntity;
-                    zoneControllerEntity.setLinkedMapController(null);
+                    zoneControllerEntity.setLinkedBlock(null, MapControllerBlockEntity.class);
                 }
             }
         });

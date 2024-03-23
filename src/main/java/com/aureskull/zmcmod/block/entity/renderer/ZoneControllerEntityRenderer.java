@@ -1,5 +1,7 @@
 package com.aureskull.zmcmod.block.entity.renderer;
 
+import com.aureskull.zmcmod.ZMCMod;
+import com.aureskull.zmcmod.block.entity.SmallZombieDoorwayBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZoneControllerBlockEntity;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
@@ -15,6 +17,8 @@ import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
+
+import java.util.List;
 
 public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneControllerBlockEntity> {
 
@@ -256,7 +260,7 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
     }
 
     public void drawLinesToDoorways(ZoneControllerBlockEntity entity, MatrixStack matrices){
-        if(entity.getLinkedDoorway().size() == 0) return;
+        if(entity.getAllLinkedBlocks(SmallZombieDoorwayBlockEntity.class).size() == 0) return;
 
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         RenderSystem.enableDepthTest();
@@ -267,7 +271,7 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
 
         buffer.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
 
-        for (BlockPos posB: entity.getLinkedDoorway()) {
+        for (BlockPos posB: entity.getAllLinkedBlocks(SmallZombieDoorwayBlockEntity.class)) {
             double deltaX = posB.getX() - entity.getPos().getX();
             double deltaY = posB.getY() - entity.getPos().getY();
             double deltaZ = posB.getZ() - entity.getPos().getZ();

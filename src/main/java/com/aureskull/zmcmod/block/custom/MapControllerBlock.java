@@ -78,7 +78,7 @@ public class MapControllerBlock extends BlockWithEntity implements BlockEntityPr
             if (be instanceof MapControllerBlockEntity) {
                 MapControllerBlockEntity mapControllerBE = (MapControllerBlockEntity) be;
 
-                mapControllerBE.unlinkExistingZoneController(world);
+                mapControllerBE.unlink(world, ZoneControllerBlockEntity.class);
             }
         }
         super.onBreak(world, pos, state, player);

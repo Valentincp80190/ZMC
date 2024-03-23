@@ -1,6 +1,7 @@
 package com.aureskull.zmcmod.block.entity;
 
 import com.aureskull.zmcmod.ZMCMod;
+import com.aureskull.zmcmod.block.ILinkable;
 import com.aureskull.zmcmod.networking.ModMessages;
 import com.aureskull.zmcmod.screen.mapcontroller.MapControllerScreenHandler;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
@@ -21,7 +22,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class MapControllerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory {
+import java.util.List;
+
+public class MapControllerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ILinkable {
     public String mapName = "";
 
     private BlockPos linkedZoneController = null;
@@ -94,16 +97,16 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         return new MapControllerScreenHandler(syncId, this);
     }
 
-    public BlockPos getLinkedZoneController() {
+    /*public BlockPos getLinkedZoneController() {
         return linkedZoneController;
     }
 
     public void setLinkedZoneController(BlockPos linkedZoneController) {
         this.linkedZoneController = linkedZoneController;
         markDirty();
-    }
+    }*/
 
-    public void unlinkExistingZoneController(World world) {
+    /*public void unlinkExistingZoneController(World world) {
         BlockPos existingZoneController = getLinkedZoneController();
         if (existingZoneController != null) {
             BlockEntity existingZoneControllerEntity = world.getBlockEntity(existingZoneController);
@@ -114,5 +117,54 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
                 ModMessages.sendRemoveLinkPacket(world, existingZoneController);
             }
         }
+    }*/
+
+    @Override
+    public void unlink(World world, Class<? extends BlockEntity> linkType) {
+        if(ZoneControllerBlockEntity.class.isAssignableFrom(linkType) && linkedZoneController != null){
+            unlinkZone(world);
+        }
+    }
+
+    private void unlinkZone(World world){
+        ModMessages.sendRemoveLinkPacket(world, this.getLinkedBlock(ZoneControllerBlockEntity.class));
+
+        //Remove from MapController the zone
+        BlockEntity zoneControllerBE = world.getBlockEntity(this.getLinkedBlock(ZoneControllerBlockEntity.class));
+        if(zoneControllerBE instanceof ZoneControllerBlockEntity)
+            ((ZoneControllerBlockEntity) zoneControllerBE).setLinkedBlock(null, MapControllerBlockEntity.class);
+
+        setLinkedBlock(null, ZoneControllerBlockEntity.class);
+    }
+
+    @Override
+    public void setLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
+        if(ZoneControllerBlockEntity.class.isAssignableFrom(linkType)){
+            this.linkedZoneController = linkedBlockPos;
+        }
+        markDirty();
+    }
+
+    @Override
+    public @Nullable BlockPos getLinkedBlock(Class<? extends BlockEntity> linkType) {
+        if(ZoneControllerBlockEntity.class.isAssignableFrom(linkType))
+            return this.linkedZoneController;
+
+        return null;
+    }
+
+    @Override
+    public void addLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
+
+    }
+
+    @Override
+    public void removeLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
+
+    }
+
+    @Override
+    public List<BlockPos> getAllLinkedBlocks(Class<? extends BlockEntity> linkType) {
+        return null;
     }
 }
