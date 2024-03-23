@@ -91,16 +91,16 @@ public class Linker extends Item {
         //SmallZombieDoorway <=> ZombieSpawner
         if (firstEntity instanceof ZombieSpawnerBlockEntity && secondEntity instanceof SmallZombieDoorwayBlockEntity) {
             ((ZombieSpawnerBlockEntity) firstEntity).unlinkExistingDoorway(world);
-            ((SmallZombieDoorwayBlockEntity) secondEntity).unlinkExistingZombieSpawner(world);
+            ((SmallZombieDoorwayBlockEntity) secondEntity).unlink(world, ZombieSpawnerBlockEntity.class);//TODO POURQUOI SUR UNE ZONE ??
 
             ((ZombieSpawnerBlockEntity) firstEntity).setLinkedDoorway(secondPos);
-            ((SmallZombieDoorwayBlockEntity) secondEntity).setLinkedSpawner(firstPos);
+            ((SmallZombieDoorwayBlockEntity) secondEntity).setLinkedBlock(firstPos, ZombieSpawnerBlockEntity.class);
 
         } else if (firstEntity instanceof SmallZombieDoorwayBlockEntity && secondEntity instanceof ZombieSpawnerBlockEntity) {
-            ((SmallZombieDoorwayBlockEntity) firstEntity).unlinkExistingZombieSpawner(world);
+            ((SmallZombieDoorwayBlockEntity) firstEntity).unlink(world, ZombieSpawnerBlockEntity.class);
             ((ZombieSpawnerBlockEntity) secondEntity).unlinkExistingDoorway(world);
 
-            ((SmallZombieDoorwayBlockEntity) firstEntity).setLinkedSpawner(secondPos);
+            ((SmallZombieDoorwayBlockEntity) firstEntity).setLinkedBlock(secondPos, ZombieSpawnerBlockEntity.class);
             ((ZombieSpawnerBlockEntity) secondEntity).setLinkedDoorway(firstPos);
         }
 
@@ -124,18 +124,18 @@ public class Linker extends Item {
 
         //ZoneController <=> SmallZombieDoorway
         else if (firstEntity instanceof SmallZombieDoorwayBlockEntity && secondEntity instanceof ZoneControllerBlockEntity) {
-            ((SmallZombieDoorwayBlockEntity) firstEntity).unlinkExistingZoneController(world);
+            ((SmallZombieDoorwayBlockEntity) firstEntity).unlink(world, ZoneControllerBlockEntity.class);
             //((ZoneControllerBlockEntity) secondEntity).unlinkExistingMapController(world);
 
-            ((SmallZombieDoorwayBlockEntity) firstEntity).setLinkedZonePos(secondPos);
+            ((SmallZombieDoorwayBlockEntity) firstEntity).setLinkedBlock(secondPos, ZoneControllerBlockEntity.class);
             ((ZoneControllerBlockEntity) secondEntity).addLinkedDoorway(firstPos);
 
         } else if (firstEntity instanceof ZoneControllerBlockEntity && secondEntity instanceof SmallZombieDoorwayBlockEntity) {
             //((ZoneControllerBlockEntity) firstEntity).unlinkExistingMapController(world);
-            ((SmallZombieDoorwayBlockEntity) secondEntity).unlinkExistingZoneController(world);
+            ((SmallZombieDoorwayBlockEntity) secondEntity).unlink(world, ZoneControllerBlockEntity.class);
 
             ((ZoneControllerBlockEntity) firstEntity).addLinkedDoorway(secondPos);
-            ((SmallZombieDoorwayBlockEntity) secondEntity).setLinkedZonePos(firstPos);
+            ((SmallZombieDoorwayBlockEntity) secondEntity).setLinkedBlock(firstPos, ZoneControllerBlockEntity.class);
         }
     }
 }

@@ -2,6 +2,7 @@ package com.aureskull.zmcmod.block.entity.renderer;
 
 import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.entity.SmallZombieDoorwayBlockEntity;
+import com.aureskull.zmcmod.block.entity.ZombieSpawnerBlockEntity;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
@@ -21,8 +22,8 @@ public class SmallZombieDoorwayEntityRenderer  implements BlockEntityRenderer<Sm
 
     @Override
     public void render(SmallZombieDoorwayBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-        if(entity.getLinkedSpawner() != null){
-            renderLine(entity.getPos(), entity.getLinkedSpawner(), matrices);
+        if(entity.getLinkedBlock(ZombieSpawnerBlockEntity.class) != null){
+            renderLine(entity.getPos(), entity.getLinkedBlock(ZombieSpawnerBlockEntity.class), matrices);
         }
     }
 

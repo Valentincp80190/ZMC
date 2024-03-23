@@ -25,7 +25,7 @@ public class RemoveLinkS2CPacket {
 
                 if (blockEntity instanceof SmallZombieDoorwayBlockEntity) {
                     SmallZombieDoorwayBlockEntity doorwayEntity = (SmallZombieDoorwayBlockEntity) blockEntity;
-                    doorwayEntity.setLinkedSpawner(null);
+                    doorwayEntity.setLinkedBlock(null, ZombieSpawnerBlockEntity.class);
 
                 } else if (blockEntity instanceof ZombieSpawnerBlockEntity) {
                     ZombieSpawnerBlockEntity spawnerEntity = (ZombieSpawnerBlockEntity) blockEntity;

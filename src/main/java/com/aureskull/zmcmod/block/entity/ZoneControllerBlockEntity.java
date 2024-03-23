@@ -190,7 +190,7 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
         for(BlockPos doorway : existingDoorway) {
             BlockEntity doorwayBE = world.getBlockEntity(doorway);
             if (doorwayBE instanceof SmallZombieDoorwayBlockEntity) {
-                ((SmallZombieDoorwayBlockEntity) doorwayBE).setLinkedZonePos(null);
+                ((SmallZombieDoorwayBlockEntity) doorwayBE).unlink(null, ZoneControllerBlockEntity.class);
                 doorwayBE.markDirty();
 
                 ModMessages.sendRemoveZoneLinkFromDoorwayPacket(world, doorway);

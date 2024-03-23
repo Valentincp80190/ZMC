@@ -117,7 +117,7 @@ public class ZombieSpawnerBlockEntity extends BlockEntity implements ExtendedScr
         if (existingLinkedDoorway != null) {
             BlockEntity existingDoorwayEntity = world.getBlockEntity(existingLinkedDoorway);
             if (existingDoorwayEntity instanceof SmallZombieDoorwayBlockEntity) {
-                ((SmallZombieDoorwayBlockEntity) existingDoorwayEntity).setLinkedSpawner(null);
+                ((SmallZombieDoorwayBlockEntity) existingDoorwayEntity).unlink(null, ZombieSpawnerBlockEntity.class);
                 existingDoorwayEntity.markDirty();
 
                 ModMessages.sendRemoveLinkPacket(world, existingLinkedDoorway);
