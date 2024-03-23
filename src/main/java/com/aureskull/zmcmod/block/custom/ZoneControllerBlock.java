@@ -2,7 +2,6 @@ package com.aureskull.zmcmod.block.custom;
 
 import com.aureskull.zmcmod.block.entity.*;
 import com.aureskull.zmcmod.item.custom.Linker;
-import com.aureskull.zmcmod.networking.ModMessages;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;
@@ -78,7 +77,16 @@ public class ZoneControllerBlock extends BlockWithEntity implements BlockEntityP
             if (be instanceof ZoneControllerBlockEntity) {
                 ZoneControllerBlockEntity zoneControllerBE = (ZoneControllerBlockEntity) be;
                 zoneControllerBE.unlink(world, MapControllerBlockEntity.class);
-                zoneControllerBE.unlink(world, SmallZombieDoorwayBlockEntity.class);
+                zoneControllerBE.unlink(world, SmallZombieWindowBlockEntity.class);
+
+                //Remove child from parent zone
+                for (BlockPos zonePos: zoneControllerBE.getParent(ZoneControllerBlockEntity.class)) {
+                    BlockEntity parentZoneBE = world.getBlockEntity(zonePos);
+                    if (parentZoneBE instanceof ZoneControllerBlockEntity) {
+                        ZoneControllerBlockEntity parentZoneController = ((ZoneControllerBlockEntity) parentZoneBE);
+                        parentZoneController.removeChild(pos, ZoneControllerBlockEntity.class);
+                    }
+                }
             }
         }
         super.onBreak(world, pos, state, player);

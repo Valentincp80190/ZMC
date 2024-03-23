@@ -1,9 +1,8 @@
 package com.aureskull.zmcmod.block.custom;
 
 import com.aureskull.zmcmod.block.entity.ModBlockEntities;
-import com.aureskull.zmcmod.block.entity.SmallZombieDoorwayBlockEntity;
+import com.aureskull.zmcmod.block.entity.SmallZombieWindowBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZombieSpawnerBlockEntity;
-import com.aureskull.zmcmod.networking.ModMessages;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;
@@ -54,7 +53,7 @@ public class ZombieSpawnerBlock extends BlockWithEntity implements BlockEntityPr
             if (be instanceof ZombieSpawnerBlockEntity) {
                 ZombieSpawnerBlockEntity spawnerEntity = (ZombieSpawnerBlockEntity) be;
 
-                spawnerEntity.unlink(world, SmallZombieDoorwayBlockEntity.class);
+                spawnerEntity.unlink(world, SmallZombieWindowBlockEntity.class);
             }
         }
         super.onBreak(world, pos, state, player);

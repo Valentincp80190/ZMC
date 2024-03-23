@@ -1,24 +1,16 @@
 package com.aureskull.zmcmod.block.entity.renderer;
 
-import com.aureskull.zmcmod.ZMCMod;
-import com.aureskull.zmcmod.block.entity.SmallZombieDoorwayBlockEntity;
+import com.aureskull.zmcmod.block.entity.SmallZombieWindowBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZoneControllerBlockEntity;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.Vec3d;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
-
-import java.util.List;
 
 public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneControllerBlockEntity> {
 
@@ -28,6 +20,7 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
     @Override
     public void render(ZoneControllerBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
         drawLinesToDoorways(entity, matrices);
+        drawLinesToChildZones(entity, matrices);
 
         BlockPos posA = entity.posA;
         BlockPos posB = entity.posB;
@@ -260,7 +253,7 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
     }
 
     public void drawLinesToDoorways(ZoneControllerBlockEntity entity, MatrixStack matrices){
-        if(entity.getAllLinkedBlocks(SmallZombieDoorwayBlockEntity.class).size() == 0) return;
+        if(entity.getAllLinkedBlocks(SmallZombieWindowBlockEntity.class).size() == 0) return;
 
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         RenderSystem.enableDepthTest();
@@ -271,13 +264,37 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
 
         buffer.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
 
-        for (BlockPos posB: entity.getAllLinkedBlocks(SmallZombieDoorwayBlockEntity.class)) {
+        for (BlockPos posB: entity.getAllLinkedBlocks(SmallZombieWindowBlockEntity.class)) {
             double deltaX = posB.getX() - entity.getPos().getX();
             double deltaY = posB.getY() - entity.getPos().getY();
             double deltaZ = posB.getZ() - entity.getPos().getZ();
 
             buffer.vertex(positionMatrix, 0.5F, .5F, 0.5F).color(0f, 1f, 0f, 1f).next();
             buffer.vertex(positionMatrix, (float) deltaX + 0.5F, (float) deltaY + 1.0F, (float) deltaZ + 0.5F).color(1f, 0f, 0f, 1f).next();
+        }
+
+        Tessellator.getInstance().draw();
+    }
+
+    public void drawLinesToChildZones(ZoneControllerBlockEntity entity, MatrixStack matrices){
+        if(entity.getChild(ZoneControllerBlockEntity.class).size() == 0) return;
+
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.enableDepthTest();
+
+
+        Matrix4f positionMatrix = matrices.peek().getPositionMatrix();
+        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
+
+        buffer.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+
+        for (BlockPos posB: entity.getChild(ZoneControllerBlockEntity.class)) {
+            double deltaX = posB.getX() - entity.getPos().getX();
+            double deltaY = posB.getY() - entity.getPos().getY();
+            double deltaZ = posB.getZ() - entity.getPos().getZ();
+
+            buffer.vertex(positionMatrix, 0.5F, .5F, 0.5F).color(0f, 1f, 0f, 1f).next();
+            buffer.vertex(positionMatrix, (float) deltaX + 0.5F, (float) deltaY + 0.5F, (float) deltaZ + 0.5F).color(1f, 0f, 0f, 1f).next();
         }
 
         Tessellator.getInstance().draw();

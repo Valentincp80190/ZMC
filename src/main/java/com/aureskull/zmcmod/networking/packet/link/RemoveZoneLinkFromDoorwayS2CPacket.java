@@ -1,6 +1,6 @@
 package com.aureskull.zmcmod.networking.packet.link;
 
-import com.aureskull.zmcmod.block.entity.SmallZombieDoorwayBlockEntity;
+import com.aureskull.zmcmod.block.entity.SmallZombieWindowBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZoneControllerBlockEntity;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.block.entity.BlockEntity;
@@ -18,9 +18,9 @@ public class RemoveZoneLinkFromDoorwayS2CPacket {
             if (client.world != null) {
                 BlockEntity doorway = client.world.getBlockEntity(doorwayPos);
 
-                if (doorway instanceof SmallZombieDoorwayBlockEntity) {
+                if (doorway instanceof SmallZombieWindowBlockEntity) {
                     //Don't check if doorway exist because in case we destroy the block it doesn't exist in the world in this state
-                    ((SmallZombieDoorwayBlockEntity) doorway).setLinkedBlock(null, ZoneControllerBlockEntity.class);
+                    ((SmallZombieWindowBlockEntity) doorway).setLinkedBlock(null, ZoneControllerBlockEntity.class);
                 }
             }
         });

@@ -6,13 +6,9 @@ import com.aureskull.zmcmod.block.custom.SmallZombieDoorwayBlock;
 import com.aureskull.zmcmod.block.custom.ZombieSpawnerBlock;
 import com.aureskull.zmcmod.block.custom.ZoneControllerBlock;
 import com.aureskull.zmcmod.block.entity.MapControllerBlockEntity;
-import com.aureskull.zmcmod.block.entity.SmallZombieDoorwayBlockEntity;
+import com.aureskull.zmcmod.block.entity.SmallZombieWindowBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZombieSpawnerBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZoneControllerBlockEntity;
-import com.aureskull.zmcmod.networking.ModMessages;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -21,10 +17,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -47,6 +42,9 @@ public class Linker extends Item {
             // Check if the player is sneaking to clear the stored positions
             if (playerEntity.isSneaking()) {
                 clearStoredPositions(itemStack, playerEntity);
+                playerEntity.sendMessage(Text.literal("")
+                        .append(Text.literal("Linker position reset")
+                                .formatted(Formatting.GOLD)));
                 return ActionResult.SUCCESS;
             }
 
@@ -68,9 +66,15 @@ public class Linker extends Item {
 
         if (!tag.contains("FirstPos")) {
             tag.put("FirstPos", NbtHelper.fromBlockPos(pos));
+            player.sendMessage(Text.literal("")
+                    .append(Text.literal("First position set at [" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + "] on " + world.getBlockEntity(pos).getClass().getSimpleName())
+                            .formatted(Formatting.GOLD)));
         } else {
             // Retrieve the first position and link with the second position
             BlockPos firstPos = NbtHelper.toBlockPos(tag.getCompound("FirstPos"));
+            player.sendMessage(Text.literal("")
+                    .append(Text.literal("Second position set at [" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + "] on " + world.getBlockEntity(pos).getClass().getSimpleName())
+                            .formatted(Formatting.GOLD)));
             linkBlocks(world, firstPos, pos);
             tag.remove("FirstPos"); // Clear after linking
         }
@@ -88,19 +92,19 @@ public class Linker extends Item {
         BlockEntity secondEntity = world.getBlockEntity(secondPos);
 
         //SmallZombieDoorway <=> ZombieSpawner
-        if (firstEntity instanceof ZombieSpawnerBlockEntity && secondEntity instanceof SmallZombieDoorwayBlockEntity) {
-            ((ZombieSpawnerBlockEntity) firstEntity).unlink(world, SmallZombieDoorwayBlockEntity.class);
-            ((SmallZombieDoorwayBlockEntity) secondEntity).unlink(world, ZombieSpawnerBlockEntity.class);
+        if (firstEntity instanceof ZombieSpawnerBlockEntity && secondEntity instanceof SmallZombieWindowBlockEntity) {
+            ((ZombieSpawnerBlockEntity) firstEntity).unlink(world, SmallZombieWindowBlockEntity.class);
+            ((SmallZombieWindowBlockEntity) secondEntity).unlink(world, ZombieSpawnerBlockEntity.class);
 
-            ((ZombieSpawnerBlockEntity) firstEntity).setLinkedBlock(secondPos, SmallZombieDoorwayBlockEntity.class);
-            ((SmallZombieDoorwayBlockEntity) secondEntity).setLinkedBlock(firstPos, ZombieSpawnerBlockEntity.class);
+            ((ZombieSpawnerBlockEntity) firstEntity).setLinkedBlock(secondPos, SmallZombieWindowBlockEntity.class);
+            ((SmallZombieWindowBlockEntity) secondEntity).setLinkedBlock(firstPos, ZombieSpawnerBlockEntity.class);
 
-        } else if (firstEntity instanceof SmallZombieDoorwayBlockEntity && secondEntity instanceof ZombieSpawnerBlockEntity) {
-            ((SmallZombieDoorwayBlockEntity) firstEntity).unlink(world, ZombieSpawnerBlockEntity.class);
-            ((ZombieSpawnerBlockEntity) secondEntity).unlink(world, SmallZombieDoorwayBlockEntity.class);
+        } else if (firstEntity instanceof SmallZombieWindowBlockEntity && secondEntity instanceof ZombieSpawnerBlockEntity) {
+            ((SmallZombieWindowBlockEntity) firstEntity).unlink(world, ZombieSpawnerBlockEntity.class);
+            ((ZombieSpawnerBlockEntity) secondEntity).unlink(world, SmallZombieWindowBlockEntity.class);
 
-            ((SmallZombieDoorwayBlockEntity) firstEntity).setLinkedBlock(secondPos, ZombieSpawnerBlockEntity.class);
-            ((ZombieSpawnerBlockEntity) secondEntity).setLinkedBlock(firstPos, SmallZombieDoorwayBlockEntity.class);
+            ((SmallZombieWindowBlockEntity) firstEntity).setLinkedBlock(secondPos, ZombieSpawnerBlockEntity.class);
+            ((ZombieSpawnerBlockEntity) secondEntity).setLinkedBlock(firstPos, SmallZombieWindowBlockEntity.class);
         }
 
 
@@ -122,19 +126,27 @@ public class Linker extends Item {
 
 
         //ZoneController <=> SmallZombieDoorway
-        else if (firstEntity instanceof SmallZombieDoorwayBlockEntity && secondEntity instanceof ZoneControllerBlockEntity) {
-            ((SmallZombieDoorwayBlockEntity) firstEntity).unlink(world, ZoneControllerBlockEntity.class);
-            //((ZoneControllerBlockEntity) secondEntity).unlinkExistingMapController(world);
+        else if (firstEntity instanceof SmallZombieWindowBlockEntity && secondEntity instanceof ZoneControllerBlockEntity) {
+            ((SmallZombieWindowBlockEntity) firstEntity).unlink(world, ZoneControllerBlockEntity.class);
 
-            ((SmallZombieDoorwayBlockEntity) firstEntity).setLinkedBlock(secondPos, ZoneControllerBlockEntity.class);
-            ((ZoneControllerBlockEntity) secondEntity).addLinkedBlock(firstPos, SmallZombieDoorwayBlockEntity.class);
+            ((SmallZombieWindowBlockEntity) firstEntity).setLinkedBlock(secondPos, ZoneControllerBlockEntity.class);
+            ((ZoneControllerBlockEntity) secondEntity).addLinkedBlock(firstPos, SmallZombieWindowBlockEntity.class);
 
-        } else if (firstEntity instanceof ZoneControllerBlockEntity && secondEntity instanceof SmallZombieDoorwayBlockEntity) {
-            //((ZoneControllerBlockEntity) firstEntity).unlinkExistingMapController(world);
-            ((SmallZombieDoorwayBlockEntity) secondEntity).unlink(world, ZoneControllerBlockEntity.class);
+        } else if (firstEntity instanceof ZoneControllerBlockEntity && secondEntity instanceof SmallZombieWindowBlockEntity) {
+            ((SmallZombieWindowBlockEntity) secondEntity).unlink(world, ZoneControllerBlockEntity.class);
 
-            ((ZoneControllerBlockEntity) firstEntity).addLinkedBlock(secondPos, SmallZombieDoorwayBlockEntity.class);
-            ((SmallZombieDoorwayBlockEntity) secondEntity).setLinkedBlock(firstPos, ZoneControllerBlockEntity.class);
+            ((ZoneControllerBlockEntity) firstEntity).addLinkedBlock(secondPos, SmallZombieWindowBlockEntity.class);
+            ((SmallZombieWindowBlockEntity) secondEntity).setLinkedBlock(firstPos, ZoneControllerBlockEntity.class);
+        }
+
+
+        //ZoneController <=> ZoneController
+        else if (firstEntity instanceof ZoneControllerBlockEntity && secondEntity instanceof ZoneControllerBlockEntity) {
+            if(firstPos.getX() == secondPos.getX() && firstPos.getY() == secondPos.getY() && firstPos.getZ() == secondPos.getZ()) return;
+
+            //first pos = parent
+            ((ZoneControllerBlockEntity) firstEntity).addChild(secondPos, ZoneControllerBlockEntity.class);
+            ((ZoneControllerBlockEntity) secondEntity).addParent(firstPos, ZoneControllerBlockEntity.class);
         }
     }
 }

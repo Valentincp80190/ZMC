@@ -1,7 +1,6 @@
 package com.aureskull.zmcmod.block.entity.renderer;
 
 import com.aureskull.zmcmod.block.entity.MapControllerBlockEntity;
-import com.aureskull.zmcmod.block.entity.SmallZombieDoorwayBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZoneControllerBlockEntity;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.*;

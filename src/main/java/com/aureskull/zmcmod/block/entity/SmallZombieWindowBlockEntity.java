@@ -1,9 +1,7 @@
 package com.aureskull.zmcmod.block.entity;
 
-import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.ILinkable;
 import com.aureskull.zmcmod.block.custom.SmallZombieDoorwayBlock;
-import com.aureskull.zmcmod.block.custom.ZoneControllerBlock;
 import com.aureskull.zmcmod.client.InteractionHelper;
 import com.aureskull.zmcmod.client.MessageHudOverlay;
 import com.aureskull.zmcmod.event.ModKeyInputHandler;
@@ -32,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class SmallZombieDoorwayBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ILinkable {
+public class SmallZombieWindowBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ILinkable {
     public final int MAX_PLANK = 6;
     public int plank = 0;
 
@@ -40,8 +38,8 @@ public class SmallZombieDoorwayBlockEntity extends BlockEntity implements Extend
 
     private BlockPos linkedZonePos;
 
-    public SmallZombieDoorwayBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntities.SMALL_ZOMBIE_DOORWAY_BLOCK_ENTITY, pos, state);
+    public SmallZombieWindowBlockEntity(BlockPos pos, BlockState state) {
+        super(ModBlockEntities.SMALL_ZOMBIE_WINDOW_BLOCK_ENTITY, pos, state);
     }
 
     @Override
@@ -162,7 +160,7 @@ public class SmallZombieDoorwayBlockEntity extends BlockEntity implements Extend
         //Remove from ZombieSpawner the doorway
         BlockEntity existingZombieSpawnerBE = world.getBlockEntity(this.getLinkedBlock(ZombieSpawnerBlockEntity.class));
         if(existingZombieSpawnerBE instanceof ZombieSpawnerBlockEntity)
-            ((ZombieSpawnerBlockEntity) existingZombieSpawnerBE).setLinkedBlock(null, SmallZombieDoorwayBlockEntity.class);
+            ((ZombieSpawnerBlockEntity) existingZombieSpawnerBE).setLinkedBlock(null, SmallZombieWindowBlockEntity.class);
 
         setLinkedBlock(null, ZombieSpawnerBlockEntity.class);
     }
@@ -175,7 +173,7 @@ public class SmallZombieDoorwayBlockEntity extends BlockEntity implements Extend
         //Remove from ZoneController the doorway
         BlockEntity zoneControllerBE = world.getBlockEntity(getLinkedBlock(ZoneControllerBlockEntity.class));
         if(zoneControllerBE instanceof ZoneControllerBlockEntity)
-            ((ZoneControllerBlockEntity) zoneControllerBE).removeLinkedBlock(this.getPos(), SmallZombieDoorwayBlockEntity.class);
+            ((ZoneControllerBlockEntity) zoneControllerBE).removeLinkedBlock(this.getPos(), SmallZombieWindowBlockEntity.class);
 
         //Remove from server at the end
         setLinkedBlock(null, ZoneControllerBlockEntity.class);

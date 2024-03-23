@@ -1,11 +1,9 @@
 package com.aureskull.zmcmod.block.custom;
 
-import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.entity.ModBlockEntities;
-import com.aureskull.zmcmod.block.entity.SmallZombieDoorwayBlockEntity;
+import com.aureskull.zmcmod.block.entity.SmallZombieWindowBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZombieSpawnerBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZoneControllerBlockEntity;
-import com.aureskull.zmcmod.networking.ModMessages;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
@@ -75,13 +73,13 @@ public class SmallZombieDoorwayBlock extends BlockWithEntity implements BlockEnt
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state){
-        return new SmallZombieDoorwayBlockEntity(pos, state);
+        return new SmallZombieWindowBlockEntity(pos, state);
     }
 
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return validateTicker(type, ModBlockEntities.SMALL_ZOMBIE_DOORWAY_BLOCK_ENTITY,
+        return validateTicker(type, ModBlockEntities.SMALL_ZOMBIE_WINDOW_BLOCK_ENTITY,
                 (world1, pos, state1, blockEntity) -> blockEntity.tick(world1, pos, state1));
     }
 
@@ -94,8 +92,8 @@ public class SmallZombieDoorwayBlock extends BlockWithEntity implements BlockEnt
     public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         if (!world.isClient()) { // Server side
             BlockEntity be = world.getBlockEntity(pos);
-            if (be instanceof SmallZombieDoorwayBlockEntity) {
-                SmallZombieDoorwayBlockEntity smallZombieDoorway = (SmallZombieDoorwayBlockEntity) be;
+            if (be instanceof SmallZombieWindowBlockEntity) {
+                SmallZombieWindowBlockEntity smallZombieDoorway = (SmallZombieWindowBlockEntity) be;
 
                 smallZombieDoorway.unlink(world, ZombieSpawnerBlockEntity.class);
                 smallZombieDoorway.unlink(world, ZoneControllerBlockEntity.class);

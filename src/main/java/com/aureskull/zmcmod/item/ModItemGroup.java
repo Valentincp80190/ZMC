@@ -26,7 +26,7 @@ public class ModItemGroup {
                 entries.add(ModItems.LINKER);
                 entries.add(ModBlocks.MAP_CONTROLLER);
                 entries.add(ModBlocks.ZONE_CONTROLLER);
-                entries.add(ModBlocks.SMALL_ZOMBIE_DOORWAY);
+                entries.add(ModBlocks.SMALL_ZOMBIE_WINDOW);
                 entries.add(ModBlocks.ZOMBIE_SPAWNER);
             }))
             .displayName(Text.translatable("itemgroup.zmc"))

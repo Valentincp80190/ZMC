@@ -1,19 +1,16 @@
 package com.aureskull.zmcmod.block.entity.renderer;
 
-import com.aureskull.zmcmod.ZMCMod;
-import com.aureskull.zmcmod.block.entity.SmallZombieDoorwayBlockEntity;
+import com.aureskull.zmcmod.block.entity.SmallZombieWindowBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZombieSpawnerBlockEntity;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 
-public class SmallZombieDoorwayEntityRenderer  implements BlockEntityRenderer<SmallZombieDoorwayBlockEntity> {
+public class SmallZombieDoorwayEntityRenderer  implements BlockEntityRenderer<SmallZombieWindowBlockEntity> {
     //TODO : Dessiner une texture de 1*3 pixels qui représente un fil
 
     public SmallZombieDoorwayEntityRenderer(BlockEntityRendererFactory.Context context){
@@ -21,7 +18,7 @@ public class SmallZombieDoorwayEntityRenderer  implements BlockEntityRenderer<Sm
     }
 
     @Override
-    public void render(SmallZombieDoorwayBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+    public void render(SmallZombieWindowBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
         if(entity.getLinkedBlock(ZombieSpawnerBlockEntity.class) != null){
             renderLine(entity.getPos(), entity.getLinkedBlock(ZombieSpawnerBlockEntity.class), matrices);
         }

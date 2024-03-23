@@ -22,7 +22,7 @@ public class ModBlocks {
     public static final Block ZONE_CONTROLLER = registerBlock("zone_controller",
             new ZoneControllerBlock(FabricBlockSettings.copyOf(Blocks.NETHERITE_BLOCK)));
 
-    public static final Block SMALL_ZOMBIE_DOORWAY = registerBlock("small_zombie_doorway",
+    public static final Block SMALL_ZOMBIE_WINDOW = registerBlock("small_zombie_window",
             new SmallZombieDoorwayBlock(FabricBlockSettings.copyOf(Blocks.NETHERITE_BLOCK).nonOpaque()));
 
     public static final Block ZOMBIE_SPAWNER = registerBlock("zombie_spawner",

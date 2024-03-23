@@ -115,25 +115,25 @@ public class ZombieSpawnerBlockEntity extends BlockEntity implements ExtendedScr
     }
 
     public void unlinkDoorway(World world) {
-        ModMessages.sendRemoveLinkPacket(world, this.getLinkedBlock(SmallZombieDoorwayBlockEntity.class));
+        ModMessages.sendRemoveLinkPacket(world, this.getLinkedBlock(SmallZombieWindowBlockEntity.class));
 
-        BlockEntity existingDoorwayEntity = world.getBlockEntity(this.getLinkedBlock(SmallZombieDoorwayBlockEntity.class));
-        if (existingDoorwayEntity instanceof SmallZombieDoorwayBlockEntity)
-            ((SmallZombieDoorwayBlockEntity) existingDoorwayEntity).setLinkedBlock(null, ZombieSpawnerBlockEntity.class);
+        BlockEntity existingDoorwayEntity = world.getBlockEntity(this.getLinkedBlock(SmallZombieWindowBlockEntity.class));
+        if (existingDoorwayEntity instanceof SmallZombieWindowBlockEntity)
+            ((SmallZombieWindowBlockEntity) existingDoorwayEntity).setLinkedBlock(null, ZombieSpawnerBlockEntity.class);
 
-        setLinkedBlock(null, SmallZombieDoorwayBlockEntity.class);
+        setLinkedBlock(null, SmallZombieWindowBlockEntity.class);
     }
 
     @Override
     public void unlink(World world, Class<? extends BlockEntity> linkType) {
-        if(SmallZombieDoorwayBlockEntity.class.isAssignableFrom(linkType) && linkedDoorwayPos != null){
+        if(SmallZombieWindowBlockEntity.class.isAssignableFrom(linkType) && linkedDoorwayPos != null){
             unlinkDoorway(world);
         }
     }
 
     @Override
     public void setLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
-        if(SmallZombieDoorwayBlockEntity.class.isAssignableFrom(linkType)) {
+        if(SmallZombieWindowBlockEntity.class.isAssignableFrom(linkType)) {
             this.linkedDoorwayPos = linkedBlockPos;
         }
 
@@ -142,7 +142,7 @@ public class ZombieSpawnerBlockEntity extends BlockEntity implements ExtendedScr
 
     @Override
     public @Nullable BlockPos getLinkedBlock(Class<? extends BlockEntity> linkType) {
-        if(SmallZombieDoorwayBlockEntity.class.isAssignableFrom(linkType)) {
+        if(SmallZombieWindowBlockEntity.class.isAssignableFrom(linkType)) {
             return this.linkedDoorwayPos;
         }
 

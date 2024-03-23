@@ -2,8 +2,8 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [64, 64],
 	"textures": {
-		"0": "zmcmod:block/small_zombie_doorway/small_zombie_doorway_1",
-		"particle": "zmcmod:block/small_zombie_doorway/small_zombie_doorway_1"
+		"0": "zmcmod:block/small_zombie_window/small_zombie_window_1",
+		"particle": "zmcmod:block/small_zombie_window/small_zombie_window_1"
 	},
 	"elements": [
 		{
