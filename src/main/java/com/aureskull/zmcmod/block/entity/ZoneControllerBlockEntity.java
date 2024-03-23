@@ -204,50 +204,6 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
         removeLinkedBlock(doorway, SmallZombieWindowBlockEntity.class);
     }
 
-    /*private void unlinkZone(World world, BlockPos zonePos){
-        ModMessages.sendRemoveZoneLinkFromZonePacket(world, getPos(), zonePos);
-
-        //Remove from SmallZombieDoorway the zone
-        BlockEntity zoneBE = world.getBlockEntity(zonePos);
-        if (zoneBE instanceof ZoneControllerBlockEntity)
-            ((ZoneControllerBlockEntity) zoneBE).setLinkedBlock(null, ZoneControllerBlockEntity.class);
-
-        removeLinkedBlock(zonePos, ZoneControllerBlockEntity.class);
-    }
-
-    public BlockPos getLinkedParentZone() {
-        return linkedParentZone;
-    }
-
-    public void setLinkedParentZone(BlockPos linkedParentZone) {
-        if(this.linkedParentZone != null && world.getBlockEntity(this.linkedParentZone) instanceof  ZoneControllerBlockEntity)
-            ModMessages.sendRemoveZoneLinkFromZonePacket(world, this.linkedParentZone, this.getPos());
-
-        //Remove from parent's zone the zone
-        if(this.linkedParentZone != null){
-            BlockEntity zoneBE = world.getBlockEntity(this.linkedParentZone);
-            if (zoneBE instanceof ZoneControllerBlockEntity)
-                ((ZoneControllerBlockEntity) zoneBE).removeLinkedZone(this.getPos());
-        }
-
-        this.linkedParentZone = linkedParentZone;
-
-        markDirty();
-    }
-
-    private List<BlockPos> getLinkedZone(){
-        return new ArrayList<>(linkedZoneControllers);
-    }
-
-    private void removeLinkedZone(BlockPos zonePos){
-        if(this.linkedZoneControllers.contains(zonePos))
-            this.linkedZoneControllers.remove(zonePos);
-    }
-
-    private void addLinkedZone(BlockPos zonePos){
-        if(!linkedZoneControllers.contains(zonePos))
-            linkedZoneControllers.add(zonePos);
-    }*/
     private List<BlockPos> getLinkedParentZoneControllers() {
         return new ArrayList<>(linkedParentZoneControllers);
     }

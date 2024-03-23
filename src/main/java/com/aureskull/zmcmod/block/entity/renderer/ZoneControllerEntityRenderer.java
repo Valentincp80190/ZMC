@@ -2,11 +2,15 @@ package com.aureskull.zmcmod.block.entity.renderer;
 
 import com.aureskull.zmcmod.block.entity.SmallZombieWindowBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZoneControllerBlockEntity;
+import com.aureskull.zmcmod.event.ModKeyInputHandler;
+import com.aureskull.zmcmod.item.custom.Linker;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import org.joml.Matrix4f;
@@ -19,8 +23,18 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
 
     @Override
     public void render(ZoneControllerBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-        drawLinesToDoorways(entity, matrices);
-        drawLinesToChildZones(entity, matrices);
+        MinecraftClient minecraftClient = MinecraftClient.getInstance();
+
+        // Check if the Minecraft client and the player are not null
+        if (minecraftClient != null && minecraftClient.player != null) {
+            ItemStack itemInMainHand = minecraftClient.player.getMainHandStack();
+
+            // Check if the item in the main hand is the Linker item
+            if (itemInMainHand.getItem() instanceof Linker) {
+                drawLinesToDoorways(entity, matrices);
+                drawLinesToChildZones(entity, matrices);
+            }
+        }
 
         BlockPos posA = entity.posA;
         BlockPos posB = entity.posB;
@@ -59,11 +73,13 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
         final int f_z1 = z1;
         final int f_z2 = z2;
 
-        renderLine(entity, matrices, f_x1, f_x2, f_y1, f_y2, f_z1, f_z2);
-        renderSide(entity, matrices, f_x1, f_x2, f_y1, f_y2, f_z1, f_z2);
+        if(ModKeyInputHandler.showZoneArea){
+            renderLine(entity, matrices, f_x1, f_x2, f_y1, f_y2, f_z1, f_z2);
+            renderSide(entity, matrices, f_x1, f_x2, f_y1, f_y2, f_z1, f_z2);
 
-        renderCube(entity, matrices, entity.posA);
-        renderCube(entity, matrices, entity.posB);
+            renderCube(entity, matrices, entity.posA);
+            renderCube(entity, matrices, entity.posB);
+        }
     }
 
     public void renderLine(ZoneControllerBlockEntity entity, MatrixStack matrices, int f_x1, int f_x2, int f_y1, int f_y2, int f_z1, int f_z2){
@@ -142,35 +158,35 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
         float alpha = .11f;
         RenderSystem.enableBlend(); // Enable blending
 
-        buffer.vertex(positionMatrix, f_x1, f_y2, f_z1).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x1, f_y1, f_z1).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x2, f_y1, f_z1).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x2, f_y2, f_z1).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x1, f_y2, f_z1 + 0.01F).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x1, f_y1, f_z1 + 0.01F).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x2, f_y1, f_z1 + 0.01F).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x2, f_y2, f_z1 + 0.01F).color(entity.red, entity.green, entity.blue, alpha).next();
 
-        buffer.vertex(positionMatrix, f_x2, f_y1, f_z1).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x2, f_y1, f_z2).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x2, f_y2, f_z2).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x2, f_y2, f_z1).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x2 - 0.01F, f_y1, f_z1).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x2 - 0.01F, f_y1, f_z2).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x2 - 0.01F, f_y2, f_z2).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x2 - 0.01F, f_y2, f_z1).color(entity.red, entity.green, entity.blue, alpha).next();
 
-        buffer.vertex(positionMatrix, f_x2, f_y1, f_z2).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x1, f_y1, f_z2).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x1, f_y2, f_z2).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x2, f_y2, f_z2).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x2, f_y1, f_z2 - 0.01F).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x1, f_y1, f_z2 - 0.01F).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x1, f_y2, f_z2 - 0.01F).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x2, f_y2, f_z2 - 0.01F).color(entity.red, entity.green, entity.blue, alpha).next();
 
-        buffer.vertex(positionMatrix, f_x1, f_y1, f_z2).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x1, f_y1, f_z1).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x1, f_y2, f_z1).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x1, f_y2, f_z2).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x1 + 0.01F, f_y1, f_z2).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x1 + 0.01F, f_y1, f_z1).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x1 + 0.01F, f_y2, f_z1).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x1 + 0.01F, f_y2, f_z2).color(entity.red, entity.green, entity.blue, alpha).next();
 
-        buffer.vertex(positionMatrix, f_x1, f_y1, f_z1).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x2, f_y1, f_z1).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x2, f_y1, f_z2).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x1, f_y1, f_z2).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x1, f_y1+0.01F, f_z1).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x2, f_y1+0.01F, f_z1).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x2, f_y1+0.01F, f_z2).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x1, f_y1+0.01F, f_z2).color(entity.red, entity.green, entity.blue, alpha).next();
 
-        buffer.vertex(positionMatrix, f_x1, f_y2, f_z1).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x2, f_y2, f_z1).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x2, f_y2, f_z2).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x1, f_y2, f_z2).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x1, f_y2-0.01F, f_z1).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x2, f_y2-0.01F, f_z1).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x2, f_y2-0.01F, f_z2).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x1, f_y2-0.01F, f_z2).color(entity.red, entity.green, entity.blue, alpha).next();
 
         RenderSystem.setShader(GameRenderer::getPositionColorTexProgram);
         //Sans l'image, on ne peut pas afficher les faces du cube => A corriger

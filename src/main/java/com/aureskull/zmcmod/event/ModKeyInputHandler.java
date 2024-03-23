@@ -12,15 +12,21 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 public class ModKeyInputHandler {
     public static final String KEY_CATEGORY_ZMC = "key.category.zmcmod";
     public static final String KEY_OPEN_MAP_EDITOR = "key.zmcmod.openmapeditor";
     public static final String KEY_INTERACT = "key.zmcmod.interact";
+    public static final String KEY_SHOW_HIDE_ZONES = "key.zmcmod.showhidezones";
 
     public static KeyBinding OPEN_MAP_EDITOR_GUI;
     public static KeyBinding INTERACT;
+    public static KeyBinding SHOW_HIDE_ZONES;
     private static long lastActionTime = 0;
+
+    public static boolean showZoneArea = false;
 
     public static void registerKeyInputs(){
         ClientTickEvents.START_CLIENT_TICK.register(client -> {
@@ -58,6 +64,23 @@ public class ModKeyInputHandler {
                 }
             }
         });
+
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            while (SHOW_HIDE_ZONES.wasPressed()) {
+                if (client.player != null) {
+                    showZoneArea = !showZoneArea;
+
+                    if(showZoneArea)
+                        client.player.sendMessage(Text.literal("State of zones: ")
+                                .append(Text.literal("Displayed")
+                                        .formatted(Formatting.GREEN)), true);
+                    else
+                        client.player.sendMessage(Text.literal("State of zones: ")
+                                .append(Text.literal("Hidden")
+                                        .formatted(Formatting.RED)), true);
+                }
+            }
+        });
     }
 
     public static void register(){
@@ -72,6 +95,13 @@ public class ModKeyInputHandler {
 
         INTERACT = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 KEY_INTERACT,
+                InputUtil.Type.KEYSYM,
+                InputUtil.UNKNOWN_KEY.getCode(),
+                KEY_CATEGORY_ZMC
+        ));
+
+        SHOW_HIDE_ZONES = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                KEY_SHOW_HIDE_ZONES,
                 InputUtil.Type.KEYSYM,
                 InputUtil.UNKNOWN_KEY.getCode(),
                 KEY_CATEGORY_ZMC
