@@ -373,12 +373,12 @@ public class ZoneControllerScreen extends HandledScreen<ZoneControllerScreenHand
         context.drawCenteredTextWithShadow(textRenderer, Text.literal("Y:"), width - RIGHT_PADDING - RIGHT_ELEMENT_MAX_SIZE + LEFT_TEXT_BLOCKPOS_OFFSET, posAXTextField.getHeight() + posAXTextField.getY() + TOP_TEXT_BLOCKPOS_OFFSET, 0xffffff);
         context.drawCenteredTextWithShadow(textRenderer, Text.literal("Z:"), width - RIGHT_PADDING - RIGHT_ELEMENT_MAX_SIZE + LEFT_TEXT_BLOCKPOS_OFFSET, posAYTextField.getHeight() + posAYTextField.getY() + TOP_TEXT_BLOCKPOS_OFFSET, 0xffffff);
 
-        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Second zone position"), width - 54 - RIGHT_PADDING, posAZTextField.getY() + posAZTextField.getHeight() + SECTION_PADDING_TEXT, 0xffffff);
+        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Second zone position"), width - 57 - RIGHT_PADDING, posAZTextField.getY() + posAZTextField.getHeight() + SECTION_PADDING_TEXT, 0xffffff);
         context.drawCenteredTextWithShadow(textRenderer, Text.literal("X:"), width - RIGHT_PADDING - RIGHT_ELEMENT_MAX_SIZE + LEFT_TEXT_BLOCKPOS_OFFSET, posAZTextField.getHeight() + posAZTextField.getY() + SECTION_PADDING + TOP_TEXT_BLOCKPOS_OFFSET, 0xffffff);
         context.drawCenteredTextWithShadow(textRenderer, Text.literal("Y:"), width - RIGHT_PADDING - RIGHT_ELEMENT_MAX_SIZE + LEFT_TEXT_BLOCKPOS_OFFSET, posBXTextField.getHeight() + posBXTextField.getY() + TOP_TEXT_BLOCKPOS_OFFSET, 0xffffff);
         context.drawCenteredTextWithShadow(textRenderer, Text.literal("Z:"), width - RIGHT_PADDING - RIGHT_ELEMENT_MAX_SIZE + LEFT_TEXT_BLOCKPOS_OFFSET, posBYTextField.getHeight() + posBYTextField.getY() + TOP_TEXT_BLOCKPOS_OFFSET, 0xffffff);
 
-        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Player spawn location"), width - 54 - RIGHT_PADDING, posBZTextField.getY() + posBZTextField.getHeight() + SECTION_PADDING_TEXT, 0xffffff);
+        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Player spawn location"), width - 55 - RIGHT_PADDING, posBZTextField.getY() + posBZTextField.getHeight() + SECTION_PADDING_TEXT, 0xffffff);
         context.drawCenteredTextWithShadow(textRenderer, Text.literal("X:"), width - RIGHT_PADDING - RIGHT_ELEMENT_MAX_SIZE + LEFT_TEXT_BLOCKPOS_OFFSET, posBZTextField.getHeight() + posBZTextField.getY() + SECTION_PADDING + TOP_TEXT_BLOCKPOS_OFFSET, 0xffffff);
         context.drawCenteredTextWithShadow(textRenderer, Text.literal("Y:"), width - RIGHT_PADDING - RIGHT_ELEMENT_MAX_SIZE + LEFT_TEXT_BLOCKPOS_OFFSET, spawnPosXTextField.getHeight() + spawnPosXTextField.getY() + TOP_TEXT_BLOCKPOS_OFFSET, 0xffffff);
         context.drawCenteredTextWithShadow(textRenderer, Text.literal("Z:"), width - RIGHT_PADDING - RIGHT_ELEMENT_MAX_SIZE + LEFT_TEXT_BLOCKPOS_OFFSET, spawnPosYTextField.getHeight() + spawnPosYTextField.getY() + TOP_TEXT_BLOCKPOS_OFFSET, 0xffffff);

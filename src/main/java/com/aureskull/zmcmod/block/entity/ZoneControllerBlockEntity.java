@@ -69,15 +69,17 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
         nbt.putFloat("zone_controller.green", green);
         nbt.putFloat("zone_controller.blue", blue);
 
-        nbt.putFloat("zone_controller.posa.x", posA.getX());
+        /*nbt.putFloat("zone_controller.posa.x", posA.getX());
         nbt.putFloat("zone_controller.posa.y", posA.getY());
         nbt.putFloat("zone_controller.posa.z", posA.getZ());
 
         nbt.putFloat("zone_controller.posb.x", posB.getX());
         nbt.putFloat("zone_controller.posb.y", posB.getY());
-        nbt.putFloat("zone_controller.posb.z", posB.getZ());
+        nbt.putFloat("zone_controller.posb.z", posB.getZ());*/
 
         nbt.put("zone_controller.spawn_point", NbtHelper.fromBlockPos(spawnPoint));
+        nbt.put("zone_controller.position_a", NbtHelper.fromBlockPos(posA));
+        nbt.put("zone_controller.position_b", NbtHelper.fromBlockPos(posB));
 
         if (linkedMapController != null) {
             nbt.put("zone_controller.linked_map_controller", NbtHelper.fromBlockPos(linkedMapController));
@@ -119,23 +121,36 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
         if (nbt.contains("zone_controller.blue"))
             this.blue = nbt.getFloat("zone_controller.blue");
 
-        if (nbt.contains("zone_controller.posa.x", 99) ||
+        /*if (nbt.contains("zone_controller.posa.x", 99) ||
                 nbt.contains("zone_controller.posa.y", 99) ||
                 nbt.contains("zone_controller.posa.z", 99)) { // The '99' checks for any numeric tag type
             this.posA = new BlockPos(
                     nbt.getInt("zone_controller.posa.x"),
                     nbt.getInt("zone_controller.posa.y"),
                     nbt.getInt("zone_controller.posa.z"));
-        }
+        }*/
 
-        if (nbt.contains("zone_controller.posb.x", 99) ||
+        /*if (nbt.contains("zone_controller.posb.x", 99) ||
                 nbt.contains("zone_controller.posb.y", 99) ||
                 nbt.contains("zone_controller.posb.z", 99)) { // The '99' checks for any numeric tag type
             this.posB = new BlockPos(
                     nbt.getInt("zone_controller.posb.x"),
                     nbt.getInt("zone_controller.posb.y"),
                     nbt.getInt("zone_controller.posb.z"));
+        }*/
+
+        if (nbt.contains("zone_controller.position_a")) {
+            this.posA = NbtHelper.toBlockPos(nbt.getCompound("zone_controller.position_a"));
         }
+
+        if (nbt.contains("zone_controller.position_b")) {
+            this.posB = NbtHelper.toBlockPos(nbt.getCompound("zone_controller.position_b"));
+        }
+
+        if (nbt.contains("zone_controller.spawn_point")) {
+            this.spawnPoint = NbtHelper.toBlockPos(nbt.getCompound("zone_controller.spawn_point"));
+        }
+
 
         if (nbt.contains("zone_controller.spawn_point")) {
             this.spawnPoint = NbtHelper.toBlockPos(nbt.getCompound("zone_controller.spawn_point"));
