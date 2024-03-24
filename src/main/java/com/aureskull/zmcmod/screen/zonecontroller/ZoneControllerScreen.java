@@ -72,6 +72,7 @@ public class ZoneControllerScreen extends HandledScreen<ZoneControllerScreenHand
         }
     };
 
+    //POSITION A
     private TextFieldWidget posAXTextField;
 
     public ButtonWidget incrementPosAXButtonWidget = ButtonWidget.builder(Text.literal("˄"), button -> {
@@ -146,7 +147,7 @@ public class ZoneControllerScreen extends HandledScreen<ZoneControllerScreenHand
 
 
 
-
+    //POSITION B
     private TextFieldWidget posBXTextField;
 
     public ButtonWidget incrementPosBXButtonWidget = ButtonWidget.builder(Text.literal("˄"), button -> {
@@ -219,6 +220,81 @@ public class ZoneControllerScreen extends HandledScreen<ZoneControllerScreenHand
             .dimensions(0, 0, INC_DEC_SIZE_POS_BUTTON, INC_DEC_SIZE_POS_BUTTON)
             .build();
 
+
+    //SPAWN POSITION
+    private TextFieldWidget spawnPosXTextField;
+
+    public ButtonWidget incrementSpawnPosXButtonWidget = ButtonWidget.builder(Text.literal("˄"), button -> {
+                BlockPos spawnPoint = this.handler.blockEntity.getSpawnPoint();
+
+                BlockPos newSpawnPoint = new BlockPos(spawnPoint.getX() + 1, spawnPoint.getY(), spawnPoint.getZ());
+                this.handler.updatePos(newSpawnPoint, "spawnPos");
+
+                spawnPosXTextField.setText(String.valueOf(newSpawnPoint.getX()));
+            })
+            .dimensions(0, 0, 10, 10)
+            .build();
+
+    public ButtonWidget decrementSpawnPosXButtonWidget = ButtonWidget.builder(Text.literal("˅"), button -> {
+                BlockPos spawnPoint = this.handler.blockEntity.getSpawnPoint();
+
+                BlockPos newSpawnPoint = new BlockPos(spawnPoint.getX() - 1, spawnPoint.getY(), spawnPoint.getZ());
+                this.handler.updatePos(newSpawnPoint, "spawnPos");
+
+                spawnPosXTextField.setText(String.valueOf(newSpawnPoint.getX()));
+            })
+            .dimensions(0, 0, 10, 10)
+            .build();
+
+    private TextFieldWidget spawnPosYTextField;
+
+    public ButtonWidget incrementSpawnPosYButtonWidget = ButtonWidget.builder(Text.literal("˄"), button -> {
+                BlockPos spawnPoint = this.handler.blockEntity.getSpawnPoint();
+
+                BlockPos newSpawnPoint = new BlockPos(spawnPoint.getX(), spawnPoint.getY() + 1, spawnPoint.getZ());
+                this.handler.updatePos(newSpawnPoint, "spawnPos");
+
+                spawnPosYTextField.setText(String.valueOf(newSpawnPoint.getY()));
+            })
+            .dimensions(0, 0, INC_DEC_SIZE_POS_BUTTON, INC_DEC_SIZE_POS_BUTTON)
+            .build();
+
+    public ButtonWidget decrementSpawnPosYButtonWidget = ButtonWidget.builder(Text.literal("˅"), button -> {
+                BlockPos spawnPoint = this.handler.blockEntity.getSpawnPoint();
+
+                BlockPos newSpawnPoint = new BlockPos(spawnPoint.getX(), spawnPoint.getY() - 1, spawnPoint.getZ());
+                this.handler.updatePos(newSpawnPoint, "spawnPos");
+
+                spawnPosYTextField.setText(String.valueOf(newSpawnPoint.getY()));
+            })
+            .dimensions(0, 0, INC_DEC_SIZE_POS_BUTTON, INC_DEC_SIZE_POS_BUTTON)
+            .build();
+
+    private TextFieldWidget spawnPosZTextField;
+
+    public ButtonWidget incrementSpawnPosZButtonWidget = ButtonWidget.builder(Text.literal("˄"), button -> {
+                BlockPos spawnPoint = this.handler.blockEntity.getSpawnPoint();
+
+                BlockPos newSpawnPoint = new BlockPos(spawnPoint.getX(), spawnPoint.getY(), spawnPoint.getZ() + 1);
+                this.handler.updatePos(newSpawnPoint, "spawnPos");
+
+                spawnPosZTextField.setText(String.valueOf(newSpawnPoint.getZ()));
+            })
+            .dimensions(0, 0, INC_DEC_SIZE_POS_BUTTON, INC_DEC_SIZE_POS_BUTTON)
+            .build();
+
+    public ButtonWidget decrementSpawnPosZButtonWidget = ButtonWidget.builder(Text.literal("˅"), button -> {
+                BlockPos spawnPoint = this.handler.blockEntity.getSpawnPoint();
+
+                BlockPos newSpawnPoint = new BlockPos(spawnPoint.getX(), spawnPoint.getY(), spawnPoint.getZ() - 1);
+                this.handler.updatePos(newSpawnPoint, "spawnPos");
+
+                spawnPosZTextField.setText(String.valueOf(newSpawnPoint.getZ()));
+            })
+            .dimensions(0, 0, INC_DEC_SIZE_POS_BUTTON, INC_DEC_SIZE_POS_BUTTON)
+            .build();
+
+
     @Override
     protected void init() {
         super.init();
@@ -232,6 +308,10 @@ public class ZoneControllerScreen extends HandledScreen<ZoneControllerScreenHand
         posBXTextField.setText(String.valueOf(this.handler.getPosB().getX()));
         posBYTextField.setText(String.valueOf(this.handler.getPosB().getY()));
         posBZTextField.setText(String.valueOf(this.handler.getPosB().getZ()));
+
+        spawnPosXTextField.setText(String.valueOf(this.handler.blockEntity.getSpawnPoint().getX()));
+        spawnPosYTextField.setText(String.valueOf(this.handler.blockEntity.getSpawnPoint().getY()));
+        spawnPosZTextField.setText(String.valueOf(this.handler.blockEntity.getSpawnPoint().getZ()));
 
         redSlider.setPosition(width - redSlider.getWidth() - RIGHT_PADDING, 23);
         greenSlider.setPosition(width - redSlider.getWidth() - RIGHT_PADDING, redSlider.getY() + redSlider.getHeight() + PADDING);
@@ -263,6 +343,19 @@ public class ZoneControllerScreen extends HandledScreen<ZoneControllerScreenHand
         incrementPosBZButtonWidget.setPosition(width - RIGHT_PADDING - (RIGHT_ELEMENT_MAX_SIZE - TEXTFIELD_WIDTH) + LEFT_OFFSET_POS_BUTTON + 2 , posBYTextField.getHeight() + posBYTextField.getY() + 1);
         decrementPosBZButtonWidget.setPosition(width - RIGHT_PADDING - (RIGHT_ELEMENT_MAX_SIZE - TEXTFIELD_WIDTH) + LEFT_OFFSET_POS_BUTTON + 2, incrementPosBZButtonWidget.getY() + incrementPosBZButtonWidget.getHeight() - 2);
 
+        //SPAWN POSITION
+        spawnPosXTextField.setPosition(width - TEXTFIELD_WIDTH - RIGHT_PADDING - (RIGHT_ELEMENT_MAX_SIZE - TEXTFIELD_WIDTH) + TEXTFIELD_LEFT_PADDING, posBZTextField.getHeight() + posBZTextField.getY() + SECTION_PADDING + 1);
+        incrementSpawnPosXButtonWidget.setPosition(width - RIGHT_PADDING - (RIGHT_ELEMENT_MAX_SIZE - TEXTFIELD_WIDTH) + LEFT_OFFSET_POS_BUTTON + 2 , posBZTextField.getHeight() + posBZTextField.getY() + SECTION_PADDING + 1);
+        decrementSpawnPosXButtonWidget.setPosition(width - RIGHT_PADDING - (RIGHT_ELEMENT_MAX_SIZE - TEXTFIELD_WIDTH) + LEFT_OFFSET_POS_BUTTON + 2, incrementSpawnPosXButtonWidget.getY() + incrementSpawnPosXButtonWidget.getHeight() - 2);
+
+        spawnPosYTextField.setPosition(width - TEXTFIELD_WIDTH - RIGHT_PADDING - (RIGHT_ELEMENT_MAX_SIZE - TEXTFIELD_WIDTH) + TEXTFIELD_LEFT_PADDING, spawnPosXTextField.getHeight() + spawnPosXTextField.getY() + 1);
+        incrementSpawnPosYButtonWidget.setPosition(width - RIGHT_PADDING - (RIGHT_ELEMENT_MAX_SIZE - TEXTFIELD_WIDTH) + LEFT_OFFSET_POS_BUTTON + 2 , spawnPosXTextField.getHeight() + spawnPosXTextField.getY() + 1);
+        decrementSpawnPosYButtonWidget.setPosition(width - RIGHT_PADDING - (RIGHT_ELEMENT_MAX_SIZE - TEXTFIELD_WIDTH) + LEFT_OFFSET_POS_BUTTON + 2, incrementSpawnPosYButtonWidget.getY() + incrementSpawnPosYButtonWidget.getHeight() - 2);
+
+        spawnPosZTextField.setPosition(width - TEXTFIELD_WIDTH - RIGHT_PADDING - (RIGHT_ELEMENT_MAX_SIZE - TEXTFIELD_WIDTH) + TEXTFIELD_LEFT_PADDING, spawnPosYTextField.getHeight() + spawnPosYTextField.getY() + 1);
+        incrementSpawnPosZButtonWidget.setPosition(width - RIGHT_PADDING - (RIGHT_ELEMENT_MAX_SIZE - TEXTFIELD_WIDTH) + LEFT_OFFSET_POS_BUTTON + 2 , spawnPosYTextField.getHeight() + spawnPosYTextField.getY() + 1);
+        decrementSpawnPosZButtonWidget.setPosition(width - RIGHT_PADDING - (RIGHT_ELEMENT_MAX_SIZE - TEXTFIELD_WIDTH) + LEFT_OFFSET_POS_BUTTON + 2, incrementSpawnPosZButtonWidget.getY() + incrementSpawnPosZButtonWidget.getHeight() - 2);
+
         // Supprimez les composants de texte par défaut
         this.titleX = Integer.MIN_VALUE;
         this.titleY = Integer.MIN_VALUE;
@@ -284,6 +377,11 @@ public class ZoneControllerScreen extends HandledScreen<ZoneControllerScreenHand
         context.drawCenteredTextWithShadow(textRenderer, Text.literal("X:"), width - RIGHT_PADDING - RIGHT_ELEMENT_MAX_SIZE + LEFT_TEXT_BLOCKPOS_OFFSET, posAZTextField.getHeight() + posAZTextField.getY() + SECTION_PADDING + TOP_TEXT_BLOCKPOS_OFFSET, 0xffffff);
         context.drawCenteredTextWithShadow(textRenderer, Text.literal("Y:"), width - RIGHT_PADDING - RIGHT_ELEMENT_MAX_SIZE + LEFT_TEXT_BLOCKPOS_OFFSET, posBXTextField.getHeight() + posBXTextField.getY() + TOP_TEXT_BLOCKPOS_OFFSET, 0xffffff);
         context.drawCenteredTextWithShadow(textRenderer, Text.literal("Z:"), width - RIGHT_PADDING - RIGHT_ELEMENT_MAX_SIZE + LEFT_TEXT_BLOCKPOS_OFFSET, posBYTextField.getHeight() + posBYTextField.getY() + TOP_TEXT_BLOCKPOS_OFFSET, 0xffffff);
+
+        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Player spawn location"), width - 54 - RIGHT_PADDING, posBZTextField.getY() + posBZTextField.getHeight() + SECTION_PADDING_TEXT, 0xffffff);
+        context.drawCenteredTextWithShadow(textRenderer, Text.literal("X:"), width - RIGHT_PADDING - RIGHT_ELEMENT_MAX_SIZE + LEFT_TEXT_BLOCKPOS_OFFSET, posBZTextField.getHeight() + posBZTextField.getY() + SECTION_PADDING + TOP_TEXT_BLOCKPOS_OFFSET, 0xffffff);
+        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Y:"), width - RIGHT_PADDING - RIGHT_ELEMENT_MAX_SIZE + LEFT_TEXT_BLOCKPOS_OFFSET, spawnPosXTextField.getHeight() + spawnPosXTextField.getY() + TOP_TEXT_BLOCKPOS_OFFSET, 0xffffff);
+        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Z:"), width - RIGHT_PADDING - RIGHT_ELEMENT_MAX_SIZE + LEFT_TEXT_BLOCKPOS_OFFSET, spawnPosYTextField.getHeight() + spawnPosYTextField.getY() + TOP_TEXT_BLOCKPOS_OFFSET, 0xffffff);
     }
 
     @Override
@@ -305,6 +403,10 @@ public class ZoneControllerScreen extends HandledScreen<ZoneControllerScreenHand
         posBXTextField = new TextFieldWidget(this.textRenderer, 0,  0, TEXTFIELD_WIDTH, 18, Text.of(String.valueOf(this.handler.getPosB().getX())));
         posBYTextField = new TextFieldWidget(this.textRenderer, 0,  0, TEXTFIELD_WIDTH, 18, Text.of(String.valueOf(this.handler.getPosB().getY())));
         posBZTextField = new TextFieldWidget(this.textRenderer, 0,  0, TEXTFIELD_WIDTH, 18, Text.of(String.valueOf(this.handler.getPosB().getZ())));
+
+        spawnPosXTextField = new TextFieldWidget(this.textRenderer, 0,  0, TEXTFIELD_WIDTH, 18, Text.of(String.valueOf(this.handler.blockEntity.getSpawnPoint().getX())));
+        spawnPosYTextField = new TextFieldWidget(this.textRenderer, 0,  0, TEXTFIELD_WIDTH, 18, Text.of(String.valueOf(this.handler.blockEntity.getSpawnPoint().getY())));
+        spawnPosZTextField = new TextFieldWidget(this.textRenderer, 0,  0, TEXTFIELD_WIDTH, 18, Text.of(String.valueOf(this.handler.blockEntity.getSpawnPoint().getZ())));
     }
 
     private void addElements(){
@@ -337,5 +439,18 @@ public class ZoneControllerScreen extends HandledScreen<ZoneControllerScreenHand
         addDrawableChild(posBZTextField);
         addDrawableChild(incrementPosBZButtonWidget);
         addDrawableChild(decrementPosBZButtonWidget);
+
+        //SPAWN POSITION
+        addDrawableChild(spawnPosXTextField);
+        addDrawableChild(incrementSpawnPosXButtonWidget);
+        addDrawableChild(decrementSpawnPosXButtonWidget);
+
+        addDrawableChild(spawnPosYTextField);
+        addDrawableChild(incrementSpawnPosYButtonWidget);
+        addDrawableChild(decrementSpawnPosYButtonWidget);
+
+        addDrawableChild(spawnPosZTextField);
+        addDrawableChild(incrementSpawnPosZButtonWidget);
+        addDrawableChild(decrementSpawnPosZButtonWidget);
     }
 }

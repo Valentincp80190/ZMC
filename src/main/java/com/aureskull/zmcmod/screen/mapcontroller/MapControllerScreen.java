@@ -69,7 +69,7 @@ public class MapControllerScreen extends HandledScreen<MapControllerScreenHandle
     }
 
     private void createElements(){
-        this.mapNameTextField = new TextFieldWidget(this.textRenderer, 0,  0, 45, 18, Text.of(this.handler.getMapName()));
+        this.mapNameTextField = new TextFieldWidget(this.textRenderer, 0,  0, 45, ScreenConstants.TEXTFIELD_HEIGHT, Text.of(this.handler.getMapName()));
     }
 
     @Override

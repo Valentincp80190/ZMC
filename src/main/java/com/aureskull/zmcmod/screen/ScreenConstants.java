@@ -22,6 +22,7 @@ public class ScreenConstants {
     public static final int SECTION_PADDING = 22;
     public static final int SLIDER_WIDTH = RIGHT_ELEMENT_MAX_SIZE;
     public static final int TEXTFIELD_WIDTH = 50;
+    public static final int TEXTFIELD_HEIGHT = 18;
     public static final int TEXTFIELD_LEFT_PADDING = 15;
     public static final int LEFT_OFFSET_POS_BUTTON = 14;
     public static final int INC_DEC_SIZE_POS_BUTTON = 10;

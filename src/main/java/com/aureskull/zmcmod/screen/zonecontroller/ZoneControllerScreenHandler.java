@@ -90,11 +90,12 @@ public class ZoneControllerScreenHandler extends ScreenHandler {
     public void updatePos(BlockPos newPos, String posVariable){
         updatePosOnServer(newPos, posVariable);
 
-        if(posVariable.equals("posA")){
+        if(posVariable.equals("posA"))
             blockEntity.posA = newPos;
-        }else{
+        else if(posVariable.equals("posB"))
             blockEntity.posB = newPos;
-        }
+        else if(posVariable.equals("spawnPos"))
+            blockEntity.spawnPoint = newPos;
 
         blockEntity.markDirty();
     }

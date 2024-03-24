@@ -20,9 +20,12 @@ public class ZoneControllerUpdatePosC2SPacket {
             if (blockEntity != null) {
                 if(new String(posVariable).equals("posA")){
                     blockEntity.posA = newPos;
-                }else{
+                }else if(new String(posVariable).equals("posB")){
                     blockEntity.posB = newPos;
+                }else if(new String(posVariable).equals("spawnPos")){
+                    blockEntity.spawnPoint = newPos;
                 }
+
                 blockEntity.markDirty();
             }
         });

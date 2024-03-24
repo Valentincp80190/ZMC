@@ -29,6 +29,7 @@ import java.util.List;
 public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ILinkable {
     public BlockPos posA = new BlockPos(pos.getX() - 5, pos.getY() + 1, pos.getZ() - 5);
     public BlockPos posB = new BlockPos(pos.getX() + 5, pos.getY() + 5, pos.getZ() + 5);
+    public BlockPos spawnPoint = new BlockPos(pos.getX(), pos.getY() + 2, pos.getZ());
 
     public float red = 1f;
     public float green = 1f;
@@ -75,6 +76,8 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
         nbt.putFloat("zone_controller.posb.x", posB.getX());
         nbt.putFloat("zone_controller.posb.y", posB.getY());
         nbt.putFloat("zone_controller.posb.z", posB.getZ());
+
+        nbt.put("zone_controller.spawn_point", NbtHelper.fromBlockPos(spawnPoint));
 
         if (linkedMapController != null) {
             nbt.put("zone_controller.linked_map_controller", NbtHelper.fromBlockPos(linkedMapController));
@@ -132,6 +135,10 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
                     nbt.getInt("zone_controller.posb.x"),
                     nbt.getInt("zone_controller.posb.y"),
                     nbt.getInt("zone_controller.posb.z"));
+        }
+
+        if (nbt.contains("zone_controller.spawn_point")) {
+            this.spawnPoint = NbtHelper.toBlockPos(nbt.getCompound("zone_controller.spawn_point"));
         }
 
         if (nbt.contains("zone_controller.linked_map_controller")) {
@@ -344,5 +351,14 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
 
         ZMCMod.LOGGER.warn("getAllLinkedBlocks from ZoneController called with wrong type : " + linkType);
         return null;
+    }
+
+    public BlockPos getSpawnPoint() {
+        return spawnPoint;
+    }
+
+    public void setSpawnPoint(BlockPos spawnPoint) {
+        this.spawnPoint = spawnPoint;
+        markDirty();
     }
 }
