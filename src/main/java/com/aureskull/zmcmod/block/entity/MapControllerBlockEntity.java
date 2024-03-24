@@ -27,6 +27,11 @@ import java.util.List;
 public class MapControllerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ILinkable {
     public String mapName = "";
 
+    private boolean start = false;
+
+    private int round = 0;
+    private int zombiesInRound = 0;
+
     private BlockPos linkedZoneController = null;
 
     public MapControllerBlockEntity(BlockPos pos, BlockState state) {
@@ -52,6 +57,9 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
     @Override
     protected void writeNbt(NbtCompound nbt){
         nbt.putString("map_controller.mapname", this.mapName);
+        nbt.putInt("map_controller.round", this.round);
+        nbt.putInt("map_controller.zombies_in_round", this.zombiesInRound);
+        nbt.putBoolean("map_controller.start", this.start);
 
         if (nbt.contains("map_controller.linked_zone_controller")) {
             this.linkedZoneController = NbtHelper.toBlockPos(nbt.getCompound("map_controller.linked_zone_controller"));
@@ -68,6 +76,15 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         super.readNbt(nbt);
         if (nbt.contains("map_controller.mapname"))
             this.mapName = nbt.getString("map_controller.mapname");
+
+        if (nbt.contains("map_controller.round"))
+            this.round = nbt.getInt("map_controller.round");
+
+        if (nbt.contains("map_controller.zombies_in_round"))
+            this.zombiesInRound = nbt.getInt("map_controller.zombies_in_round");
+
+        if (nbt.contains("map_controller.start"))
+            this.start = nbt.getBoolean("map_controller.start");
 
         if (nbt.contains("map_controller.linked_zone_controller")) {
             this.linkedZoneController = NbtHelper.toBlockPos(nbt.getCompound("map_controller.linked_zone_controller"));
@@ -96,28 +113,6 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
         return new MapControllerScreenHandler(syncId, this);
     }
-
-    /*public BlockPos getLinkedZoneController() {
-        return linkedZoneController;
-    }
-
-    public void setLinkedZoneController(BlockPos linkedZoneController) {
-        this.linkedZoneController = linkedZoneController;
-        markDirty();
-    }*/
-
-    /*public void unlinkExistingZoneController(World world) {
-        BlockPos existingZoneController = getLinkedZoneController();
-        if (existingZoneController != null) {
-            BlockEntity existingZoneControllerEntity = world.getBlockEntity(existingZoneController);
-            if (existingZoneControllerEntity instanceof ZoneControllerBlockEntity) {
-                ((ZoneControllerBlockEntity) existingZoneControllerEntity).setLinkedMapController(null);
-                existingZoneControllerEntity.markDirty();
-
-                ModMessages.sendRemoveLinkPacket(world, existingZoneController);
-            }
-        }
-    }*/
 
     @Override
     public void unlink(World world, Class<? extends BlockEntity> linkType) {
@@ -166,5 +161,21 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
     @Override
     public List<BlockPos> getAllLinkedBlocks(Class<? extends BlockEntity> linkType) {
         return null;
+    }
+
+    public boolean isStart() {
+        return start;
+    }
+
+    public void setStart(boolean start) {
+        this.start = start;
+    }
+
+    public int getRound() {
+        return round;
+    }
+
+    public void setRound(int round) {
+        this.round = round;
     }
 }

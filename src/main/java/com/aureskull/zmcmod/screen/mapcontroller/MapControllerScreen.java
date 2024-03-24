@@ -1,5 +1,6 @@
 package com.aureskull.zmcmod.screen.mapcontroller;
 
+import com.aureskull.zmcmod.screen.ScreenConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -11,32 +12,48 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 @Environment(EnvType.CLIENT)
 public class MapControllerScreen extends HandledScreen<MapControllerScreenHandler> {
     private TextFieldWidget mapNameTextField;
+    private ButtonWidget startGameButton = ButtonWidget.builder(Text.literal("")
+                    .append(Text.literal(this.handler.blockEntity.isStart() ? "STARTED" : "STOPPED")
+                        .formatted(this.handler.blockEntity.isStart() ? Formatting.GREEN : Formatting.RED)), button -> {
+                this.handler.blockEntity.setStart(!this.handler.blockEntity.isStart());
+
+                this.startGameButton.setMessage(Text.literal("")
+                        .append(Text.literal(this.handler.blockEntity.isStart() ? "STARTED" : "STOPPED")
+                                .formatted(this.handler.blockEntity.isStart() ? Formatting.GREEN : Formatting.RED)));
+
+            })
+            .dimensions(0, 0, 65, ScreenConstants.BUTTON_HEIGHT)
+            .build();
+
+
+    public ButtonWidget saveMapNameButton = ButtonWidget.builder(Text.literal("Save"), button -> {
+            this.handler.updateMapName(mapNameTextField.getText());
+        })
+        .dimensions(0, 0, 50, ScreenConstants.BUTTON_HEIGHT)
+        .build();
 
     public MapControllerScreen(MapControllerScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
     }
 
-    public ButtonWidget saveMapName = ButtonWidget.builder(Text.literal("Save"), button -> {
-            this.handler.updateMapName(mapNameTextField.getText());
-        })
-        .dimensions(width/2 + 45, 50, 50, 20)
-        .build();
-
     @Override
     protected void init() {
         super.init();
+        createElements();
+        addElements();
 
-        this.mapNameTextField = new TextFieldWidget(this.textRenderer, width/2 - 60,  51, 100, 18, Text.of(this.handler.getMapName()));
         mapNameTextField.setText(String.valueOf(this.handler.getMapName()));
 
-        this.addDrawableChild(this.mapNameTextField);
+        mapNameTextField.setPosition(width - ScreenConstants.RIGHT_ELEMENT_MAX_SIZE + ScreenConstants.INLINE_ELEMENT_LEFT_OFFSET, 23);
+        saveMapNameButton.setPosition(width - saveMapNameButton.getWidth() - ScreenConstants.RIGHT_PADDING, 23);
 
-        saveMapName.setPosition(width/2 + 45, 50);
-        addDrawableChild(saveMapName);
+        startGameButton.setPosition(width - ScreenConstants.RIGHT_ELEMENT_MAX_SIZE + ScreenConstants.INLINE_ELEMENT_LEFT_OFFSET, saveMapNameButton.getY() + saveMapNameButton.getHeight() + ScreenConstants.PADDING);
+
 
         // Supprimez les composants de texte par défaut
         this.titleX = Integer.MIN_VALUE;
@@ -45,10 +62,25 @@ public class MapControllerScreen extends HandledScreen<MapControllerScreenHandle
         this.playerInventoryTitleY = Integer.MIN_VALUE;
     }
 
+    private void addElements(){
+        addDrawableChild(mapNameTextField);
+        addDrawableChild(saveMapNameButton);
+        addDrawableChild(startGameButton);
+    }
+
+    private void createElements(){
+        this.mapNameTextField = new TextFieldWidget(this.textRenderer, 0,  0, 45, 18, Text.of(this.handler.getMapName()));
+    }
+
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta); //Ne pas afficher l'inventaire etc
-        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Map name : " + this.handler.getMapName()), width / 2, height / 2, 0xffffff);
+        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Map: " + mapNameTextField.getText()), 10 + textRenderer.getWidth(Text.literal("Map: " + mapNameTextField.getText()))/2, 10, 0xffffff);
+
+        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Map Information"), width - ScreenConstants.RIGHT_ELEMENT_MAX_SIZE - ScreenConstants.RIGHT_PADDING + (textRenderer.getWidth(Text.literal("Map Information"))/2), ScreenConstants.TOP_PADDING, 0xffffff);
+
+        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Name: "), width - ScreenConstants.RIGHT_ELEMENT_MAX_SIZE - ScreenConstants.RIGHT_PADDING + (textRenderer.getWidth(Text.literal("Name: "))/2) + ScreenConstants.SECTION_PADDING_TEXT, ScreenConstants.SECTION_PADDING + ScreenConstants.TOP_TEXT_OFFSET_SECTION, 0xffffff);
+        context.drawCenteredTextWithShadow(textRenderer, Text.literal("State: "), width - ScreenConstants.RIGHT_ELEMENT_MAX_SIZE - ScreenConstants.RIGHT_PADDING + (textRenderer.getWidth(Text.literal("State: "))/2) + ScreenConstants.SECTION_PADDING_TEXT, mapNameTextField.getHeight() + mapNameTextField.getY() + ScreenConstants.TOP_TEXT_OFFSET, 0xffffff);
     }
 
     @Override

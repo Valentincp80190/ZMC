@@ -39,7 +39,7 @@ public class SmallZombieDoorwayEntityRenderer  implements BlockEntityRenderer<Sm
 
     private void renderLine(BlockPos posA, BlockPos posB, MatrixStack matrices) {
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        RenderSystem.enableDepthTest();
+        //RenderSystem.enableDepthTest();
 
         double deltaX = posB.getX() - posA.getX();
         double deltaY = posB.getY() - posA.getY();

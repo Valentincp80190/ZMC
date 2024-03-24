@@ -272,7 +272,7 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
         if(entity.getAllLinkedBlocks(SmallZombieWindowBlockEntity.class).size() == 0) return;
 
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        RenderSystem.enableDepthTest();
+        //RenderSystem.enableDepthTest();
 
 
         Matrix4f positionMatrix = matrices.peek().getPositionMatrix();
@@ -296,7 +296,7 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
         if(entity.getChild(ZoneControllerBlockEntity.class).size() == 0) return;
 
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        RenderSystem.enableDepthTest();
+        //RenderSystem.enableDepthTest();
 
 
         Matrix4f positionMatrix = matrices.peek().getPositionMatrix();
