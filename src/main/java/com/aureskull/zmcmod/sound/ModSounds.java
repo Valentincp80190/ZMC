@@ -7,6 +7,10 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 
 public class ModSounds {
+    //WAVE
+    public static final SoundEvent ROUND_START = registerSoundEvent("round_start");
+
+    //DOOR/WINDOW
     public static final SoundEvent REBUILD_DOOR = registerSoundEvent("rebuild_door");
     public static final SoundEvent REBUILD_DOOR_MONEY = registerSoundEvent("rebuild_door_money");
 

@@ -51,4 +51,12 @@ public class MapControllerScreenHandler extends ScreenHandler {
     public String getMapName(){
         return this.blockEntity.mapName;
     }
+
+
+    public void updateStartGameOnServer(Boolean isStarted) {
+        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+        buf.writeBoolean(isStarted);
+        buf.writeBlockPos(this.blockEntity.getPos());
+        ClientPlayNetworking.send(ModMessages.MAP_CONTROLLER_UPDATE_START_STATE, buf);
+    }
 }

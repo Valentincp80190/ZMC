@@ -4,6 +4,10 @@ import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.ILinkable;
 import com.aureskull.zmcmod.networking.ModMessages;
 import com.aureskull.zmcmod.screen.mapcontroller.MapControllerScreenHandler;
+import com.aureskull.zmcmod.sound.ModSounds;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -17,20 +21,26 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Random;
 
 public class MapControllerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ILinkable {
     public String mapName = "";
 
-    private boolean start = false;
+    private boolean started = false;
 
     private int round = 0;
     private int zombiesInRound = 0;
+    private int MAX_ZOMBIES = 24;
 
     private BlockPos linkedZoneController = null;
 
@@ -59,7 +69,7 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         nbt.putString("map_controller.mapname", this.mapName);
         nbt.putInt("map_controller.round", this.round);
         nbt.putInt("map_controller.zombies_in_round", this.zombiesInRound);
-        nbt.putBoolean("map_controller.start", this.start);
+        nbt.putBoolean("map_controller.started", this.started);
 
         if (nbt.contains("map_controller.linked_zone_controller")) {
             this.linkedZoneController = NbtHelper.toBlockPos(nbt.getCompound("map_controller.linked_zone_controller"));
@@ -83,8 +93,8 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         if (nbt.contains("map_controller.zombies_in_round"))
             this.zombiesInRound = nbt.getInt("map_controller.zombies_in_round");
 
-        if (nbt.contains("map_controller.start"))
-            this.start = nbt.getBoolean("map_controller.start");
+        if (nbt.contains("map_controller.started"))
+            this.started = nbt.getBoolean("map_controller.started");
 
         if (nbt.contains("map_controller.linked_zone_controller")) {
             this.linkedZoneController = NbtHelper.toBlockPos(nbt.getCompound("map_controller.linked_zone_controller"));
@@ -103,8 +113,15 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
     }
 
     public void tick(World world, BlockPos pos, BlockState state) {
-        if(world.isClient()) {
-            return;
+        if(!world.isClient()) {
+            if(this.started == true){
+                Random random = new Random();
+                int chance = random.nextInt(1000);
+
+                //Map started => SpawnZombie if we doesn't exceed the number of zombie on the map
+                if(chance < 7 && this.zombiesInRound > 0)
+                    spawnZombie();
+            }
         }
     }
 
@@ -163,12 +180,20 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         return null;
     }
 
-    public boolean isStart() {
-        return start;
+    public boolean isStarted() {
+        return started;
     }
 
-    public void setStart(boolean start) {
-        this.start = start;
+    public void setStart(boolean p_started) {
+        this.started = p_started;
+        markDirty();
+        ZMCMod.LOGGER.info("Started state changed to " + this.started);
+
+        if(p_started)
+            startZombieMap();
+        else{
+            stopZombieMap();
+        }
     }
 
     public int getRound() {
@@ -177,5 +202,98 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
     public void setRound(int round) {
         this.round = round;
+        markDirty();
+    }
+
+    private void startZombieMap(){
+        if (!world.isClient()) {
+
+            if(isMapAvailable()){
+                ZMCMod.LOGGER.info("Starting Zombie Map on Server...");
+                teleportAllPlayerInFirstZone();
+                goToNextRound();
+            }else{
+                this.setStart(false);
+            }
+        }
+    }
+
+    private void teleportAllPlayerInFirstZone() {
+        ZoneControllerBlockEntity zoneControllerBlockEntity = ((ZoneControllerBlockEntity) world.getBlockEntity(this.linkedZoneController));
+
+        BlockPos spawnPoint = zoneControllerBlockEntity.getSpawnPoint();
+        double spawnX = spawnPoint.getX() + 0.5;
+        double spawnY = spawnPoint.getY();
+        double spawnZ = spawnPoint.getZ() + 0.5;
+
+        for (PlayerEntity player : world.getPlayers()) {
+            if (player instanceof ServerPlayerEntity) {
+                ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+
+                // Teleport each server player
+                serverPlayer.teleport((ServerWorld) world, spawnX, spawnY, spawnZ, player.getYaw(), player.getPitch());
+            }
+        }
+    }
+
+
+    private boolean isMapAvailable(){
+        if(this.linkedZoneController == null)
+            return false;
+
+        BlockEntity blockEntity = world.getBlockEntity(this.linkedZoneController);
+        if(!(blockEntity instanceof ZoneControllerBlockEntity)){
+            for (PlayerEntity player : world.getPlayers()) {
+                player.sendMessage(Text.literal("Warning : Please connect a Zone Controller to the Map Controller to start the game.").formatted(Formatting.GOLD), false); // Send the message to all players
+            }
+            return false;
+        }
+
+        return true;
+    }
+
+    private void goToNextRound(){
+        if (!world.isClient()) {
+            ZMCMod.LOGGER.info("Increase round to " + (this.round + 1));
+
+            this.setRound(this.getRound() + 1);
+            ZMCMod.LOGGER.info("Round is: " + this.round);
+            setZombiesInRound((int) ((this.getRound() * 6) + ((this.getRound() * 6) * 0.25 * (1-1))));
+            if (world instanceof ServerWorld) {
+                sendUpdateRoundPacket((ServerWorld) world, this.pos, this.getRound());
+            }
+        }
+    }
+
+    public void setZombiesInRound(int zombiesInRound) {
+        this.zombiesInRound = zombiesInRound;
+        markDirty();
+        ZMCMod.LOGGER.info("Change zombies in the round to: " + zombiesInRound + " <- " + (int) ((this.getRound() * 6) * (0.25 * (1-1))));
+        ZMCMod.LOGGER.info("Zombies in the round: " + this.zombiesInRound);
+    }
+
+    private static void sendUpdateRoundPacket(ServerWorld  world, BlockPos zonePos, int newRound) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeBlockPos(zonePos);
+        buf.writeInt(newRound);
+
+        // Send this packet to all players in the world
+        PlayerLookup.tracking(world, zonePos).forEach(player -> {
+            ServerPlayNetworking.send(player, ModMessages.MAP_CONTROLLER_UPDATE_ROUND, buf);
+        });
+    }
+
+    private void stopZombieMap(){
+        this.setRound(0);
+        if (world instanceof ServerWorld) {
+            sendUpdateRoundPacket((ServerWorld) world, this.pos, this.getRound());
+        }
+    }
+
+    private void spawnZombie(){
+        ZoneControllerBlockEntity zoneControllerBlockEntity = ((ZoneControllerBlockEntity) world.getBlockEntity(this.linkedZoneController));
+        zoneControllerBlockEntity.spawnZombie();
+
+        zombiesInRound--;
     }
 }

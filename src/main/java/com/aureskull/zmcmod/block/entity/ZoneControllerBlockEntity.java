@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.random.RandomGenerator;
 
 public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ILinkable {
     public BlockPos posA = new BlockPos(pos.getX() - 5, pos.getY() + 1, pos.getZ() - 5);
@@ -69,14 +70,6 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
         nbt.putFloat("zone_controller.green", green);
         nbt.putFloat("zone_controller.blue", blue);
 
-        /*nbt.putFloat("zone_controller.posa.x", posA.getX());
-        nbt.putFloat("zone_controller.posa.y", posA.getY());
-        nbt.putFloat("zone_controller.posa.z", posA.getZ());
-
-        nbt.putFloat("zone_controller.posb.x", posB.getX());
-        nbt.putFloat("zone_controller.posb.y", posB.getY());
-        nbt.putFloat("zone_controller.posb.z", posB.getZ());*/
-
         nbt.put("zone_controller.spawn_point", NbtHelper.fromBlockPos(spawnPoint));
         nbt.put("zone_controller.position_a", NbtHelper.fromBlockPos(posA));
         nbt.put("zone_controller.position_b", NbtHelper.fromBlockPos(posB));
@@ -120,24 +113,6 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
 
         if (nbt.contains("zone_controller.blue"))
             this.blue = nbt.getFloat("zone_controller.blue");
-
-        /*if (nbt.contains("zone_controller.posa.x", 99) ||
-                nbt.contains("zone_controller.posa.y", 99) ||
-                nbt.contains("zone_controller.posa.z", 99)) { // The '99' checks for any numeric tag type
-            this.posA = new BlockPos(
-                    nbt.getInt("zone_controller.posa.x"),
-                    nbt.getInt("zone_controller.posa.y"),
-                    nbt.getInt("zone_controller.posa.z"));
-        }*/
-
-        /*if (nbt.contains("zone_controller.posb.x", 99) ||
-                nbt.contains("zone_controller.posb.y", 99) ||
-                nbt.contains("zone_controller.posb.z", 99)) { // The '99' checks for any numeric tag type
-            this.posB = new BlockPos(
-                    nbt.getInt("zone_controller.posb.x"),
-                    nbt.getInt("zone_controller.posb.y"),
-                    nbt.getInt("zone_controller.posb.z"));
-        }*/
 
         if (nbt.contains("zone_controller.position_a")) {
             this.posA = NbtHelper.toBlockPos(nbt.getCompound("zone_controller.position_a"));
@@ -375,5 +350,18 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
     public void setSpawnPoint(BlockPos spawnPoint) {
         this.spawnPoint = spawnPoint;
         markDirty();
+    }
+
+    public void spawnZombie(){
+        int randomWindowIndex = RandomGenerator.getDefault().nextInt(this.linkedWindows.size());
+        ZMCMod.LOGGER.info("Zombie will spawn at door " + randomWindowIndex);
+
+        SmallZombieWindowBlockEntity smallZombieWindowBlockEntity = ((SmallZombieWindowBlockEntity) world.getBlockEntity(linkedWindows.get(randomWindowIndex)));
+        ZombieSpawnerBlockEntity zombieSpawnerBlockEntity = ((ZombieSpawnerBlockEntity) world.getBlockEntity(smallZombieWindowBlockEntity.getLinkedBlock(ZombieSpawnerBlockEntity.class)));
+        zombieSpawnerBlockEntity.spawnZombie();
+    }
+
+    public void spawnZombieInAdjacentZone(){
+
     }
 }

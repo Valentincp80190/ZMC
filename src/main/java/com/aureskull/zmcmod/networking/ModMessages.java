@@ -9,6 +9,8 @@ import com.aureskull.zmcmod.networking.packet.TriggerInteractionC2SPacket;
 import com.aureskull.zmcmod.networking.packet.link.RemoveZoneLinkFromDoorwayS2CPacket;
 import com.aureskull.zmcmod.networking.packet.link.RemoveZoneLinkFromZoneS2CPacket;
 import com.aureskull.zmcmod.networking.packet.mapcontroller.MapControllerUpdateMapNameC2SPacket;
+import com.aureskull.zmcmod.networking.packet.mapcontroller.MapControllerUpdateStartStateC2SPacket;
+import com.aureskull.zmcmod.networking.packet.mapcontroller.UpdateMapControllerRoundS2CPacket;
 import com.aureskull.zmcmod.networking.packet.zonecontroller.*;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -26,6 +28,8 @@ public class ModMessages {
 
     //MAP CONTROLLER
     public static final Identifier MAP_CONTROLLER_UPDATE_MAP_NAME = new Identifier(ZMCMod.MOD_ID, "mapcontroller_update_mapname");
+    public static final Identifier MAP_CONTROLLER_UPDATE_START_STATE = new Identifier(ZMCMod.MOD_ID, "mapcontroller_update_start_state");
+    public static final Identifier MAP_CONTROLLER_UPDATE_ROUND = new Identifier(ZMCMod.MOD_ID, "mapcontroller_update_round");
 
     //ZONE CONTROLLER
     public static final Identifier ZONE_CONTROLLER_UPDATE_ZONE_COLOR = new Identifier(ZMCMod.MOD_ID, "zonecontroller_update_color");
@@ -51,6 +55,8 @@ public class ModMessages {
         ServerPlayNetworking.registerGlobalReceiver(EXAMPLE_ID, ExampleC2SPacket::receive);
         ServerPlayNetworking.registerGlobalReceiver(EXIST_ZMC_MAP_CHECKER, ExistZMCMapC2SPacket::receive);
         ServerPlayNetworking.registerGlobalReceiver(MAP_CONTROLLER_UPDATE_MAP_NAME, MapControllerUpdateMapNameC2SPacket::receive);
+        ServerPlayNetworking.registerGlobalReceiver(MAP_CONTROLLER_UPDATE_START_STATE, MapControllerUpdateStartStateC2SPacket::receive);
+
 
         ServerPlayNetworking.registerGlobalReceiver(ZONE_CONTROLLER_UPDATE_ZONE_COLOR, ZoneControllerUpdateZoneColorC2SPacket::receive);
         ServerPlayNetworking.registerGlobalReceiver(ZONE_CONTROLLER_UPDATE_POS, ZoneControllerUpdatePosC2SPacket::receive);
@@ -59,10 +65,14 @@ public class ModMessages {
     }
 
     public static void registerS2CPackets(){
+        //LINKER
         ClientPlayNetworking.registerGlobalReceiver(REMOVE_LINK_FROM_BLOCK_ENTITY, RemoveLinkS2CPacket::receive);
         ClientPlayNetworking.registerGlobalReceiver(REMOVE_DOORWAY_LINK_FROM_ZONE, RemoveDoorwayLinkFromZoneS2CPacket::receive);
         ClientPlayNetworking.registerGlobalReceiver(REMOVE_ZONE_LINK_FROM_DOORWAY, RemoveZoneLinkFromDoorwayS2CPacket::receive);
         ClientPlayNetworking.registerGlobalReceiver(REMOVE_ZONE_LINK_FROM_ZONE, RemoveZoneLinkFromZoneS2CPacket::receive);
+
+        //MapController
+        ClientPlayNetworking.registerGlobalReceiver(MAP_CONTROLLER_UPDATE_ROUND, UpdateMapControllerRoundS2CPacket::receive);
     }
 
     public static void sendExistZMCMapCheckerResponse(ServerPlayerEntity player, boolean exists) {

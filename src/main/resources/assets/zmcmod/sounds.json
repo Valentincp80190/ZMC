@@ -1,4 +1,10 @@
 {
+  "round_start": {
+    "subtitle": "sounds.zmcmod.round_start",
+    "sounds": [
+      "zmcmod:round_start"
+    ]
+  },
   "rebuild_door": {
     "subtitle": "sounds.zmcmod.rebuild_door",
     "sounds": [

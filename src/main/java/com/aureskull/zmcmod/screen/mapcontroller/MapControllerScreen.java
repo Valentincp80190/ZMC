@@ -18,13 +18,16 @@ import net.minecraft.util.Formatting;
 public class MapControllerScreen extends HandledScreen<MapControllerScreenHandler> {
     private TextFieldWidget mapNameTextField;
     private ButtonWidget startGameButton = ButtonWidget.builder(Text.literal("")
-                    .append(Text.literal(this.handler.blockEntity.isStart() ? "STARTED" : "STOPPED")
-                        .formatted(this.handler.blockEntity.isStart() ? Formatting.GREEN : Formatting.RED)), button -> {
-                this.handler.blockEntity.setStart(!this.handler.blockEntity.isStart());
+            .append(Text.literal(this.handler.blockEntity.isStarted() ? "STARTED" : "STOPPED")
+            .formatted(this.handler.blockEntity.isStarted() ? Formatting.GREEN : Formatting.RED)), button -> {
+
+                Boolean newState = !this.handler.blockEntity.isStarted();
+                this.handler.blockEntity.setStart(newState);
+                this.handler.updateStartGameOnServer(newState);
 
                 this.startGameButton.setMessage(Text.literal("")
-                        .append(Text.literal(this.handler.blockEntity.isStart() ? "STARTED" : "STOPPED")
-                                .formatted(this.handler.blockEntity.isStart() ? Formatting.GREEN : Formatting.RED)));
+                        .append(Text.literal(this.handler.blockEntity.isStarted() ? "STARTED" : "STOPPED")
+                                .formatted(this.handler.blockEntity.isStarted() ? Formatting.GREEN : Formatting.RED)));
 
             })
             .dimensions(0, 0, 65, ScreenConstants.BUTTON_HEIGHT)
