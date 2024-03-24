@@ -11,8 +11,9 @@ public class ModSounds {
     public static final SoundEvent ROUND_START = registerSoundEvent("round_start");
 
     //DOOR/WINDOW
-    public static final SoundEvent REBUILD_DOOR = registerSoundEvent("rebuild_door");
-    public static final SoundEvent REBUILD_DOOR_MONEY = registerSoundEvent("rebuild_door_money");
+    public static final SoundEvent REBUILD_WINDOW = registerSoundEvent("rebuild_window");
+    public static final SoundEvent SNAP_WINDOW = registerSoundEvent("snap_window");
+    public static final SoundEvent REBUILD_WINDOW_MONEY = registerSoundEvent("rebuild_window_money");
 
 
     //Standing zombie

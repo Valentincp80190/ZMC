@@ -4,11 +4,13 @@ import com.aureskull.zmcmod.block.entity.ModBlockEntities;
 import com.aureskull.zmcmod.block.entity.SmallZombieWindowBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZombieSpawnerBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZoneControllerBlockEntity;
+import com.aureskull.zmcmod.entity.custom.StandingZombieEntity;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.property.DirectionProperty;
@@ -101,5 +103,16 @@ public class SmallZombieDoorwayBlock extends BlockWithEntity implements BlockEnt
         }
         super.onBreak(world, pos, state, player);
         return state;
+    }
+
+    @Override
+    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        if (context instanceof EntityShapeContext) {
+            Entity entity = ((EntityShapeContext) context).getEntity();
+            if (entity instanceof StandingZombieEntity zombie && !zombie.isPassedThroughWindow()) {
+                return VoxelShapes.empty();
+            }
+        }
+        return super.getCollisionShape(state, world, pos, context);
     }
 }

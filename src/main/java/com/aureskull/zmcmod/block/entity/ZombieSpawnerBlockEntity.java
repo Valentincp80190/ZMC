@@ -100,16 +100,18 @@ public class ZombieSpawnerBlockEntity extends BlockEntity implements ExtendedScr
         if (!world.isClient && linkedDoorwayPos != null) {
             // Logic to spawn the zombie
             StandingZombieEntity zombie = ModEntities.STANDING_ZOMBIE.create(world);
+            zombie.setTargetBlockPos(this.linkedDoorwayPos);
+
             if (zombie != null) {
                 zombie.setPosition(getPos().getX() + 0.5, getPos().getY() + 1, getPos().getZ() + 0.5);
                 world.spawnEntity(zombie);
 
                 // Direct the zombie to the linked doorway
-                zombie.getNavigation().startMovingTo(
+                /*zombie.getNavigation().startMovingTo(
                         linkedDoorwayPos.getX() + 0.5,
                         linkedDoorwayPos.getY(),
                         linkedDoorwayPos.getZ() + 0.5,
-                        1.0);
+                        1.0);*/
             }
         }
     }

@@ -1,0 +1,89 @@
+package com.aureskull.zmcmod.entity.goal;
+
+import com.aureskull.zmcmod.ZMCMod;
+import com.aureskull.zmcmod.block.entity.SmallZombieWindowBlockEntity;
+import com.aureskull.zmcmod.entity.custom.StandingZombieEntity;
+import net.minecraft.block.FacingBlock;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.MovementType;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+
+import java.util.EnumSet;
+
+public class CrawlThroughWindowGoal extends Goal {
+    private final StandingZombieEntity zombie;
+    private final double speed;
+    private BlockPos windowSouthPos;
+    private boolean isCrawling;
+
+    private Direction windowDirection;
+
+    public CrawlThroughWindowGoal(StandingZombieEntity zombie, double speed) {
+        this.zombie = zombie;
+        this.speed = speed;
+        this.setControls(EnumSet.of(Control.MOVE));
+    }
+
+    @Override
+    public boolean canStart() {
+        if (this.zombie.getTargetBlockPos() != null) {
+            BlockEntity entity = this.zombie.getWorld().getBlockEntity(this.zombie.getTargetBlockPos());
+            if (entity instanceof SmallZombieWindowBlockEntity window && window.getPlank() <= 0) {
+                //this.windowPos = window.getPos();
+                this.windowDirection = window.getWindowFacing();
+
+                windowSouthPos = window.getDirectionPosition(Direction.SOUTH);
+                //ZMCMod.LOGGER.info("Can pass : " + (this.zombie.squaredDistanceTo(windowSouthPos.getX(), windowSouthPos.getY(), windowSouthPos.getZ()) < 1.5 ? "yes" : "no, distance is " + this.zombie.squaredDistanceTo(windowSouthPos.getX(), windowSouthPos.getY(), windowSouthPos.getZ())));
+                //ZMCMod.LOGGER.info("South block is : " + windowSouthPos);
+                return this.zombie.squaredDistanceTo(windowSouthPos.getX() + .5f, windowSouthPos.getY(), windowSouthPos.getZ()+.5f) < .5;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void start() {
+        super.start();
+        this.isCrawling = true;
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
+        this.isCrawling = false;
+    }
+
+    @Override
+    public void tick() {
+        if (this.isCrawling) {
+            // Keep updating the movement to encourage going through the window
+            if (windowDirection != null) {
+                Vec3d destination = getDestination();
+                ZMCMod.LOGGER.info("Triggered " + getDestination());
+                if(destination != null){
+                    this.zombie.teleport(windowSouthPos.getX() + .5f, windowSouthPos.getY(), windowSouthPos.getZ() + .5f);
+                    this.zombie.move(MovementType.SELF, getDestination());
+                    this.zombie.setPassedThroughWindow(true);
+                }
+            }
+        }
+    }
+
+    private Vec3d getDestination(){
+        switch (this.windowDirection) {
+            case NORTH:
+                return new Vec3d(0, 0, -2);
+            case SOUTH:
+                return new Vec3d(0, 0, 2);
+            case EAST:
+                return new Vec3d(2, 0, 0);
+            case WEST:
+                return new Vec3d(-2, 0, 0);
+            default:
+                return null;
+        }
+    }
+}

@@ -5,16 +5,27 @@
       "zmcmod:round_start"
     ]
   },
-  "rebuild_door": {
-    "subtitle": "sounds.zmcmod.rebuild_door",
+  "snap_window": {
+    "subtitle": "sounds.zmcmod.rebuild_window",
     "sounds": [
-      "zmcmod:rebuild_door/rebuild_door"
+      "zmcmod:snap_window/snap_0",
+      "zmcmod:snap_window/snap_1",
+      "zmcmod:snap_window/snap_2",
+      "zmcmod:snap_window/snap_3",
+      "zmcmod:snap_window/snap_4",
+      "zmcmod:snap_window/snap_5"
     ]
   },
-  "rebuild_door_money": {
-    "subtitle": "sounds.zmcmod.rebuild_door_money",
+  "rebuild_window": {
+    "subtitle": "sounds.zmcmod.rebuild_window",
     "sounds": [
-      "zmcmod:rebuild_door/rebuild_door_money"
+      "zmcmod:rebuild_window/rebuild_window"
+    ]
+  },
+  "rebuild_window_money": {
+    "subtitle": "sounds.zmcmod.rebuild_window_money",
+    "sounds": [
+      "zmcmod:rebuild_window/rebuild_window_money"
     ]
   },
   "standing_zombie_death": {

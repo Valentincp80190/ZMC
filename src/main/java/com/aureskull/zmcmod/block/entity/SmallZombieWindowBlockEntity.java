@@ -1,5 +1,6 @@
 package com.aureskull.zmcmod.block.entity;
 
+import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.ILinkable;
 import com.aureskull.zmcmod.block.custom.SmallZombieDoorwayBlock;
 import com.aureskull.zmcmod.client.InteractionHelper;
@@ -9,7 +10,10 @@ import com.aureskull.zmcmod.networking.ModMessages;
 import com.aureskull.zmcmod.sound.ModSounds;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.HorizontalFacingBlock;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.nbt.NbtCompound;
@@ -22,9 +26,9 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.*;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -148,11 +152,106 @@ public class SmallZombieWindowBlockEntity extends BlockEntity implements Extende
             assert world != null;
             if (!world.isClient) {
                 world.setBlockState(pos, world.getBlockState(pos).with(SmallZombieDoorwayBlock.PLANKS, Integer.valueOf(plank)), 3);
-                world.playSound(null, pos, ModSounds.REBUILD_DOOR, SoundCategory.BLOCKS, 0.5f, 1.0f);
-                world.playSound(null, pos, ModSounds.REBUILD_DOOR_MONEY, SoundCategory.BLOCKS, 0.5f, 1.0f);
+                world.playSound(null, pos, ModSounds.REBUILD_WINDOW, SoundCategory.BLOCKS, 0.5f, 1.0f);
+                world.playSound(null, pos, ModSounds.REBUILD_WINDOW_MONEY, SoundCategory.BLOCKS, 0.5f, 1.0f);
+            }
+        }
+
+        ZMCMod.LOGGER.info("CURRENT POS : " + this.pos);
+        ZMCMod.LOGGER.info("SOUTH : " + new BlockPos(this.pos.getX(), this.pos.getY(),this.pos.getZ() + 1));
+    }
+
+    public void removePlank(){
+        if(plank > 0){
+            plank--;
+            markDirty();
+
+            assert world != null;
+            if (!world.isClient) {
+                world.setBlockState(pos, world.getBlockState(pos).with(SmallZombieDoorwayBlock.PLANKS, Integer.valueOf(plank)), 3);
+                world.playSound(null, pos, ModSounds.SNAP_WINDOW, SoundCategory.BLOCKS, 0.5f, 1.0f);
+                world.playSound(null, pos, ModSounds.SNAP_WINDOW, SoundCategory.BLOCKS, 0.5f, 1.0f);
             }
         }
     }
+
+    public int getPlank() {
+        return plank;
+    }
+
+    public Direction getWindowFacing() {
+        BlockState state = this.world.getBlockState(this.pos);
+        return state.get(HorizontalFacingBlock.FACING);
+    }
+
+    public BlockPos getDirectionPosition(Direction targetDirection){
+        Direction direction = getWindowFacing();
+
+        switch (targetDirection) {
+            case NORTH:
+                switch (direction) {
+                    case NORTH:
+                        return new BlockPos(this.pos.getX(), this.pos.getY(),this.pos.getZ() - 1);
+                    case SOUTH:
+                        return new BlockPos(this.pos.getX(), this.pos.getY(), this.pos.getZ() + 1);
+                    case EAST:
+                        return new BlockPos(this.pos.getX() + 1, this.pos.getY(), this.pos.getZ());
+                    case WEST:
+                        return new BlockPos(this.pos.getX() - 1, this.pos.getY(), this.pos.getZ());
+                    default:
+                        return null;
+                }
+            case SOUTH:
+                switch (direction) {
+                    case NORTH:
+                        return new BlockPos(this.pos.getX(), this.pos.getY(),this.pos.getZ() + 1);
+                    case SOUTH:
+                        return new BlockPos(this.pos.getX(), this.pos.getY(), this.pos.getZ() - 1);
+                    case EAST:
+                        return new BlockPos(this.pos.getX() - 1, this.pos.getY(), this.pos.getZ());
+                    case WEST:
+                        return new BlockPos(this.pos.getX() + 1, this.pos.getY(), this.pos.getZ());
+                    default:
+                        return null;
+                }
+            case EAST:
+                switch (direction) {
+                    case NORTH:
+                        return new BlockPos(this.pos.getX() + 1, this.pos.getY(),this.pos.getZ());
+                    case SOUTH:
+                        return new BlockPos(this.pos.getX() - 1, this.pos.getY(), this.pos.getZ());
+                    case EAST:
+                        return new BlockPos(this.pos.getX(), this.pos.getY(), this.pos.getZ() + 1);
+                    case WEST:
+                        return new BlockPos(this.pos.getX(), this.pos.getY(), this.pos.getZ() - 1);
+                    default:
+                        return null;
+                }
+            case WEST:
+                switch (direction) {
+                    case NORTH:
+                        return new BlockPos(this.pos.getX() - 1, this.pos.getY(),this.pos.getZ());
+                    case SOUTH:
+                        return new BlockPos(this.pos.getX() + 1, this.pos.getY(), this.pos.getZ());
+                    case EAST:
+                        return new BlockPos(this.pos.getX(), this.pos.getY(), this.pos.getZ() - 1);
+                    case WEST:
+                        return new BlockPos(this.pos.getX(), this.pos.getY(), this.pos.getZ() + 1);
+                    default:
+                        return null;
+                }
+            default:
+                return null;
+        }
+    }
+
+
+    public boolean canPassThrough() {
+        return this.plank <= 0;
+    }
+
+
+
 
     private void unlinkSpawner(World world) {
         ModMessages.sendRemoveLinkPacket(world, this.getLinkedBlock(ZombieSpawnerBlockEntity.class));
