@@ -17,6 +17,7 @@ public class CrawlThroughWindowGoal extends Goal {
     private final StandingZombieEntity zombie;
     private final double speed;
     private BlockPos windowSouthPos;
+    private SmallZombieWindowBlockEntity window;
     private boolean isCrawling;
 
     private Direction windowDirection;
@@ -32,13 +33,11 @@ public class CrawlThroughWindowGoal extends Goal {
         if (this.zombie.getTargetBlockPos() != null) {
             BlockEntity entity = this.zombie.getWorld().getBlockEntity(this.zombie.getTargetBlockPos());
             if (entity instanceof SmallZombieWindowBlockEntity window && window.getPlank() <= 0) {
-                //this.windowPos = window.getPos();
+                this.window = window;
                 this.windowDirection = window.getWindowFacing();
 
                 windowSouthPos = window.getDirectionPosition(Direction.SOUTH);
-                //ZMCMod.LOGGER.info("Can pass : " + (this.zombie.squaredDistanceTo(windowSouthPos.getX(), windowSouthPos.getY(), windowSouthPos.getZ()) < 1.5 ? "yes" : "no, distance is " + this.zombie.squaredDistanceTo(windowSouthPos.getX(), windowSouthPos.getY(), windowSouthPos.getZ())));
-                //ZMCMod.LOGGER.info("South block is : " + windowSouthPos);
-                return this.zombie.squaredDistanceTo(windowSouthPos.getX() + .5f, windowSouthPos.getY(), windowSouthPos.getZ()+.5f) < .5;
+                return !this.zombie.isPassedThroughWindow() && this.zombie.squaredDistanceTo(windowSouthPos.getX() + .5f, windowSouthPos.getY(), windowSouthPos.getZ()+.5f) < .5;
             }
         }
         return false;
@@ -60,13 +59,15 @@ public class CrawlThroughWindowGoal extends Goal {
     public void tick() {
         if (this.isCrawling) {
             // Keep updating the movement to encourage going through the window
-            if (windowDirection != null) {
-                Vec3d destination = getDestination();
-                ZMCMod.LOGGER.info("Triggered " + getDestination());
-                if(destination != null){
-                    this.zombie.teleport(windowSouthPos.getX() + .5f, windowSouthPos.getY(), windowSouthPos.getZ() + .5f);
-                    this.zombie.move(MovementType.SELF, getDestination());
-                    this.zombie.setPassedThroughWindow(true);
+            if (window.canPassThrough()) {
+                window.onZombiePassedThrough();
+                if (windowDirection != null) {
+                    Vec3d destination = getDestination();
+                    if(destination != null){
+                        this.zombie.teleport(windowSouthPos.getX() + .5f, windowSouthPos.getY(), windowSouthPos.getZ() + .5f);
+                        this.zombie.move(MovementType.SELF, getDestination());
+                        this.zombie.setPassedThroughWindow(true);
+                    }
                 }
             }
         }

@@ -27,14 +27,14 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import net.minecraft.state.StateManager.Builder;
 
-public class SmallZombieDoorwayBlock extends BlockWithEntity implements BlockEntityProvider {
+public class SmallZombieWindowBlock extends BlockWithEntity implements BlockEntityProvider {
     public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
 
     public static final IntProperty PLANKS = IntProperty.of("planks", 0, 6);
 
-    public static final MapCodec<SmallZombieDoorwayBlock> CODEC = SmallZombieDoorwayBlock.createCodec(SmallZombieDoorwayBlock::new);
+    public static final MapCodec<SmallZombieWindowBlock> CODEC = SmallZombieWindowBlock.createCodec(SmallZombieWindowBlock::new);
 
-    public SmallZombieDoorwayBlock(Settings settings){
+    public SmallZombieWindowBlock(Settings settings){
         super(settings);
         setDefaultState(this.stateManager.getDefaultState().with(FACING, Direction.NORTH).with(PLANKS, 0));
     }
@@ -108,8 +108,10 @@ public class SmallZombieDoorwayBlock extends BlockWithEntity implements BlockEnt
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         if (context instanceof EntityShapeContext) {
+            BlockEntity be = world.getBlockEntity(pos);
+
             Entity entity = ((EntityShapeContext) context).getEntity();
-            if (entity instanceof StandingZombieEntity zombie && !zombie.isPassedThroughWindow()) {
+            if (be instanceof SmallZombieWindowBlockEntity window && window.getPlank() == 0 && entity instanceof StandingZombieEntity zombie && !zombie.isPassedThroughWindow()) {
                 return VoxelShapes.empty();
             }
         }

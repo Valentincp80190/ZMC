@@ -2,7 +2,7 @@ package com.aureskull.zmcmod.item.custom;
 
 import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.custom.MapControllerBlock;
-import com.aureskull.zmcmod.block.custom.SmallZombieDoorwayBlock;
+import com.aureskull.zmcmod.block.custom.SmallZombieWindowBlock;
 import com.aureskull.zmcmod.block.custom.ZombieSpawnerBlock;
 import com.aureskull.zmcmod.block.custom.ZoneControllerBlock;
 import com.aureskull.zmcmod.block.entity.MapControllerBlockEntity;
@@ -51,7 +51,7 @@ public class Linker extends Item {
             BlockState state = world.getBlockState(pos);
             ZMCMod.LOGGER.info(state.getBlock().toString());
             if (state.getBlock() instanceof ZombieSpawnerBlock
-                    || state.getBlock() instanceof SmallZombieDoorwayBlock
+                    || state.getBlock() instanceof SmallZombieWindowBlock
                     || state.getBlock() instanceof MapControllerBlock
                     || state.getBlock() instanceof ZoneControllerBlock) {
                 handleBlockLinking(world, pos, itemStack, playerEntity);

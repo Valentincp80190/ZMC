@@ -1,5 +1,7 @@
 package com.aureskull.zmcmod.entity.goal;
 
+import com.aureskull.zmcmod.ZMCMod;
+import com.aureskull.zmcmod.entity.custom.StandingZombieEntity;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.entity.mob.MobEntity;
@@ -31,6 +33,8 @@ public class MoveToBlockGoal extends Goal {
 
     @Override
     public boolean canStart() {
+        if(this.targetPos == null) return false;
+        if(this.entity instanceof StandingZombieEntity zombie && zombie.isPassedThroughWindow()) return false;
         return this.entity.squaredDistanceTo(Vec3d.ofCenter(this.targetPos)) > 1.0D;
     }
 

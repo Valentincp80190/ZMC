@@ -1,5 +1,6 @@
 package com.aureskull.zmcmod.entity.goal;
 
+import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.entity.SmallZombieWindowBlockEntity;
 import com.aureskull.zmcmod.entity.custom.StandingZombieEntity;
 import net.minecraft.block.entity.BlockEntity;
@@ -16,6 +17,8 @@ public class AttackWindowGoal extends Goal {
 
     @Override
     public boolean canStart() {
+        if(this.zombie.isPassedThroughWindow()) return false;
+
         // Check for nearby window every second
         if (this.lastAttackTime + 3000 > System.currentTimeMillis()) {
             return false;

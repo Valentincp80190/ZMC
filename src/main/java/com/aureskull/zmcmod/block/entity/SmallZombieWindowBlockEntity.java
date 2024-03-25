@@ -2,7 +2,7 @@ package com.aureskull.zmcmod.block.entity;
 
 import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.ILinkable;
-import com.aureskull.zmcmod.block.custom.SmallZombieDoorwayBlock;
+import com.aureskull.zmcmod.block.custom.SmallZombieWindowBlock;
 import com.aureskull.zmcmod.client.InteractionHelper;
 import com.aureskull.zmcmod.client.MessageHudOverlay;
 import com.aureskull.zmcmod.event.ModKeyInputHandler;
@@ -11,9 +11,7 @@ import com.aureskull.zmcmod.sound.ModSounds;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalFacingBlock;
-import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.nbt.NbtCompound;
@@ -27,8 +25,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.*;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,6 +33,10 @@ import java.util.List;
 public class SmallZombieWindowBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ILinkable {
     public final int MAX_PLANK = 6;
     public int plank = 0;
+
+    private boolean canZombiePassThrough = false;
+    private long nextPassThroughTime = 0;
+
 
     private BlockPos linkedSpawnerPos;
 
@@ -109,7 +109,7 @@ public class SmallZombieWindowBlockEntity extends BlockEntity implements Extende
 
         //Show if the player can rebuild the barrier
         if(plank < MAX_PLANK){
-            Direction facing = state.get(SmallZombieDoorwayBlock.FACING);
+            Direction facing = state.get(SmallZombieWindowBlock.FACING);
             Box searchArea = getSearchArea(pos, facing);
 
             List<PlayerEntity> players = world.getNonSpectatingEntities(PlayerEntity.class, searchArea);
@@ -119,6 +119,14 @@ public class SmallZombieWindowBlockEntity extends BlockEntity implements Extende
                         MessageHudOverlay.setMessage("Hold [" + ModKeyInputHandler.INTERACT.getBoundKeyLocalizedText().getLiteralString() + "] to Rebuild Barrier", 100);
                 }
             }
+        }
+
+        // Update canZombiePassThrough based on the cooldown
+        long currentTime = world.getTime();
+        if (currentTime >= nextPassThroughTime) {
+            canZombiePassThrough = true;
+        } else {
+            canZombiePassThrough = false;
         }
     }
 
@@ -151,7 +159,7 @@ public class SmallZombieWindowBlockEntity extends BlockEntity implements Extende
 
             assert world != null;
             if (!world.isClient) {
-                world.setBlockState(pos, world.getBlockState(pos).with(SmallZombieDoorwayBlock.PLANKS, Integer.valueOf(plank)), 3);
+                world.setBlockState(pos, world.getBlockState(pos).with(SmallZombieWindowBlock.PLANKS, Integer.valueOf(plank)), 3);
                 world.playSound(null, pos, ModSounds.REBUILD_WINDOW, SoundCategory.BLOCKS, 0.5f, 1.0f);
                 world.playSound(null, pos, ModSounds.REBUILD_WINDOW_MONEY, SoundCategory.BLOCKS, 0.5f, 1.0f);
             }
@@ -168,7 +176,7 @@ public class SmallZombieWindowBlockEntity extends BlockEntity implements Extende
 
             assert world != null;
             if (!world.isClient) {
-                world.setBlockState(pos, world.getBlockState(pos).with(SmallZombieDoorwayBlock.PLANKS, Integer.valueOf(plank)), 3);
+                world.setBlockState(pos, world.getBlockState(pos).with(SmallZombieWindowBlock.PLANKS, Integer.valueOf(plank)), 3);
                 world.playSound(null, pos, ModSounds.SNAP_WINDOW, SoundCategory.BLOCKS, 0.5f, 1.0f);
                 world.playSound(null, pos, ModSounds.SNAP_WINDOW, SoundCategory.BLOCKS, 0.5f, 1.0f);
             }
@@ -247,10 +255,16 @@ public class SmallZombieWindowBlockEntity extends BlockEntity implements Extende
 
 
     public boolean canPassThrough() {
-        return this.plank <= 0;
+        return this.plank <= 0 && canZombiePassThrough;
     }
 
-
+    public void onZombiePassedThrough() {
+        if (canZombiePassThrough) {
+            long currentTime = world.getTime();
+            nextPassThroughTime = currentTime + 40; // 2 seconds cooldown
+            canZombiePassThrough = false; // Prevent further passes until cooldown expires
+        }
+    }
 
 
     private void unlinkSpawner(World world) {
