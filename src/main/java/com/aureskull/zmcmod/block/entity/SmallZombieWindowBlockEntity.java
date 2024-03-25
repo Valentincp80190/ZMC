@@ -164,9 +164,6 @@ public class SmallZombieWindowBlockEntity extends BlockEntity implements Extende
                 world.playSound(null, pos, ModSounds.REBUILD_WINDOW_MONEY, SoundCategory.BLOCKS, 0.5f, 1.0f);
             }
         }
-
-        ZMCMod.LOGGER.info("CURRENT POS : " + this.pos);
-        ZMCMod.LOGGER.info("SOUTH : " + new BlockPos(this.pos.getX(), this.pos.getY(),this.pos.getZ() + 1));
     }
 
     public void removePlank(){

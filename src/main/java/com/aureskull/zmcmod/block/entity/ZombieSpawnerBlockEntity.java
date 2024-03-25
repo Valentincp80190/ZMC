@@ -1,5 +1,6 @@
 package com.aureskull.zmcmod.block.entity;
 
+import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.ILinkable;
 import com.aureskull.zmcmod.entity.ModEntities;
 import com.aureskull.zmcmod.entity.custom.StandingZombieEntity;
@@ -26,7 +27,7 @@ import java.util.List;
 
 public class ZombieSpawnerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ILinkable {
 
-    private BlockPos linkedDoorwayPos;
+    private BlockPos linkedWindowPos;
 
     public ZombieSpawnerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.ZOMBIE_SPAWNER_BLOCK_ENTITY, pos, state);
@@ -50,18 +51,18 @@ public class ZombieSpawnerBlockEntity extends BlockEntity implements ExtendedScr
 
     @Override
     protected void writeNbt(NbtCompound nbt){
-        if (linkedDoorwayPos != null) {
-            nbt.put("linked_doorway", NbtHelper.fromBlockPos(linkedDoorwayPos));
-        }
+        if (linkedWindowPos != null)
+            nbt.put("linked_window", NbtHelper.fromBlockPos(linkedWindowPos));
+
         super.writeNbt(nbt);
     }
 
     @Override
     public void readNbt(NbtCompound nbt){
         super.readNbt(nbt);
-        if (nbt.contains("linked_doorway")) {
-            this.linkedDoorwayPos = NbtHelper.toBlockPos(nbt.getCompound("linked_doorway"));
-        }
+        if (nbt.contains("linked_window"))
+            this.linkedWindowPos =  NbtHelper.toBlockPos(nbt.getCompound("linked_window"));
+
     }
 
     @Nullable
@@ -87,31 +88,54 @@ public class ZombieSpawnerBlockEntity extends BlockEntity implements ExtendedScr
         return null;
     }
 
-    /*public void setLinkedDoorway(BlockPos pos) {
-        this.linkedDoorwayPos = pos;
-        this.markDirty();
+    public BlockPos getLinkedWindow() {
+        return this.linkedWindowPos;
     }
 
-    public BlockPos getLinkedDoorway() {
-        return this.linkedDoorwayPos;
-    }*/
+    public BlockPos getMapControllerBlockEntityPos() {
+        if (getLinkedWindow() != null && world.getBlockEntity(getLinkedWindow()) instanceof SmallZombieWindowBlockEntity window) {
+            BlockPos zoneBP = window.getLinkedBlock(ZoneControllerBlockEntity.class);
+
+            if (world.getBlockEntity(zoneBP) instanceof ZoneControllerBlockEntity zoneBE) {
+                return findMapControllerRecursively(zoneBE);
+            }
+        }
+        return null; // MapControllerBlockEntity BlockPos not found
+    }
+
+    private BlockPos findMapControllerRecursively(ZoneControllerBlockEntity zone) {
+        // If this zone is directly linked to a MapControllerBlockEntity, return its BlockPos
+        BlockPos mapControllerBP = zone.getLinkedBlock(MapControllerBlockEntity.class);
+        if (mapControllerBP != null) {
+            return mapControllerBP;
+        }
+
+        // Otherwise, recursively search through all parent zones
+        for (BlockPos parentZoneBP : zone.getAllLinkedBlocks(ZoneControllerBlockEntity.class)) {
+            if (world.getBlockEntity(parentZoneBP) instanceof ZoneControllerBlockEntity parentZoneBE) {
+                BlockPos foundBP = findMapControllerRecursively(parentZoneBE);
+                if (foundBP != null && world.getBlockEntity(foundBP) instanceof MapControllerBlockEntity) {
+                    // If one of the parent zones (or their parents, recursively) is linked to a MapController, return its BlockPos
+                    return foundBP;
+                }
+            }
+        }
+
+        // If no MapControllerBlockEntity is found in the hierarchy, return null
+        return null;
+    }
 
     public void spawnZombie() {
-        if (!world.isClient && linkedDoorwayPos != null) {
+        BlockPos mapController = this.getMapControllerBlockEntityPos();
+        if (!world.isClient && getLinkedWindow() != null &&  mapController != null && world.getBlockEntity(mapController) instanceof  MapControllerBlockEntity) {
             // Logic to spawn the zombie
             StandingZombieEntity zombie = ModEntities.STANDING_ZOMBIE.create(world);
-            zombie.setTargetBlockPos(this.linkedDoorwayPos);
+            zombie.setTargetBlockPos(getLinkedWindow());
+            zombie.setMapControllerBlockPos(mapController);
 
             if (zombie != null) {
                 zombie.setPosition(getPos().getX() + 0.5, getPos().getY() + 1, getPos().getZ() + 0.5);
                 world.spawnEntity(zombie);
-
-                // Direct the zombie to the linked doorway
-                /*zombie.getNavigation().startMovingTo(
-                        linkedDoorwayPos.getX() + 0.5,
-                        linkedDoorwayPos.getY(),
-                        linkedDoorwayPos.getZ() + 0.5,
-                        1.0);*/
             }
         }
     }
@@ -128,7 +152,7 @@ public class ZombieSpawnerBlockEntity extends BlockEntity implements ExtendedScr
 
     @Override
     public void unlink(World world, Class<? extends BlockEntity> linkType) {
-        if(SmallZombieWindowBlockEntity.class.isAssignableFrom(linkType) && linkedDoorwayPos != null){
+        if(SmallZombieWindowBlockEntity.class.isAssignableFrom(linkType) && getLinkedWindow() != null){
             unlinkDoorway(world);
         }
     }
@@ -136,7 +160,7 @@ public class ZombieSpawnerBlockEntity extends BlockEntity implements ExtendedScr
     @Override
     public void setLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
         if(SmallZombieWindowBlockEntity.class.isAssignableFrom(linkType)) {
-            this.linkedDoorwayPos = linkedBlockPos;
+            this.linkedWindowPos = linkedBlockPos;
         }
 
         markDirty();
@@ -145,7 +169,7 @@ public class ZombieSpawnerBlockEntity extends BlockEntity implements ExtendedScr
     @Override
     public @Nullable BlockPos getLinkedBlock(Class<? extends BlockEntity> linkType) {
         if(SmallZombieWindowBlockEntity.class.isAssignableFrom(linkType)) {
-            return this.linkedDoorwayPos;
+            return getLinkedWindow();
         }
 
         return null;

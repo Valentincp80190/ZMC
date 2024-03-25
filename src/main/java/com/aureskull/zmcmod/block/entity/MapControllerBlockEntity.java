@@ -39,7 +39,9 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
     private boolean started = false;
 
     private int round = 0;
+
     private int zombiesInRound = 0;
+    private int killedZombiesInRound = 0;
     private int MAX_ZOMBIES = 24;
 
     private BlockPos linkedZoneController = null;
@@ -69,6 +71,7 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         nbt.putString("map_controller.mapname", this.mapName);
         nbt.putInt("map_controller.round", this.round);
         nbt.putInt("map_controller.zombies_in_round", this.zombiesInRound);
+        nbt.putInt("map_controller.killed_zombies_in_round", this.killedZombiesInRound);
         nbt.putBoolean("map_controller.started", this.started);
 
         if (nbt.contains("map_controller.linked_zone_controller")) {
@@ -92,6 +95,9 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
         if (nbt.contains("map_controller.zombies_in_round"))
             this.zombiesInRound = nbt.getInt("map_controller.zombies_in_round");
+
+        if (nbt.contains("map_controller.killed_zombies_in_round"))
+            this.zombiesInRound = nbt.getInt("map_controller.killed_zombies_in_round");
 
         if (nbt.contains("map_controller.started"))
             this.started = nbt.getBoolean("map_controller.started");
@@ -119,7 +125,8 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
                 int chance = random.nextInt(1000);
 
                 //Map started => SpawnZombie if we doesn't exceed the number of zombie on the map
-                if(chance < 7 && this.zombiesInRound > 0)
+                //Normaly chance < 7
+                if(chance < 100 && this.zombiesInRound > 0)
                     spawnZombie();
             }
         }
@@ -205,6 +212,19 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         markDirty();
     }
 
+    public int getKilledZombiesInRound() {
+        return killedZombiesInRound;
+    }
+
+    public void setKilledZombiesInRound(int killedZombiesInRound) {
+        this.killedZombiesInRound = killedZombiesInRound;
+        markDirty();
+        ZMCMod.LOGGER.info(this.killedZombiesInRound + "/" + (int) ((this.getRound() * 6) + ((this.getRound() * 6) * 0.25 * (1-1))));
+        if(this.killedZombiesInRound == (int) ((this.getRound() * 6) + ((this.getRound() * 6) * 0.25 * (1-1))))
+            goToNextRound();
+    }
+
+
     private void startZombieMap(){
         if (!world.isClient()) {
 
@@ -259,6 +279,7 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
             this.setRound(this.getRound() + 1);
             ZMCMod.LOGGER.info("Round is: " + this.round);
             setZombiesInRound((int) ((this.getRound() * 6) + ((this.getRound() * 6) * 0.25 * (1-1))));
+            setKilledZombiesInRound(0);
             if (world instanceof ServerWorld) {
                 sendUpdateRoundPacket((ServerWorld) world, this.pos, this.getRound());
             }
@@ -268,8 +289,6 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
     public void setZombiesInRound(int zombiesInRound) {
         this.zombiesInRound = zombiesInRound;
         markDirty();
-        ZMCMod.LOGGER.info("Change zombies in the round to: " + zombiesInRound + " <- " + (int) ((this.getRound() * 6) * (0.25 * (1-1))));
-        ZMCMod.LOGGER.info("Zombies in the round: " + this.zombiesInRound);
     }
 
     private static void sendUpdateRoundPacket(ServerWorld  world, BlockPos zonePos, int newRound) {
@@ -285,6 +304,8 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
     private void stopZombieMap(){
         this.setRound(0);
+        this.setKilledZombiesInRound(0);
+
         if (world instanceof ServerWorld) {
             sendUpdateRoundPacket((ServerWorld) world, this.pos, this.getRound());
         }

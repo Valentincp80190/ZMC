@@ -25,6 +25,7 @@ public class ZMCMod implements ModInitializer {
 		//TODO: Retirer le droit de drop des items lorsqu'une game est en cours (pour les joueurs qui jouent dans la map bien sûr).
 		//TODO: Faire en sorte qu'un joueur ne perde pas son inventaire lorsqu'une game est en cours (pour les joueurs qui jouent dans la map toujours).
 		//TODO: Faire un block joueur de son servant à mettre de l'ambiance. Dans ce block on pourrait configurer quel son à jouer et un random tick à mettre. On pourrait également le rendre activable via redstone
+		//TODO: Sécuriter tout les enregistrement de NBT et la lecture pour enregister dans le nbt la bonne classe du block souhaitée comme fait dans la classe du spawner
 
 		ModItemGroup.registerItemGroups();
 		ModItems.registerModItems();

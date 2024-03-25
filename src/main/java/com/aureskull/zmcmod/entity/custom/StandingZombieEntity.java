@@ -1,5 +1,6 @@
 package com.aureskull.zmcmod.entity.custom;
 
+import com.aureskull.zmcmod.block.entity.MapControllerBlockEntity;
 import com.aureskull.zmcmod.block.entity.SmallZombieWindowBlockEntity;
 import com.aureskull.zmcmod.entity.goal.AttackWindowGoal;
 import com.aureskull.zmcmod.entity.goal.CrawlThroughWindowGoal;
@@ -12,6 +13,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -31,6 +33,8 @@ public class StandingZombieEntity extends HostileEntity {
 
     //NBT pas sauvegardé pour cette variable => Au redémarrage du serveur tous les zombies déjà présents voudront repasser au travers de leur porte même s'ils sont déjà passé.
     private boolean passedThroughWindow = false;
+
+    private BlockPos mapControllerBlockPos;
 
     public StandingZombieEntity(EntityType<? extends HostileEntity> entityType, World world) {
         super(entityType, world);
@@ -87,18 +91,26 @@ public class StandingZombieEntity extends HostileEntity {
 
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
-        if (targetBlockPos != null) {
+        if (targetBlockPos != null)
             nbt.put("standing_zombie.target_position", NbtHelper.fromBlockPos(targetBlockPos));
-        }
+
+        if(mapControllerBlockPos != null)
+            nbt.put("standing_zombie.map_controller_position", NbtHelper.fromBlockPos(targetBlockPos));
+
+
+
         super.writeCustomDataToNbt(nbt);
     }
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
-        if (nbt.contains("standing_zombie.target_position")) {
+
+        if (nbt.contains("standing_zombie.target_position"))
             this.targetBlockPos = NbtHelper.toBlockPos(nbt.getCompound("standing_zombie.target_position"));
-        }
+
+        if(nbt.contains("standing_zombie.map_controller_position"))
+            this.mapControllerBlockPos = NbtHelper.toBlockPos(nbt.getCompound("standing_zombie.map_controller_position"));
     }
 
     public static DefaultAttributeContainer.Builder createStandingZombieAttributes(){
@@ -120,6 +132,29 @@ public class StandingZombieEntity extends HostileEntity {
     @Override
     protected SoundEvent getDeathSound() {
         return ModSounds.STANDING_ZOMBIE_DEATH;
+    }
+
+    @Override
+    public void onDeath(DamageSource source) {
+        super.onDeath(source); // Always call the superclass method first
+
+        if (!this.getWorld().isClient) {
+            sendZombieHasBeenKilledToMapController();
+        }
+    }
+
+    private void sendZombieHasBeenKilledToMapController(){
+        if(mapControllerBlockPos != null
+                && getWorld().getBlockEntity(this.mapControllerBlockPos) instanceof MapControllerBlockEntity mapControllerBE
+                && mapControllerBE.isStarted()){
+            mapControllerBE.setKilledZombiesInRound(mapControllerBE.getKilledZombiesInRound() + 1);
+        }
+    }
+
+
+    @Override
+    public int getXpToDrop() {
+        return 0;
     }
 
     public BlockPos getTargetBlockPos() {
@@ -147,5 +182,9 @@ public class StandingZombieEntity extends HostileEntity {
 
     public Boolean isPassedThroughWindow() {
         return passedThroughWindow;
+    }
+
+    public void setMapControllerBlockPos(BlockPos mapControllerBlockPos) {
+        this.mapControllerBlockPos = mapControllerBlockPos;
     }
 }
