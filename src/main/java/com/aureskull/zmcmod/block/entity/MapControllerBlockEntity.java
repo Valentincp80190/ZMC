@@ -306,9 +306,9 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         this.setRound(0);
         this.setKilledZombiesInRound(0);
 
-        if (world instanceof ServerWorld) {
+        /*if (world instanceof ServerWorld) {
             sendUpdateRoundPacket((ServerWorld) world, this.pos, this.getRound());
-        }
+        }*/
     }
 
     private void spawnZombie(){

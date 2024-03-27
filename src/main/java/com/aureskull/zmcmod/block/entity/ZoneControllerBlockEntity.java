@@ -20,6 +20,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,6 +29,8 @@ import java.util.List;
 import java.util.random.RandomGenerator;
 
 public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ILinkable {
+    //TODO : Faire une relation parent/enfant de façon unique, un parent ne peux pas être à la fois l'enfant de l'autre...
+
     public BlockPos posA = new BlockPos(pos.getX() - 5, pos.getY() + 1, pos.getZ() - 5);
     public BlockPos posB = new BlockPos(pos.getX() + 5, pos.getY() + 5, pos.getZ() + 5);
     public BlockPos spawnPoint = new BlockPos(pos.getX(), pos.getY() + 2, pos.getZ());
@@ -168,7 +171,27 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
     }
 
     public void tick(World world, BlockPos pos, BlockState state) {
-        if(world.isClient()) {
+        if(!world.isClient()) {
+            // Calculate the minimum and maximum coordinates to define the zone
+            int minX = Math.min(posA.getX(), posB.getX());
+            int minY = Math.min(posA.getY(), posB.getY());
+            int minZ = Math.min(posA.getZ(), posB.getZ());
+            int maxX = Math.max(posA.getX(), posB.getX());
+            int maxY = Math.max(posA.getY(), posB.getY());
+            int maxZ = Math.max(posA.getZ(), posB.getZ());
+
+            // Create a box representing the zone
+            Box zone = new Box(minX, minY, minZ, maxX+1, maxY+1, maxZ+1);
+
+            // Check for players within the zone
+            List<PlayerEntity> playersInZone = world.getNonSpectatingEntities(PlayerEntity.class, zone);
+            for(PlayerEntity player : playersInZone) {
+                player.sendMessage(Text.literal(player.getName().getString() + " has entered the zone at " + pos.toString()), true);
+            }
+
+            if(playersInZone != null && playersInZone.size() > 0){
+                //spawnZombie();
+            }
             return;
         }
     }
@@ -211,7 +234,7 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
     }
 
     private void addLinkedParentZoneControllers(BlockPos windowPos) {
-        if (!linkedParentZoneControllers.contains(windowPos))
+        if (windowPos != this.getPos() && !linkedParentZoneControllers.contains(windowPos))
             linkedParentZoneControllers.add(windowPos);
     }
 
@@ -224,9 +247,9 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
             this.linkedChildZoneControllers.remove(doorwayPos);
     }
 
-    private void addLinkedChildZoneControllers(BlockPos doorwayPos) {
-        if (!linkedChildZoneControllers.contains(doorwayPos))
-            linkedChildZoneControllers.add(doorwayPos);
+    private void addLinkedChildZoneControllers(BlockPos windowPos) {
+        if (windowPos != this.getPos() && !linkedChildZoneControllers.contains(windowPos))
+            linkedChildZoneControllers.add(windowPos);
     }
 
     private List<BlockPos> getLinkedWindows() {
@@ -353,12 +376,16 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
     }
 
     public void spawnZombie(){
-        int randomWindowIndex = RandomGenerator.getDefault().nextInt(this.linkedWindows.size());
-        ZMCMod.LOGGER.info("Zombie will spawn at door " + randomWindowIndex);
+        try{
+            int randomWindowIndex = RandomGenerator.getDefault().nextInt(this.linkedWindows.size());
+            ZMCMod.LOGGER.info("Zombie will spawn at door " + randomWindowIndex);
 
-        SmallZombieWindowBlockEntity smallZombieWindowBlockEntity = ((SmallZombieWindowBlockEntity) world.getBlockEntity(linkedWindows.get(randomWindowIndex)));
-        ZombieSpawnerBlockEntity zombieSpawnerBlockEntity = ((ZombieSpawnerBlockEntity) world.getBlockEntity(smallZombieWindowBlockEntity.getLinkedBlock(ZombieSpawnerBlockEntity.class)));
-        zombieSpawnerBlockEntity.spawnZombie();
+            SmallZombieWindowBlockEntity smallZombieWindowBlockEntity = ((SmallZombieWindowBlockEntity) world.getBlockEntity(linkedWindows.get(randomWindowIndex)));
+            ZombieSpawnerBlockEntity zombieSpawnerBlockEntity = ((ZombieSpawnerBlockEntity) world.getBlockEntity(smallZombieWindowBlockEntity.getLinkedBlock(ZombieSpawnerBlockEntity.class)));
+            zombieSpawnerBlockEntity.spawnZombie();
+        }catch (Exception e){
+            ZMCMod.LOGGER.error(e.getMessage());
+        }
     }
 
     public void spawnZombieInAdjacentZone(){

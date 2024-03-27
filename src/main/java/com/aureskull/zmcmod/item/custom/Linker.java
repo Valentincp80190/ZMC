@@ -145,6 +145,10 @@ public class Linker extends Item {
             if(firstPos.getX() == secondPos.getX() && firstPos.getY() == secondPos.getY() && firstPos.getZ() == secondPos.getZ()) return;
 
             //first pos = parent
+            if(((ZoneControllerBlockEntity)secondEntity).getChild(ZoneControllerBlockEntity.class).contains(firstPos)){
+                ((ZoneControllerBlockEntity) secondEntity).removeChild(firstPos, ZoneControllerBlockEntity.class);
+            }
+
             ((ZoneControllerBlockEntity) firstEntity).addChild(secondPos, ZoneControllerBlockEntity.class);
             ((ZoneControllerBlockEntity) secondEntity).addParent(firstPos, ZoneControllerBlockEntity.class);
         }

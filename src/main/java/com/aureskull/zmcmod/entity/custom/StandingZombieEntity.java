@@ -82,10 +82,10 @@ public class StandingZombieEntity extends HostileEntity {
         this.goalSelector.add(2, new AttackWindowGoal(this));
         this.goalSelector.add(3, new CrawlThroughWindowGoal(this, 0.5D));
 
-        this.goalSelector.add(4, new ZombieAttackGoal(this, 0.7, false));
+        this.goalSelector.add(4, new ZombieAttackGoal(this, 1.7, false));
         this.goalSelector.add(4, new ActiveTargetGoal<PlayerEntity>((MobEntity)this, PlayerEntity.class, true));
 
-        this.goalSelector.add(5, new LookAtEntityGoal(this, PlayerEntity.class, 32.0F));
+        this.goalSelector.add(5, new LookAtEntityGoal(this, PlayerEntity.class, 256.0F));
 
     }
 
