@@ -172,28 +172,39 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
 
     public void tick(World world, BlockPos pos, BlockState state) {
         if(!world.isClient()) {
-            // Calculate the minimum and maximum coordinates to define the zone
-            int minX = Math.min(posA.getX(), posB.getX());
-            int minY = Math.min(posA.getY(), posB.getY());
-            int minZ = Math.min(posA.getZ(), posB.getZ());
-            int maxX = Math.max(posA.getX(), posB.getX());
-            int maxY = Math.max(posA.getY(), posB.getY());
-            int maxZ = Math.max(posA.getZ(), posB.getZ());
 
-            // Create a box representing the zone
-            Box zone = new Box(minX, minY, minZ, maxX+1, maxY+1, maxZ+1);
+            BlockPos mapControllerPos = findMapControllerRecursively(this);
+            if(world.getBlockEntity(mapControllerPos) instanceof MapControllerBlockEntity mapControllerBlockEntity && mapControllerBlockEntity.isStarted()){
 
-            // Check for players within the zone
-            List<PlayerEntity> playersInZone = world.getNonSpectatingEntities(PlayerEntity.class, zone);
-            for(PlayerEntity player : playersInZone) {
-                player.sendMessage(Text.literal(player.getName().getString() + " has entered the zone at " + pos.toString()), true);
+                // Create a box representing the zone
+                Box zone = getBox();
+
+                // Check for players within the zone
+                //TODO : Voir s'il est nécéssaire de répéter l'opération toute les secondes au lieu de 20x par seconde.
+                List<PlayerEntity> playersInZone = world.getNonSpectatingEntities(PlayerEntity.class, zone);
+                for(PlayerEntity player : playersInZone) {
+                    player.sendMessage(Text.literal(player.getName().getString() + " has entered the zone at " + pos.toString()), true);
+                    mapControllerBlockEntity.playerCurrentZone.put(player.getUuid(), this.getPos());
+                }
             }
 
-            if(playersInZone != null && playersInZone.size() > 0){
-                //spawnZombie();
-            }
             return;
         }
+    }
+
+    public Box getBox(){
+        // Calculate the minimum and maximum coordinates to define the zone
+        int minX = Math.min(posA.getX(), posB.getX());
+        int minY = Math.min(posA.getY(), posB.getY());
+        int minZ = Math.min(posA.getZ(), posB.getZ());
+        int maxX = Math.max(posA.getX(), posB.getX());
+        int maxY = Math.max(posA.getY(), posB.getY());
+        int maxZ = Math.max(posA.getZ(), posB.getZ());
+
+        // Create a box representing the zone
+        Box box = new Box(minX, minY, minZ, maxX+1, maxY+1, maxZ+1);
+
+        return box;
     }
 
     @Nullable
@@ -390,5 +401,33 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
 
     public void spawnZombieInAdjacentZone(){
 
+    }
+
+    public BlockPos findMapControllerRecursively(ZoneControllerBlockEntity zone) {
+        // If this zone is directly linked to a MapControllerBlockEntity, return its BlockPos
+        BlockPos mapControllerBP = zone.getLinkedBlock(MapControllerBlockEntity.class);
+
+        if (mapControllerBP != null) {
+            return mapControllerBP;
+        }else{
+            //ZMCMod.LOGGER.info("Map controller not found at zone " + zone.getPos());
+        }
+
+        // Otherwise, recursively search through all parent zones
+        //ZMCMod.LOGGER.info("Parents in zone " + zone.getPos() + " are : " + zone.getParent(ZoneControllerBlockEntity.class));
+        for (BlockPos parentZoneBP : zone.getParent(ZoneControllerBlockEntity.class)) {
+            if (world.getBlockEntity(parentZoneBP) instanceof ZoneControllerBlockEntity parentZoneBE) {
+                //ZMCMod.LOGGER.info("looking for Map Controller in parent Zone" + parentZoneBE.getPos());
+                BlockPos foundBP = findMapControllerRecursively(parentZoneBE);
+
+                if (foundBP != null && world.getBlockEntity(foundBP) instanceof MapControllerBlockEntity) {
+                    // If one of the parent zones (or their parents, recursively) is linked to a MapController, return its BlockPos
+                    return foundBP;
+                }
+            }
+        }
+
+        // If no MapControllerBlockEntity is found in the hierarchy, return null
+        return null;
     }
 }

@@ -97,38 +97,10 @@ public class ZombieSpawnerBlockEntity extends BlockEntity implements ExtendedScr
             BlockPos zoneBP = window.getLinkedBlock(ZoneControllerBlockEntity.class);
 
             if (world.getBlockEntity(zoneBP) instanceof ZoneControllerBlockEntity zoneBE) {
-                return findMapControllerRecursively(zoneBE);
+                return zoneBE.findMapControllerRecursively(zoneBE);
             }
         }
         return null; // MapControllerBlockEntity BlockPos not found
-    }
-
-    private BlockPos findMapControllerRecursively(ZoneControllerBlockEntity zone) {
-        // If this zone is directly linked to a MapControllerBlockEntity, return its BlockPos
-        BlockPos mapControllerBP = zone.getLinkedBlock(MapControllerBlockEntity.class);
-
-        if (mapControllerBP != null) {
-            return mapControllerBP;
-        }else{
-            //ZMCMod.LOGGER.info("Map controller not found at zone " + zone.getPos());
-        }
-
-        // Otherwise, recursively search through all parent zones
-        //ZMCMod.LOGGER.info("Parents in zone " + zone.getPos() + " are : " + zone.getParent(ZoneControllerBlockEntity.class));
-        for (BlockPos parentZoneBP : zone.getParent(ZoneControllerBlockEntity.class)) {
-            if (world.getBlockEntity(parentZoneBP) instanceof ZoneControllerBlockEntity parentZoneBE) {
-                //ZMCMod.LOGGER.info("looking for Map Controller in parent Zone" + parentZoneBE.getPos());
-                BlockPos foundBP = findMapControllerRecursively(parentZoneBE);
-
-                if (foundBP != null && world.getBlockEntity(foundBP) instanceof MapControllerBlockEntity) {
-                    // If one of the parent zones (or their parents, recursively) is linked to a MapController, return its BlockPos
-                    return foundBP;
-                }
-            }
-        }
-
-        // If no MapControllerBlockEntity is found in the hierarchy, return null
-        return null;
     }
 
     public void spawnZombie() {

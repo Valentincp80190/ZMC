@@ -4,7 +4,6 @@ import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.ILinkable;
 import com.aureskull.zmcmod.networking.ModMessages;
 import com.aureskull.zmcmod.screen.mapcontroller.MapControllerScreenHandler;
-import com.aureskull.zmcmod.sound.ModSounds;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -20,29 +19,27 @@ import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class MapControllerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ILinkable {
     public String mapName = "";
-
     private boolean started = false;
-
     private int round = 0;
-
     private int zombiesInRound = 0;
     private int killedZombiesInRound = 0;
     private int MAX_ZOMBIES = 24;
+
+    public static final Map<UUID, BlockPos> playerCurrentZone = new HashMap<>();
 
     private BlockPos linkedZoneController = null;
 
@@ -121,13 +118,7 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
     public void tick(World world, BlockPos pos, BlockState state) {
         if(!world.isClient()) {
             if(this.started == true){
-                Random random = new Random();
-                int chance = random.nextInt(1000);
-
-                //Map started => SpawnZombie if we doesn't exceed the number of zombie on the map
-                //Normaly chance < 7
-                if(chance < 100 && this.zombiesInRound > 0)
-                    spawnZombie();
+                spawnZombie();
             }
         }
     }
@@ -312,9 +303,56 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
     }
 
     private void spawnZombie(){
-        ZoneControllerBlockEntity zoneControllerBlockEntity = ((ZoneControllerBlockEntity) world.getBlockEntity(this.linkedZoneController));
-        zoneControllerBlockEntity.spawnZombie();
+        Random random = new Random();
+        int chance = random.nextInt(1000);
 
-        zombiesInRound--;
+        //Map started => SpawnZombie if we doesn't exceed the number of zombie on the map
+        //Normaly chance < 7
+        if(chance < 100 && this.zombiesInRound > 0) {
+            for (Map.Entry<UUID, BlockPos> entry : playerCurrentZone.entrySet()) {
+                UUID playerUUID = entry.getKey();
+                BlockPos zoneBlockPos = entry.getValue();
+
+                boolean test = isPlayerInsideItsZone(playerUUID);
+
+                if(!test){
+                    playerCurrentZone.remove(playerUUID);
+                }else{
+                    ZoneControllerBlockEntity zoneControllerBlockEntity = ((ZoneControllerBlockEntity) world.getBlockEntity(zoneBlockPos));
+                    zoneControllerBlockEntity.spawnZombie();
+
+                    zombiesInRound--;
+                }
+            }
+        }
+    }
+
+    private boolean isPlayerInsideItsZone(UUID playerUUID){
+        // Check if the world is a ServerWorld instance
+        if (world instanceof ServerWorld) {
+            ServerWorld serverWorld = (ServerWorld) world;
+
+            // Attempt to retrieve the player by UUID
+            PlayerEntity player = serverWorld.getPlayerByUuid(playerUUID);
+
+            if (player != null) {
+                // If the player is found, check the zone
+                BlockPos bp = playerCurrentZone.get(playerUUID);
+                if (bp != null && world.getBlockEntity(bp) instanceof ZoneControllerBlockEntity zoneControllerBE) {
+                    //If the ZoneController is connected to the current MapController
+                    BlockPos mapControllerBlockPos = zoneControllerBE.findMapControllerRecursively(zoneControllerBE);
+                    if(mapControllerBlockPos != null &&
+                            world.getBlockEntity(mapControllerBlockPos) instanceof MapControllerBlockEntity mapControllerBlockEntity
+                            && mapControllerBlockEntity.getPos() == this.getPos()){
+
+                        Box zoneBox = zoneControllerBE.getBox();
+
+                        // Use the player's current position to check if they're inside the box
+                        return zoneBox.contains(player.getPos().x, player.getPos().y, player.getPos().z);
+                    }
+                }
+            }
+        }
+        return false;
     }
 }
