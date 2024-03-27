@@ -1,9 +1,11 @@
 package com.aureskull.zmcmod.block.entity.renderer;
 
 import com.aureskull.zmcmod.block.entity.SmallZombieWindowBlockEntity;
+import com.aureskull.zmcmod.block.entity.ZombieSpawnerBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZoneControllerBlockEntity;
 import com.aureskull.zmcmod.event.ModKeyInputHandler;
 import com.aureskull.zmcmod.item.custom.Linker;
+import com.aureskull.zmcmod.item.custom.ZoneStick;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
@@ -35,6 +37,8 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
                 drawLinesToChildZones(entity, matrices);
             }
         }
+
+
 
         BlockPos posA = entity.posA;
         BlockPos posB = entity.posB;
@@ -73,12 +77,18 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
         final int f_z1 = z1;
         final int f_z2 = z2;
 
-        if(ModKeyInputHandler.showZoneArea){
-            renderLine(entity, matrices, f_x1, f_x2, f_y1, f_y2, f_z1, f_z2);
-            renderSide(entity, matrices, f_x1, f_x2, f_y1, f_y2, f_z1, f_z2);
 
-            renderCube(entity, matrices, entity.posA);
-            renderCube(entity, matrices, entity.posB);
+        if (minecraftClient != null && minecraftClient.player != null) {
+            ItemStack itemInMainHand = minecraftClient.player.getMainHandStack();
+
+            // Check if the item in the main hand is the ZoneStick item
+            if (itemInMainHand.getItem() instanceof ZoneStick || ModKeyInputHandler.showZoneArea) {
+                renderLine(entity, matrices, f_x1, f_x2, f_y1, f_y2, f_z1, f_z2);
+                renderSide(entity, matrices, f_x1, f_x2, f_y1, f_y2, f_z1, f_z2);
+
+                renderCube(entity, matrices, entity.posA);
+                renderCube(entity, matrices, entity.posB);
+            }
         }
     }
 

@@ -12,10 +12,4 @@ public class ZoneStick extends Item {
     public ZoneStick(Settings settings) {
         super(settings);
     }
-
-    @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity playerEntity, Hand hand) {
-        playerEntity.playSound(SoundEvents.BLOCK_WOOL_BREAK, 1.0F, 1.0F);
-        return TypedActionResult.success(playerEntity.getStackInHand(hand));
-    }
 }
