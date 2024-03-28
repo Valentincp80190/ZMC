@@ -27,6 +27,8 @@ public class ZMCMod implements ModInitializer {
 		//TODO: Faire un block joueur de son servant à mettre de l'ambiance. Dans ce block on pourrait configurer quel son à jouer et un random tick à mettre. On pourrait également le rendre activable via redstone
 		//TODO: Sécuriter tout les enregistrement de NBT et la lecture pour enregister dans le nbt la bonne classe du block souhaitée comme fait dans la classe du spawner
 
+		//TODO: BUG - Lorsqu'un joueur répare une porte au moment où un zombie arrive dessus, le zombie se déplace légérement de la porte et celui-ci ne peut plus passer au travers
+		//TODO: BUG - Les zombies ne nous suivent pas d'assez loin.
 		ModItemGroup.registerItemGroups();
 		ModItems.registerModItems();
 		ModBlockEntities.registerBlockEntities();

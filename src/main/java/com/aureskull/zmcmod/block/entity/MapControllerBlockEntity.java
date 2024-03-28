@@ -38,6 +38,7 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
     private int zombiesInRound = 0;
     private int killedZombiesInRound = 0;
     private int MAX_ZOMBIES = 24;
+    private int spawnLuck = 7;
 
     public static final Map<UUID, BlockPos> playerCurrentZone = new HashMap<>();
 
@@ -270,6 +271,7 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
             ZMCMod.LOGGER.info("Round is: " + this.round);
             setZombiesInRound((int) ((this.getRound() * 6) + ((this.getRound() * 6) * 0.25 * (1-1))));
             setKilledZombiesInRound(0);
+            setSpawnLuck(20 + ((int) ( ((getRound()-1) * .6) > 60 ? 60 : (getRound()-1) * .6)));
             if (world instanceof ServerWorld) {
                 sendUpdateRoundPacket((ServerWorld) world, this.pos, this.getRound());
             }
@@ -307,12 +309,12 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
         //Map started => SpawnZombie if we doesn't exceed the number of zombie on the map
         //Normaly chance < 7
-        if(chance < getSpawnLuck() && this.zombiesInRound > 0) {
+        if(chance < spawnLuck && this.zombiesInRound > 0) {
 
             ZoneControllerBlockEntity zone = getRandomZoneOccupiedByPlayer();
             if(zone != null){
                 try{
-                    zone.spawnZombie();
+                    zone.spawnZombie(true);
                     zombiesInRound--;
                 }catch (Exception e){
                     ZMCMod.LOGGER.error(e.getMessage(), e);
@@ -343,8 +345,8 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         return null;
     }
 
-    private int getSpawnLuck(){
-        return 7 + ((int) ( ((getRound()-1) * .6) > 60 ? 60 : (getRound()-1) * .6));
+    private void setSpawnLuck(int spawnLuck){
+        this.spawnLuck = spawnLuck;
     }
 
     private boolean isPlayerInsideItsZone(UUID playerUUID){

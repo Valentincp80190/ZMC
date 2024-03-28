@@ -26,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.random.RandomGenerator;
 
 public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ILinkable {
@@ -183,7 +184,7 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
                 //TODO : Voir s'il est nécéssaire de répéter l'opération toute les secondes au lieu de 20x par seconde.
                 List<PlayerEntity> playersInZone = world.getNonSpectatingEntities(PlayerEntity.class, zone);
                 for(PlayerEntity player : playersInZone) {
-                    player.sendMessage(Text.literal(player.getName().getString() + " has entered the zone at " + pos.toString()), true);
+                    //player.sendMessage(Text.literal(player.getName().getString() + " has entered the zone at " + pos.toString()), true);
                     mapControllerBlockEntity.playerCurrentZone.put(player.getUuid(), this.getPos());
                 }
             }
@@ -386,16 +387,35 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
         markDirty();
     }
 
-    public void spawnZombie(){
+    public void spawnZombie(boolean spawnInZoneOrInNeighborhood){
+        //TODO: Lorsque les portes arriveront, vérifier si la salle voisine est ouverte ou non
         try{
-            int randomWindowIndex = RandomGenerator.getDefault().nextInt(this.linkedWindows.size());
-            ZMCMod.LOGGER.info("Zombie will spawn at door " + randomWindowIndex);
+            Random random = new Random();
+            int randomInt = random.nextInt(100);
 
-            SmallZombieWindowBlockEntity smallZombieWindowBlockEntity = ((SmallZombieWindowBlockEntity) world.getBlockEntity(linkedWindows.get(randomWindowIndex)));
-            ZombieSpawnerBlockEntity zombieSpawnerBlockEntity = ((ZombieSpawnerBlockEntity) world.getBlockEntity(smallZombieWindowBlockEntity.getLinkedBlock(ZombieSpawnerBlockEntity.class)));
-            zombieSpawnerBlockEntity.spawnZombie();
+            if(randomInt >= 25
+                //75% that the zombie spawn in this zone
+                || (this.getParent(ZoneControllerBlockEntity.class).size() == 0  && this.getChild(ZoneControllerBlockEntity.class).size() == 0)
+                || spawnInZoneOrInNeighborhood == false){
+
+                SmallZombieWindowBlockEntity smallZombieWindowBlockEntity = ((SmallZombieWindowBlockEntity) world.getBlockEntity(linkedWindows.get(new Random().nextInt(linkedWindows.size()))));
+                ZombieSpawnerBlockEntity zombieSpawnerBlockEntity = ((ZombieSpawnerBlockEntity) world.getBlockEntity(smallZombieWindowBlockEntity.getLinkedBlock(ZombieSpawnerBlockEntity.class)));
+                zombieSpawnerBlockEntity.spawnZombie();
+            }else{
+                //25% that the zombie spawn in the parent/child zone
+                randomInt = random.nextInt(1);
+                if(randomInt == 0 && this.getParent(ZoneControllerBlockEntity.class).size() != 0){
+                    //Spawn in parent random zone
+                    BlockPos randomParentZone = linkedParentZoneControllers.get(new Random().nextInt(linkedParentZoneControllers.size()));
+                    ((ZoneControllerBlockEntity)world.getBlockEntity(randomParentZone)).spawnZombie(false);
+                }else {
+                    //Spawn in child random zone
+                    BlockPos randomChildZone = linkedChildZoneControllers.get(new Random().nextInt(linkedChildZoneControllers.size()));
+                    ((ZoneControllerBlockEntity)world.getBlockEntity(randomChildZone)).spawnZombie(false);
+                }
+            }
         }catch (Exception e){
-            ZMCMod.LOGGER.error(e.getMessage());
+            ZMCMod.LOGGER.error("ZoneController - Spawn Zombie :" + e.getMessage() + e.getStackTrace());
         }
     }
 
