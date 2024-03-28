@@ -247,7 +247,6 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         }
     }
 
-
     private boolean isMapAvailable(){
         if(this.linkedZoneController == null)
             return false;
@@ -295,7 +294,7 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
     private void stopZombieMap(){
         this.setRound(0);
-        this.setKilledZombiesInRound(0);
+        //this.setKilledZombiesInRound(0);
 
         /*if (world instanceof ServerWorld) {
             sendUpdateRoundPacket((ServerWorld) world, this.pos, this.getRound());
@@ -308,23 +307,44 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
         //Map started => SpawnZombie if we doesn't exceed the number of zombie on the map
         //Normaly chance < 7
-        if(chance < 100 && this.zombiesInRound > 0) {
-            for (Map.Entry<UUID, BlockPos> entry : playerCurrentZone.entrySet()) {
-                UUID playerUUID = entry.getKey();
-                BlockPos zoneBlockPos = entry.getValue();
+        if(chance < getSpawnLuck() && this.zombiesInRound > 0) {
 
-                boolean test = isPlayerInsideItsZone(playerUUID);
-
-                if(!test){
-                    playerCurrentZone.remove(playerUUID);
-                }else{
-                    ZoneControllerBlockEntity zoneControllerBlockEntity = ((ZoneControllerBlockEntity) world.getBlockEntity(zoneBlockPos));
-                    zoneControllerBlockEntity.spawnZombie();
-
+            ZoneControllerBlockEntity zone = getRandomZoneOccupiedByPlayer();
+            if(zone != null){
+                try{
+                    zone.spawnZombie();
                     zombiesInRound--;
+                }catch (Exception e){
+                    ZMCMod.LOGGER.error(e.getMessage(), e);
                 }
             }
         }
+    }
+
+    private ZoneControllerBlockEntity getRandomZoneOccupiedByPlayer(){
+        //While there is a player like 'on the map'
+        while(playerCurrentZone.size() != 0){
+            Random random = new Random();
+            int randomPlayerIndex = random.nextInt(playerCurrentZone.size());
+
+            ArrayList<UUID> playerUUIDs = new ArrayList<>();
+            for (Map.Entry<UUID, BlockPos> entry : playerCurrentZone.entrySet())
+                playerUUIDs.add(entry.getKey());
+
+            UUID randomPlayerUUID = playerUUIDs.get(randomPlayerIndex);
+            BlockPos zoneBlockPos = playerCurrentZone.get(randomPlayerUUID);
+
+            if(!isPlayerInsideItsZone(randomPlayerUUID)){
+                playerCurrentZone.remove(randomPlayerUUID);
+            }else{
+                return ((ZoneControllerBlockEntity) world.getBlockEntity(zoneBlockPos));
+            }
+        }
+        return null;
+    }
+
+    private int getSpawnLuck(){
+        return 7 + ((int) ( ((getRound()-1) * .6) > 60 ? 60 : (getRound()-1) * .6));
     }
 
     private boolean isPlayerInsideItsZone(UUID playerUUID){
