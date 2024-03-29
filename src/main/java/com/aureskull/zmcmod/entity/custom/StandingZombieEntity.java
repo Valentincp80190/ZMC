@@ -82,12 +82,13 @@ public class StandingZombieEntity extends HostileEntity {
         this.goalSelector.add(2, new AttackWindowGoal(this));
         this.goalSelector.add(3, new CrawlThroughWindowGoal(this, 0.5D));
 
-        this.goalSelector.add(4, new ZombieAttackGoal(this, 1.7, false));
-        this.goalSelector.add(4, new ActiveTargetGoal<PlayerEntity>((MobEntity)this, PlayerEntity.class, true));
+        this.goalSelector.add(4, new ZombieAttackGoal(this, 1.7, false)); // Consider adjusting the speed as per your requirement
+        this.targetSelector.add(1, new ActiveTargetGoal<PlayerEntity>(this, PlayerEntity.class, 10, true, false, (entity) -> true));
 
         this.goalSelector.add(5, new LookAtEntityGoal(this, PlayerEntity.class, 256.0F));
 
     }
+
 
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
@@ -115,6 +116,7 @@ public class StandingZombieEntity extends HostileEntity {
 
     public static DefaultAttributeContainer.Builder createStandingZombieAttributes(){
         return HostileEntity.createHostileAttributes()
+                .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 256.0)
                 .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 35.0)
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.15f)
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 2.0)

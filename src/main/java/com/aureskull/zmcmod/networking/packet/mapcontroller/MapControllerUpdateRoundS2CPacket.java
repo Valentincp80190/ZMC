@@ -10,7 +10,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 
-public class UpdateMapControllerRoundS2CPacket {
+public class MapControllerUpdateRoundS2CPacket {
     public static void receive(MinecraftClient client, ClientPlayNetworkHandler clientPlayNetworkHandler, PacketByteBuf buf, PacketSender packetSender){
         BlockPos blockPos = buf.readBlockPos();
         int newRound = buf.readInt();

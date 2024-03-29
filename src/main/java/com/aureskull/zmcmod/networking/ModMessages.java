@@ -10,7 +10,7 @@ import com.aureskull.zmcmod.networking.packet.link.RemoveZoneLinkFromDoorwayS2CP
 import com.aureskull.zmcmod.networking.packet.link.RemoveZoneLinkFromZoneS2CPacket;
 import com.aureskull.zmcmod.networking.packet.mapcontroller.MapControllerUpdateMapNameC2SPacket;
 import com.aureskull.zmcmod.networking.packet.mapcontroller.MapControllerUpdateStartStateC2SPacket;
-import com.aureskull.zmcmod.networking.packet.mapcontroller.UpdateMapControllerRoundS2CPacket;
+import com.aureskull.zmcmod.networking.packet.mapcontroller.MapControllerUpdateRoundS2CPacket;
 import com.aureskull.zmcmod.networking.packet.zonecontroller.*;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -72,7 +72,7 @@ public class ModMessages {
         ClientPlayNetworking.registerGlobalReceiver(REMOVE_ZONE_LINK_FROM_ZONE, RemoveZoneLinkFromZoneS2CPacket::receive);
 
         //MapController
-        ClientPlayNetworking.registerGlobalReceiver(MAP_CONTROLLER_UPDATE_ROUND, UpdateMapControllerRoundS2CPacket::receive);
+        ClientPlayNetworking.registerGlobalReceiver(MAP_CONTROLLER_UPDATE_ROUND, MapControllerUpdateRoundS2CPacket::receive);
     }
 
     public static void sendExistZMCMapCheckerResponse(ServerPlayerEntity player, boolean exists) {

@@ -4,6 +4,7 @@ import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.ILinkable;
 import com.aureskull.zmcmod.networking.ModMessages;
 import com.aureskull.zmcmod.screen.mapcontroller.MapControllerScreenHandler;
+import com.aureskull.zmcmod.sound.ModSounds;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -22,6 +23,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
@@ -39,6 +41,14 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
     private int killedZombiesInRound = 0;
     private int MAX_ZOMBIES = 24;
     private int spawnLuck = 7;
+
+    private final int NEXT_ROUND_DELAY = 220;//11 seconds
+    private int roundStartDelay = NEXT_ROUND_DELAY;
+    private boolean roundCompleted = false;
+    private boolean canStartRound = false;
+    private boolean roundStarted = false;
+
+
 
     public static final Map<UUID, BlockPos> playerCurrentZone = new HashMap<>();
 
@@ -119,7 +129,26 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
     public void tick(World world, BlockPos pos, BlockState state) {
         if(!world.isClient()) {
             if(this.started == true){
-                spawnZombie();
+                if(this.killedZombiesInRound == getZombiesInRound()
+                    && roundStarted){
+                    endRound();
+                    roundStartDelay = NEXT_ROUND_DELAY;
+                }
+
+                if(roundStartDelay > 0){
+                    roundStartDelay--;
+                    if(roundStartDelay == 0)
+                        canStartRound = true;
+                }
+
+                if(canStartRound){
+                    goToNextRound();
+                    canStartRound = false;
+                }
+
+                if(roundStarted){
+                    spawnZombie();
+                }
             }
         }
     }
@@ -204,6 +233,10 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         markDirty();
     }
 
+    private int getZombiesInRound(){
+        return (int) ((this.getRound() * 5) + ((this.getRound() * 5) * 0.25 * (1-1)));
+    }
+
     public int getKilledZombiesInRound() {
         return killedZombiesInRound;
     }
@@ -211,9 +244,7 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
     public void setKilledZombiesInRound(int killedZombiesInRound) {
         this.killedZombiesInRound = killedZombiesInRound;
         markDirty();
-        ZMCMod.LOGGER.info(this.killedZombiesInRound + "/" + (int) ((this.getRound() * 6) + ((this.getRound() * 6) * 0.25 * (1-1))));
-        if(this.killedZombiesInRound == (int) ((this.getRound() * 6) + ((this.getRound() * 6) * 0.25 * (1-1))))
-            goToNextRound();
+        ZMCMod.LOGGER.info(this.killedZombiesInRound + "/" + getZombiesInRound());
     }
 
 
@@ -265,15 +296,29 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
     private void goToNextRound(){
         if (!world.isClient()) {
-            ZMCMod.LOGGER.info("Increase round to " + (this.round + 1));
-
-            this.setRound(this.getRound() + 1);
+            setRound(this.getRound() + 1);
             ZMCMod.LOGGER.info("Round is: " + this.round);
-            setZombiesInRound((int) ((this.getRound() * 6) + ((this.getRound() * 6) * 0.25 * (1-1))));
+            setZombiesInRound((int) ((this.getRound() * 5) + ((this.getRound() * 5) * 0.25 * (1-1))));
             setKilledZombiesInRound(0);
             setSpawnLuck(20 + ((int) ( ((getRound()-1) * .6) > 60 ? 60 : (getRound()-1) * .6)));
+            roundStarted = true;
+
             if (world instanceof ServerWorld) {
                 sendUpdateRoundPacket((ServerWorld) world, this.pos, this.getRound());
+            }
+        }
+    }
+
+    private void endRound(){
+        canStartRound = false;
+        roundStarted = false;
+
+        for (Map.Entry<UUID, BlockPos> entry : playerCurrentZone.entrySet()){
+            if(world.getPlayerByUuid(entry.getKey()) != null){
+                PlayerEntity player = world.getPlayerByUuid(entry.getKey());
+                player.playSound(ModSounds.ROUND_END, SoundCategory.AMBIENT, 0.5f, 1.0f);
+            }else{
+                playerCurrentZone.remove(entry.getKey());
             }
         }
     }

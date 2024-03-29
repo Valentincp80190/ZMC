@@ -28,7 +28,10 @@ public class ZMCMod implements ModInitializer {
 		//TODO: Sécuriter tout les enregistrement de NBT et la lecture pour enregister dans le nbt la bonne classe du block souhaitée comme fait dans la classe du spawner
 
 		//TODO: BUG - Lorsqu'un joueur répare une porte au moment où un zombie arrive dessus, le zombie se déplace légérement de la porte et celui-ci ne peut plus passer au travers
-		//TODO: BUG - Les zombies ne nous suivent pas d'assez loin.
+		//TODO: BUG - Les zombies nous suivent uniquement lorsqu'ils nous voient
+		//TODO: BUG - Les zombies n'arrivent plus à retirer les planches sur certaines porte. Ce bug arrive quand plusieurs porte sont côte à côte. Si j'en retire une, le problème se résou car ils veulent en fait retirer les planches de la porte à côté 
+		//TODO: BUG - Il arrive que des zombies soient manquants sur la map. Il faut que le mapController sache qu'il y a une différence entre le nombre de zombies à tuer et ceux présents sur la map pour refaire spawner un zombie au besoin.
+
 		ModItemGroup.registerItemGroups();
 		ModItems.registerModItems();
 		ModBlockEntities.registerBlockEntities();

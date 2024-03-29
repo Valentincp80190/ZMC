@@ -9,6 +9,7 @@ import net.minecraft.util.Identifier;
 public class ModSounds {
     //WAVE
     public static final SoundEvent ROUND_START = registerSoundEvent("round_start");
+    public static final SoundEvent ROUND_END = registerSoundEvent("round_end");
 
     //DOOR/WINDOW
     public static final SoundEvent REBUILD_WINDOW = registerSoundEvent("rebuild_window");

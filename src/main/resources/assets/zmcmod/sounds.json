@@ -5,6 +5,12 @@
       "zmcmod:round_start"
     ]
   },
+  "round_end": {
+    "subtitle": "sounds.zmcmod.round_end",
+    "sounds": [
+      "zmcmod:round_end"
+    ]
+  },
   "snap_window": {
     "subtitle": "sounds.zmcmod.rebuild_window",
     "sounds": [
