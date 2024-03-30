@@ -20,11 +20,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3d;
 
 public class StandingZombieEntity extends HostileEntity {
     //TODO faire en sorte que l'on ne puisse pas pousser les zombies, ils doivent pouvoir nous bloquer
@@ -64,16 +61,6 @@ public class StandingZombieEntity extends HostileEntity {
         super.tick();
         if(this.getWorld().isClient()){
             setupAnimationStates();
-        }else{
-            //SETUP A GOAL LOOKAT
-            /*if (this.targetBlockPos != null && this.getWorld().getBlockEntity(this.targetBlockPos) instanceof SmallZombieWindowBlockEntity window) {
-                // Check if the window still has planks left
-                double d0 = this.targetBlockPos.getX() + 0.5 - this.getX();
-                double d2 = this.targetBlockPos.getZ() + 0.5 - this.getZ();
-                this.setYaw(-((float) Math.atan2(d0, d2)) * (180F / (float) Math.PI));
-                this.bodyYaw = this.getYaw();
-                this.headYaw = this.bodyYaw;
-            }*/
         }
     }
 
@@ -83,7 +70,8 @@ public class StandingZombieEntity extends HostileEntity {
         this.goalSelector.add(0, new SwimGoal(this));
 
         this.goalSelector.add(1, new MoveToBlockGoal(this, this.targetBlockPos, 1.0D));
-        this.goalSelector.add(2, new AttackWindowGoal(this));
+        this.goalSelector.add(1, new AttackWindowGoal(this));
+        //this.goalSelector.add(1, new LookAtBlockPosBlockEntityGoal(this, this.targetBlockPos));
         this.goalSelector.add(3, new CrawlThroughWindowGoal(this, 0.5D));
 
         //Faire en sorte que le zombie se déplace vers les coordonnées du joueur le plus proche tant que le joueur n'est pas en vu.
@@ -91,7 +79,16 @@ public class StandingZombieEntity extends HostileEntity {
         this.goalSelector.add(3, new ZombieAttackGoal(this, 1.7, false)); // Consider adjusting the speed as per your requirement
         //this.targetSelector.add(4, new ActiveTargetGoal<>(this, PlayerEntity.class, 10, false, false, (entity) -> true));
         this.goalSelector.add(2, new LookAtEntityGoal(this, PlayerEntity.class, 256.0F));
+    }
 
+    private void initializeDependentTargetBlockGoals() {
+        if (!this.goalSelector.getRunningGoals().anyMatch(goal -> goal.getGoal() instanceof LookAtBlockPosBlockEntityGoal)) {
+            this.goalSelector.add(1, new LookAtBlockPosBlockEntityGoal(this, this.targetBlockPos));
+        }
+
+        if (!this.goalSelector.getRunningGoals().anyMatch(goal -> goal.getGoal() instanceof MoveToBlockGoal)) {
+            this.goalSelector.add(3, new MoveToBlockGoal(this, this.targetBlockPos, 1.0D));
+        }
     }
 
     @Override
@@ -181,8 +178,13 @@ public class StandingZombieEntity extends HostileEntity {
                     .findFirst()
                     .ifPresent(goal -> this.goalSelector.remove(goal.getGoal()));
 
-            // Now add the goal with the new target
-            this.goalSelector.add(3, new MoveToBlockGoal(this, this.targetBlockPos, 1.0D));
+            this.goalSelector.getGoals().stream()
+                    .filter(goal -> goal.getGoal() instanceof LookAtBlockPosBlockEntityGoal)
+                    .findFirst()
+                    .ifPresent(goal -> this.goalSelector.remove(goal.getGoal()));
+
+            // Now add the goals
+            initializeDependentTargetBlockGoals();
         }
     }
 
