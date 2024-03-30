@@ -1,13 +1,13 @@
 package com.aureskull.zmcmod.entity.custom;
 
+import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.entity.MapControllerBlockEntity;
 import com.aureskull.zmcmod.block.entity.SmallZombieWindowBlockEntity;
-import com.aureskull.zmcmod.entity.goal.AttackWindowGoal;
-import com.aureskull.zmcmod.entity.goal.CrawlThroughWindowGoal;
-import com.aureskull.zmcmod.entity.goal.MoveToBlockGoal;
+import com.aureskull.zmcmod.entity.goal.*;
 import com.aureskull.zmcmod.entity.goal.ZombieAttackGoal;
 import com.aureskull.zmcmod.sound.ModSounds;
 import net.minecraft.entity.AnimationState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.goal.*;
@@ -15,14 +15,16 @@ import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3d;
 
 public class StandingZombieEntity extends HostileEntity {
     //TODO faire en sorte que l'on ne puisse pas pousser les zombies, ils doivent pouvoir nous bloquer
@@ -35,6 +37,8 @@ public class StandingZombieEntity extends HostileEntity {
     private boolean passedThroughWindow = false;
 
     private BlockPos mapControllerBlockPos;
+
+    public boolean asJoinedPlayer = false;
 
     public StandingZombieEntity(EntityType<? extends HostileEntity> entityType, World world) {
         super(entityType, world);
@@ -82,13 +86,13 @@ public class StandingZombieEntity extends HostileEntity {
         this.goalSelector.add(2, new AttackWindowGoal(this));
         this.goalSelector.add(3, new CrawlThroughWindowGoal(this, 0.5D));
 
-        this.goalSelector.add(4, new ZombieAttackGoal(this, 1.7, false)); // Consider adjusting the speed as per your requirement
-        this.targetSelector.add(1, new ActiveTargetGoal<PlayerEntity>(this, PlayerEntity.class, 10, true, false, (entity) -> true));
-
-        this.goalSelector.add(5, new LookAtEntityGoal(this, PlayerEntity.class, 256.0F));
+        //Faire en sorte que le zombie se déplace vers les coordonnées du joueur le plus proche tant que le joueur n'est pas en vu.
+        this.goalSelector.add(3, new MoveToNearestPlayerGoal(this, 2.0D));
+        this.goalSelector.add(3, new ZombieAttackGoal(this, 1.7, false)); // Consider adjusting the speed as per your requirement
+        //this.targetSelector.add(4, new ActiveTargetGoal<>(this, PlayerEntity.class, 10, false, false, (entity) -> true));
+        this.goalSelector.add(2, new LookAtEntityGoal(this, PlayerEntity.class, 256.0F));
 
     }
-
 
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
@@ -117,12 +121,16 @@ public class StandingZombieEntity extends HostileEntity {
     public static DefaultAttributeContainer.Builder createStandingZombieAttributes(){
         return HostileEntity.createHostileAttributes()
                 .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 256.0)
-                .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 35.0)
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.15f)
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 2.0)
                 .add(EntityAttributes.GENERIC_ARMOR, 2.0)
                 .add(EntityAttributes.ZOMBIE_SPAWN_REINFORCEMENTS)
                 .add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, 999f);
+    }
+
+    @Override
+    public boolean canImmediatelyDespawn(double distanceSquared) {
+        return false;
     }
 
     @Nullable
@@ -138,7 +146,7 @@ public class StandingZombieEntity extends HostileEntity {
 
     @Override
     public void onDeath(DamageSource source) {
-        super.onDeath(source); // Always call the superclass method first
+        super.onDeath(source);
 
         if (!this.getWorld().isClient) {
             sendZombieHasBeenKilledToMapController();

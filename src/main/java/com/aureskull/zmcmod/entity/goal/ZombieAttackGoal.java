@@ -2,7 +2,6 @@ package com.aureskull.zmcmod.entity.goal;
 
 import com.aureskull.zmcmod.entity.custom.StandingZombieEntity;
 import net.minecraft.entity.ai.goal.MeleeAttackGoal;
-import net.minecraft.entity.mob.ZombieEntity;
 
 public class ZombieAttackGoal extends MeleeAttackGoal {
     private final StandingZombieEntity zombie;
