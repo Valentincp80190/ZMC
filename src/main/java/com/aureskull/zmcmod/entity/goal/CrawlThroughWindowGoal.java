@@ -1,9 +1,7 @@
 package com.aureskull.zmcmod.entity.goal;
 
-import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.entity.SmallZombieWindowBlockEntity;
 import com.aureskull.zmcmod.entity.custom.StandingZombieEntity;
-import net.minecraft.block.FacingBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.ai.goal.Goal;
@@ -30,8 +28,8 @@ public class CrawlThroughWindowGoal extends Goal {
 
     @Override
     public boolean canStart() {
-        if (this.zombie.getTargetBlockPos() != null) {
-            BlockEntity entity = this.zombie.getWorld().getBlockEntity(this.zombie.getTargetBlockPos());
+        if (this.zombie.getWindowBlockPos() != null) {
+            BlockEntity entity = this.zombie.getWorld().getBlockEntity(this.zombie.getWindowBlockPos());
             if (entity instanceof SmallZombieWindowBlockEntity window && window.getPlank() <= 0) {
                 this.window = window;
                 this.windowDirection = window.getWindowFacing();

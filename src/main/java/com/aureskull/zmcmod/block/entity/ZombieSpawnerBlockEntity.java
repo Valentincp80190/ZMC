@@ -1,6 +1,5 @@
 package com.aureskull.zmcmod.block.entity;
 
-import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.ILinkable;
 import com.aureskull.zmcmod.entity.ModEntities;
 import com.aureskull.zmcmod.entity.custom.StandingZombieEntity;
@@ -108,7 +107,7 @@ public class ZombieSpawnerBlockEntity extends BlockEntity implements ExtendedScr
         if (!world.isClient && getLinkedWindow() != null &&  mapController != null && world.getBlockEntity(mapController) instanceof  MapControllerBlockEntity) {
             // Logic to spawn the zombie
             StandingZombieEntity zombie = ModEntities.STANDING_ZOMBIE.create(world);
-            zombie.setTargetBlockPos(getLinkedWindow());
+            zombie.setWindowBlockPos(getLinkedWindow());
             zombie.setMapControllerBlockPos(mapController);
 
             if (zombie != null) {

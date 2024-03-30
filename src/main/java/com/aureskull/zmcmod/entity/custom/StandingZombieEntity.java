@@ -1,13 +1,10 @@
 package com.aureskull.zmcmod.entity.custom;
 
-import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.entity.MapControllerBlockEntity;
-import com.aureskull.zmcmod.block.entity.SmallZombieWindowBlockEntity;
 import com.aureskull.zmcmod.entity.goal.*;
 import com.aureskull.zmcmod.entity.goal.ZombieAttackGoal;
 import com.aureskull.zmcmod.sound.ModSounds;
 import net.minecraft.entity.AnimationState;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.goal.*;
@@ -28,7 +25,7 @@ public class StandingZombieEntity extends HostileEntity {
     public final AnimationState walkingAnimationSate = new AnimationState();
     private int walkingAnimationTimeout = 0;
 
-    private BlockPos targetBlockPos = null;
+    private BlockPos windowBlockPos = null;
 
     //NBT pas sauvegardé pour cette variable => Au redémarrage du serveur tous les zombies déjà présents voudront repasser au travers de leur porte même s'ils sont déjà passé.
     private boolean passedThroughWindow = false;
@@ -69,37 +66,35 @@ public class StandingZombieEntity extends HostileEntity {
     protected void initGoals() {
         this.goalSelector.add(0, new SwimGoal(this));
 
-        this.goalSelector.add(1, new MoveToBlockGoal(this, this.targetBlockPos, 1.0D));
-        this.goalSelector.add(1, new AttackWindowGoal(this));
-        //this.goalSelector.add(1, new LookAtBlockPosBlockEntityGoal(this, this.targetBlockPos));
+
         this.goalSelector.add(3, new CrawlThroughWindowGoal(this, 0.5D));
 
-        //Faire en sorte que le zombie se déplace vers les coordonnées du joueur le plus proche tant que le joueur n'est pas en vu.
         this.goalSelector.add(3, new MoveToNearestPlayerGoal(this, 2.0D));
         this.goalSelector.add(3, new ZombieAttackGoal(this, 1.7, false)); // Consider adjusting the speed as per your requirement
-        //this.targetSelector.add(4, new ActiveTargetGoal<>(this, PlayerEntity.class, 10, false, false, (entity) -> true));
         this.goalSelector.add(2, new LookAtEntityGoal(this, PlayerEntity.class, 256.0F));
     }
 
     private void initializeDependentTargetBlockGoals() {
         if (!this.goalSelector.getRunningGoals().anyMatch(goal -> goal.getGoal() instanceof LookAtBlockPosBlockEntityGoal)) {
-            this.goalSelector.add(1, new LookAtBlockPosBlockEntityGoal(this, this.targetBlockPos));
+            this.goalSelector.add(1, new LookAtBlockPosBlockEntityGoal(this, this.windowBlockPos));
         }
 
         if (!this.goalSelector.getRunningGoals().anyMatch(goal -> goal.getGoal() instanceof MoveToBlockGoal)) {
-            this.goalSelector.add(3, new MoveToBlockGoal(this, this.targetBlockPos, 1.0D));
+            this.goalSelector.add(3, new MoveToBlockGoal(this, this.windowBlockPos, 1.0D));
+        }
+
+        if (!this.goalSelector.getRunningGoals().anyMatch(goal -> goal.getGoal() instanceof AttackWindowGoal)) {
+            this.goalSelector.add(1, new AttackWindowGoal(this, this.windowBlockPos));
         }
     }
 
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
-        if (targetBlockPos != null)
-            nbt.put("standing_zombie.target_position", NbtHelper.fromBlockPos(targetBlockPos));
+        if (windowBlockPos != null)
+            nbt.put("standing_zombie.target_position", NbtHelper.fromBlockPos(windowBlockPos));
 
         if(mapControllerBlockPos != null)
-            nbt.put("standing_zombie.map_controller_position", NbtHelper.fromBlockPos(targetBlockPos));
-
-
+            nbt.put("standing_zombie.map_controller_position", NbtHelper.fromBlockPos(mapControllerBlockPos));
 
         super.writeCustomDataToNbt(nbt);
     }
@@ -109,7 +104,7 @@ public class StandingZombieEntity extends HostileEntity {
         super.readCustomDataFromNbt(nbt);
 
         if (nbt.contains("standing_zombie.target_position"))
-            this.targetBlockPos = NbtHelper.toBlockPos(nbt.getCompound("standing_zombie.target_position"));
+            this.windowBlockPos = NbtHelper.toBlockPos(nbt.getCompound("standing_zombie.target_position"));
 
         if(nbt.contains("standing_zombie.map_controller_position"))
             this.mapControllerBlockPos = NbtHelper.toBlockPos(nbt.getCompound("standing_zombie.map_controller_position"));
@@ -164,12 +159,12 @@ public class StandingZombieEntity extends HostileEntity {
         return 0;
     }
 
-    public BlockPos getTargetBlockPos() {
-        return targetBlockPos;
+    public BlockPos getWindowBlockPos() {
+        return windowBlockPos;
     }
 
-    public void setTargetBlockPos(BlockPos targetBlockPos) {
-        this.targetBlockPos = targetBlockPos;
+    public void setWindowBlockPos(BlockPos windowBlockPos) {
+        this.windowBlockPos = windowBlockPos;
 
         if (!this.getWorld().isClient) {
             // Remove any existing MoveToBlockGoal and re-add it to ensure it uses the updated target position
