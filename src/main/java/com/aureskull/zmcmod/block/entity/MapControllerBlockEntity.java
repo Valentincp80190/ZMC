@@ -37,6 +37,8 @@ import java.util.*;
 
 public class MapControllerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ILinkable {
     private static final int MAX_ZOMBIES = 24;//TODO: A multiplier par le nombre de joueur
+    private final int ROUND_ONE_ZOMBIES = 6;
+
     private static final int NEXT_ROUND_DELAY_TICKS = 220; // 11 seconds in ticks
 
     public String mapName = "";
@@ -156,7 +158,7 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
     }
 
     private boolean haveAllZombiesBeenKilled() {
-        return killedZombiesInRound == getZombiesInRound() && roundStarted;
+        return killedZombiesInRound == calculateZombiesInRound() && roundStarted;
     }
 
     private void prepareForNextRound() {
@@ -273,10 +275,6 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         markDirty();
     }
 
-    private int getZombiesInRound(){
-        return (int) ((this.getRound() * 5) + ((this.getRound() * 5) * 0.25 * (1-1)));
-    }
-
     public int getKilledZombiesInRound() {
         return killedZombiesInRound;
     }
@@ -284,7 +282,7 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
     public void setKilledZombiesInRound(int killedZombiesInRound) {
         this.killedZombiesInRound = killedZombiesInRound;
         markDirty();
-        ZMCMod.LOGGER.info(this.killedZombiesInRound + "/" + getZombiesInRound());
+        ZMCMod.LOGGER.info(this.killedZombiesInRound + "/" + calculateZombiesInRound());
     }
 
 
@@ -347,7 +345,28 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
     private int calculateZombiesInRound() {
         // Implement the formula for calculating the number of zombies per round
-        return (int) ((this.getRound() * 5) + ((this.getRound() * 5) * 0.25 * (1 - 1)));
+        //return (int) ((this.getRound() * 5) + ((this.getRound() * 5) * 0.25 * (1 - 1)));
+        float multiplier = getRound() / 5;
+        if(multiplier < 1)
+            multiplier = (float)1.0;
+        else if(getRound() >= 10)
+            multiplier *= (getRound() * 0.15);
+
+        int temp = (int) (MAX_ZOMBIES + (0.5 * ROUND_ONE_ZOMBIES * multiplier));
+
+        if(getRound() < 2){
+            return (int)(temp * 0.25);
+        }else if(getRound() < 3){
+            return (int)(temp * 0.3);
+        }else if(getRound() < 4){
+            return (int)(temp * 0.5);
+        }else if(getRound() < 5){
+            return (int)(temp * 0.7);
+        }else if(getRound() < 6){
+            return (int)(temp * 0.9);
+        }
+
+        return temp;
     }
 
     private int calculateSpawnLuck() {
