@@ -195,4 +195,8 @@ public class StandingZombieEntity extends HostileEntity {
     public void setMapControllerBlockPos(BlockPos mapControllerBlockPos) {
         this.mapControllerBlockPos = mapControllerBlockPos;
     }
+
+    public BlockPos getMapControllerBlockPos() {
+        return mapControllerBlockPos;
+    }
 }

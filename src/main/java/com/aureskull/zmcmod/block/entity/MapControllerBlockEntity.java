@@ -2,6 +2,7 @@ package com.aureskull.zmcmod.block.entity;
 
 import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.ILinkable;
+import com.aureskull.zmcmod.entity.custom.StandingZombieEntity;
 import com.aureskull.zmcmod.networking.ModMessages;
 import com.aureskull.zmcmod.screen.mapcontroller.MapControllerScreenHandler;
 import com.aureskull.zmcmod.sound.ModSounds;
@@ -11,6 +12,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.nbt.NbtCompound;
@@ -159,7 +161,27 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
     private void prepareForNextRound() {
         endRound();
+        killAllZombies();
         roundStartDelay = NEXT_ROUND_DELAY_TICKS;
+    }
+
+    public void killAllZombies() {
+        ServerWorld serverWorld = (ServerWorld) world;
+
+        // Iterate through all entities in the world
+        for (StandingZombieEntity entity : serverWorld.getEntitiesByClass(
+                StandingZombieEntity.class,
+                new Box(this.pos.getX()-1500, this.pos.getY()-512, this.pos.getZ()-1500, this.pos.getX() + 1500, this.pos.getY() + 512, this.pos.getZ()+1500),
+                (entity) -> true)) {
+
+            BlockPos entityPos = entity.getMapControllerBlockPos();
+            if (entityPos.getX() == getPos().getX() &&
+                entityPos.getY() == getPos().getY() &&
+                entityPos.getZ() == getPos().getZ()) {
+                // Kills the zombie
+                entity.kill();
+            }
+        }
     }
 
 
@@ -229,6 +251,7 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         ZMCMod.LOGGER.info("Started state changed to " + this.started);
 
         if(!world.isClient()){
+            killAllZombies();
             if(p_started)
                 startZombieMap(playerEntity);
             else{
