@@ -36,7 +36,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class MapControllerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ILinkable {
-    private static final int MAX_ZOMBIES = 24;
+    private static final int MAX_ZOMBIES = 24;//TODO: A multiplier par le nombre de joueur
     private static final int NEXT_ROUND_DELAY_TICKS = 220; // 11 seconds in ticks
 
     public String mapName = "";
@@ -135,7 +135,7 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         if (!started) return;
 
         manageRounds();
-        if (roundStarted) {
+        if (roundStarted && getAllZombies().size() < MAX_ZOMBIES) {
             spawnZombie();
         }
     }
@@ -165,14 +165,9 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         roundStartDelay = NEXT_ROUND_DELAY_TICKS;
     }
 
-    public void killAllZombies() {
-        ServerWorld serverWorld = (ServerWorld) world;
-
+    private void killAllZombies() {
         // Iterate through all entities in the world
-        for (StandingZombieEntity entity : serverWorld.getEntitiesByClass(
-                StandingZombieEntity.class,
-                new Box(this.pos.getX()-1500, this.pos.getY()-512, this.pos.getZ()-1500, this.pos.getX() + 1500, this.pos.getY() + 512, this.pos.getZ()+1500),
-                (entity) -> true)) {
+        for (StandingZombieEntity entity : getAllZombies()) {
 
             BlockPos entityPos = entity.getMapControllerBlockPos();
             if (entityPos.getX() == getPos().getX() &&
@@ -182,6 +177,15 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
                 entity.kill();
             }
         }
+    }
+
+    private List<StandingZombieEntity> getAllZombies(){
+        ServerWorld serverWorld = (ServerWorld) world;
+
+        return serverWorld.getEntitiesByClass(
+                StandingZombieEntity.class,
+                new Box(this.pos.getX()-1500, this.pos.getY()-512, this.pos.getZ()-1500, this.pos.getX() + 1500, this.pos.getY() + 512, this.pos.getZ()+1500),
+                (entity) -> true);
     }
 
 
@@ -335,20 +339,6 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
             return false;
         }
     }
-
-    /*private void goToNextRound(){
-        if (!world.isClient()) {
-            setRound(this.getRound() + 1);
-            ZMCMod.LOGGER.info("Round is: " + this.round);
-            setZombiesInRound((int) ((this.getRound() * 5) + ((this.getRound() * 5) * 0.25 * (1-1))));
-            setKilledZombiesInRound(0);
-            setSpawnLuck(20 + ((int) ( ((getRound()-1) * .6) > 60 ? 60 : (getRound()-1) * .6)));
-            roundStarted = true;
-
-            broadcastRoundUpdate();
-        }
-    }*/
-
     private void resetRoundState() {
         setZombiesInRound(calculateZombiesInRound());
         setKilledZombiesInRound(0);
@@ -373,20 +363,6 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         canStartRound = false;
         broadcastRoundUpdate();
     }
-
-    /*private void endRound(){
-        canStartRound = false;
-        roundStarted = false;
-
-        for (Map.Entry<UUID, BlockPos> entry : playerCurrentZone.entrySet()){
-            if(world.getPlayerByUuid(entry.getKey()) != null){
-                PlayerEntity player = world.getPlayerByUuid(entry.getKey());
-                player.playSound(ModSounds.ROUND_END, SoundCategory.AMBIENT, 0.5f, 1.0f);
-            }else{
-                playerCurrentZone.remove(entry.getKey());
-            }
-        }
-    }*/
 
     private void endRound() {
         roundStarted = false;

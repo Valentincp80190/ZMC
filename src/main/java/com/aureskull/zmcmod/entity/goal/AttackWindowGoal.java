@@ -21,18 +21,18 @@ public class AttackWindowGoal extends Goal {
     public boolean canStart() {
         if(this.zombie.isPassedThroughWindow() || this.windowBlockPos == null) return false;
 
-            // Check for nearby window every second
-            if (this.lastAttackTime + 3000 > System.currentTimeMillis()) {
-                return false;
-            }
-            this.lastAttackTime = System.currentTimeMillis();
-
-            // Calculate the Manhattan distance to the window
-            if (this.zombie.getBlockPos().getManhattanDistance(this.windowBlockPos) <= 1) {
-                return true; // The window is within reach
-            }
-
+        // Check for nearby window every second
+        if (this.lastAttackTime + 4000 > System.currentTimeMillis()) {
             return false;
+        }
+        this.lastAttackTime = System.currentTimeMillis();
+
+        // Calculate the Manhattan distance to the window
+        if (this.zombie.getBlockPos().getManhattanDistance(this.windowBlockPos) <= 1) {
+            return true; // The window is within reach
+        }
+
+        return false;
     }
 
     @Override
