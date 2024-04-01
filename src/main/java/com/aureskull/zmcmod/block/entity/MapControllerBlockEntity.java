@@ -34,20 +34,18 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class MapControllerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ILinkable {
+    private static final int MAX_ZOMBIES = 24;
+    private static final int NEXT_ROUND_DELAY_TICKS = 220; // 11 seconds in ticks
+
     public String mapName = "";
     private boolean started = false;
     private int round = 0;
     private int zombiesInRound = 0;
     private int killedZombiesInRound = 0;
-    private int MAX_ZOMBIES = 24;
     private int spawnLuck = 7;
-
-    private final int NEXT_ROUND_DELAY = 220;//11 seconds
     private int roundStartDelay = 0;
     private boolean canStartRound = false;
     private boolean roundStarted = false;
-
-
 
     public static final Map<UUID, BlockPos> playerCurrentZone = new HashMap<>();
 
@@ -130,30 +128,41 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
     }
 
     public void tick(World world, BlockPos pos, BlockState state) {
-        if(!world.isClient()) {
-            if(this.started == true){
-                if(this.killedZombiesInRound == getZombiesInRound()
-                    && roundStarted){
-                    endRound();
-                    roundStartDelay = NEXT_ROUND_DELAY;
-                }
+        if (world.isClient) return;
 
-                if(roundStartDelay == 0
-                    && !roundStarted)
-                    canStartRound = true;
-                if(roundStartDelay > 0)roundStartDelay--;
+        if (!started) return;
 
-                if(canStartRound){
-                    goToNextRound();
-                    canStartRound = false;
-                }
-
-                if(roundStarted){
-                    spawnZombie();
-                }
-            }
+        manageRounds();
+        if (roundStarted) {
+            spawnZombie();
         }
     }
+
+    private void manageRounds() {
+        if (haveAllZombiesBeenKilled()) {
+            prepareForNextRound();
+
+        } else if (roundStartDelay <= 0 && !roundStarted) {
+            canStartRound = true;
+        } else if (roundStartDelay > 0) {
+            roundStartDelay--;
+        }
+
+        if (canStartRound) {
+            goToNextRound();
+        }
+    }
+
+    private boolean haveAllZombiesBeenKilled() {
+        return killedZombiesInRound == getZombiesInRound() && roundStarted;
+    }
+
+    private void prepareForNextRound() {
+        endRound();
+        roundStartDelay = NEXT_ROUND_DELAY_TICKS;
+    }
+
+
 
     @Nullable
     @Override
@@ -304,7 +313,7 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         }
     }
 
-    private void goToNextRound(){
+    /*private void goToNextRound(){
         if (!world.isClient()) {
             setRound(this.getRound() + 1);
             ZMCMod.LOGGER.info("Round is: " + this.round);
@@ -313,13 +322,36 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
             setSpawnLuck(20 + ((int) ( ((getRound()-1) * .6) > 60 ? 60 : (getRound()-1) * .6)));
             roundStarted = true;
 
-            if (world instanceof ServerWorld) {
-                sendUpdateRoundPacket((ServerWorld) world, this.pos, this.getRound());
-            }
+            broadcastRoundUpdate();
         }
+    }*/
+
+    private void resetRoundState() {
+        setZombiesInRound(calculateZombiesInRound());
+        setKilledZombiesInRound(0);
+        setSpawnLuck(calculateSpawnLuck());
     }
 
-    private void endRound(){
+    private int calculateZombiesInRound() {
+        // Implement the formula for calculating the number of zombies per round
+        return (int) ((this.getRound() * 5) + ((this.getRound() * 5) * 0.25 * (1 - 1)));
+    }
+
+    private int calculateSpawnLuck() {
+        // Implement the formula for calculating spawn luck
+        return 20 + Math.min(60, ((getRound() - 1) * 6));
+    }
+
+    private void goToNextRound() {
+        setRound(getRound() + 1);
+        resetRoundState();
+        ZMCMod.LOGGER.info("Round is: " + this.round);
+        roundStarted = true;
+        canStartRound = false;
+        broadcastRoundUpdate();
+    }
+
+    /*private void endRound(){
         canStartRound = false;
         roundStarted = false;
 
@@ -331,6 +363,22 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
                 playerCurrentZone.remove(entry.getKey());
             }
         }
+    }*/
+
+    private void endRound() {
+        roundStarted = false;
+        playEndRoundSoundForPlayers();
+    }
+
+    private void playEndRoundSoundForPlayers() {
+        for (UUID playerUUID : playerCurrentZone.keySet()) {
+            PlayerEntity player = world.getPlayerByUuid(playerUUID);
+            if (player == null) {
+                playerCurrentZone.remove(playerUUID);
+                continue;
+            }
+            player.playSound(ModSounds.ROUND_END, SoundCategory.AMBIENT, 0.5f, 1.0f);
+        }
     }
 
     public void setZombiesInRound(int zombiesInRound) {
@@ -338,15 +386,21 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         markDirty();
     }
 
-    private static void sendUpdateRoundPacket(ServerWorld  world, BlockPos zonePos, int newRound) {
-        PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeBlockPos(zonePos);
-        buf.writeInt(newRound);
+    private void broadcastRoundUpdate() {
+        if (!(world instanceof ServerWorld)) return;
 
-        // Send this packet to all players in the world
-        PlayerLookup.tracking(world, zonePos).forEach(player -> {
-            ServerPlayNetworking.send(player, ModMessages.MAP_CONTROLLER_UPDATE_ROUND, buf);
-        });
+        ServerWorld serverWorld = (ServerWorld) world;
+        PacketByteBuf buffer = createRoundUpdatePacket();
+        PlayerLookup.tracking(serverWorld, getPos()).forEach(player ->
+                ServerPlayNetworking.send(player, ModMessages.MAP_CONTROLLER_UPDATE_ROUND, buffer)
+        );
+    }
+
+    private PacketByteBuf createRoundUpdatePacket() {
+        PacketByteBuf buffer = PacketByteBufs.create();
+        buffer.writeBlockPos(getPos());
+        buffer.writeInt(getRound());
+        return buffer;
     }
 
     private void stopZombieMap(){

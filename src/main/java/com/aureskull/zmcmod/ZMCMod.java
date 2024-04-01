@@ -27,8 +27,6 @@ public class ZMCMod implements ModInitializer {
 
 		//TODO: BUG - Il arrive que des zombies soient manquants sur la map. Il faut que le mapController sache qu'il y a une différence entre le nombre de zombies à tuer et ceux présents sur la map pour refaire spawner un zombie au besoin.
 		//TODO: BUG - Des zombies restent bloqués dans le porte de temps en temps
-		//TODO: BUG - Quand la map démarre on passe à la manche 2 direct
-		//TODO: BUG - Quand on quitte le monde et que l'on revient dessus, une nouvelle manche commence mais en plus avec une manche = manche + 1
 		//TODO: BUG - Le joueur entend les sons de commencement de manche alors qu'il n'est pas sur la map
 		//TODO: BUG - Voir pourquoi les zones controller continue de ticker même si l'on est à 1000 blocs
 
