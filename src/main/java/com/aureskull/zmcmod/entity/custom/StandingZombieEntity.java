@@ -104,8 +104,10 @@ public class StandingZombieEntity extends HostileEntity {
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
 
-        if (nbt.contains("standing_zombie.target_position"))
-            this.windowBlockPos = NbtHelper.toBlockPos(nbt.getCompound("standing_zombie.target_position"));
+        if (nbt.contains("standing_zombie.target_position")){
+            windowBlockPos = NbtHelper.toBlockPos(nbt.getCompound("standing_zombie.target_position"));
+            if(windowBlockPos != null) initializeDependentTargetBlockGoals();
+        }
 
         if(nbt.contains("standing_zombie.map_controller_position"))
             this.mapControllerBlockPos = NbtHelper.toBlockPos(nbt.getCompound("standing_zombie.map_controller_position"));
