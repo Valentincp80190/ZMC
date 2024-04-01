@@ -20,7 +20,7 @@ public class MapControllerUpdateStartStateC2SPacket {
 
             if(blockEntity instanceof MapControllerBlockEntity) {
                 MapControllerBlockEntity mapController = (MapControllerBlockEntity) player.getWorld().getBlockEntity(blockPos);
-                mapController.setStart(newStartState);
+                mapController.setStart(newStartState, player);
             }
         });
     }

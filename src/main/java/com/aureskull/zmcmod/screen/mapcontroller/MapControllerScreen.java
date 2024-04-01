@@ -10,6 +10,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -22,7 +23,7 @@ public class MapControllerScreen extends HandledScreen<MapControllerScreenHandle
             .formatted(this.handler.blockEntity.isStarted() ? Formatting.GREEN : Formatting.RED)), button -> {
 
                 Boolean newState = !this.handler.blockEntity.isStarted();
-                this.handler.blockEntity.setStart(newState);
+                this.handler.blockEntity.setStart(newState, null);
                 this.handler.updateStartGameOnServer(newState);
 
                 this.startGameButton.setMessage(Text.literal("")
