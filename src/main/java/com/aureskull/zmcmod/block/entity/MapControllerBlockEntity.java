@@ -44,7 +44,6 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
     private final int NEXT_ROUND_DELAY = 220;//11 seconds
     private int roundStartDelay = NEXT_ROUND_DELAY;
-    private boolean roundCompleted = false;
     private boolean canStartRound = false;
     private boolean roundStarted = false;
 
@@ -350,11 +349,11 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
     private void spawnZombie(){
         Random random = new Random();
-        int chance = random.nextInt(1000);
+        int luck = random.nextInt(1000);
 
         //Map started => SpawnZombie if we doesn't exceed the number of zombie on the map
         //Normaly chance < 7
-        if(chance < spawnLuck && this.zombiesInRound > 0) {
+        if(luck < spawnLuck && this.zombiesInRound > 0) {
 
             ZoneControllerBlockEntity zone = getRandomZoneOccupiedByPlayer();
             if(zone != null){
@@ -407,7 +406,7 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
                 BlockPos bp = playerCurrentZone.get(playerUUID);
                 if (bp != null && world.getBlockEntity(bp) instanceof ZoneControllerBlockEntity zoneControllerBE) {
                     //If the ZoneController is connected to the current MapController
-                    BlockPos mapControllerBlockPos = zoneControllerBE.findMapControllerRecursively(zoneControllerBE);
+                    BlockPos mapControllerBlockPos = zoneControllerBE.findMapControllerRecursively(zoneControllerBE, new ArrayList<BlockPos>());
                     if(mapControllerBlockPos != null &&
                             world.getBlockEntity(mapControllerBlockPos) instanceof MapControllerBlockEntity mapControllerBlockEntity
                             && mapControllerBlockEntity.getPos() == this.getPos()){

@@ -25,8 +25,13 @@ public class ZMCMod implements ModInitializer {
 		//TODO: Faire en sorte qu'un joueur ne perde pas son inventaire lorsqu'une game est en cours (pour les joueurs qui jouent dans la map toujours).
 		//TODO: Faire un block joueur de son servant à mettre de l'ambiance. Dans ce block on pourrait configurer quel son à jouer et un random tick à mettre. On pourrait également le rendre activable via redstone
 
-		//TODO: BUG - Les zombies n'arrivent plus à retirer les planches sur certaines porte. Ce bug arrive quand plusieurs porte sont côte à côte. Si j'en retire une, le problème se résou car ils veulent en fait retirer les planches de la porte à côté
 		//TODO: BUG - Il arrive que des zombies soient manquants sur la map. Il faut que le mapController sache qu'il y a une différence entre le nombre de zombies à tuer et ceux présents sur la map pour refaire spawner un zombie au besoin.
+		//TODO: BUG - Quand on casse le mapController en cours de game ça plante
+		//TODO: BUG - Quand la map démarre on passe à la manche 2 direct
+		//TODO: BUG - Quand on quitte le monde et que l'on revient dessus, une nouvelle manche commence mais en plus avec une manche = manche + 1
+		//TODO: BUG - Le joueur entend les sons de commencement de manche alors qu'il n'est pas sur la map
+		//TODO: BUG - Voir pourquoi les zones controller continue de ticker même si l'on est à 1000 blocs
+
 		ModItemGroup.registerItemGroups();
 		ModItems.registerModItems();
 		ModBlockEntities.registerBlockEntities();

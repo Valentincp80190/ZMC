@@ -70,6 +70,7 @@ public class StandingZombieEntity extends HostileEntity {
         this.goalSelector.add(3, new CrawlThroughWindowGoal(this, 0.5D));
 
         this.goalSelector.add(3, new MoveToNearestPlayerGoal(this, 2.0D));
+        //Pour attaquer c'est juste un set sur le zombie. On pourrait donc se passer de ce goal si on fait un mix de l'attaque et du MoveToBlockGoal
         this.goalSelector.add(3, new ZombieAttackGoal(this, 1.7, false)); // Consider adjusting the speed as per your requirement
         this.goalSelector.add(2, new LookAtEntityGoal(this, PlayerEntity.class, 256.0F));
     }

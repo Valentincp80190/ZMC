@@ -22,6 +22,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ZombieSpawnerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ILinkable {
@@ -96,7 +97,7 @@ public class ZombieSpawnerBlockEntity extends BlockEntity implements ExtendedScr
             BlockPos zoneBP = window.getLinkedBlock(ZoneControllerBlockEntity.class);
 
             if (world.getBlockEntity(zoneBP) instanceof ZoneControllerBlockEntity zoneBE) {
-                return zoneBE.findMapControllerRecursively(zoneBE);
+                return zoneBE.findMapControllerRecursively(zoneBE, new ArrayList<BlockPos>());
             }
         }
         return null; // MapControllerBlockEntity BlockPos not found

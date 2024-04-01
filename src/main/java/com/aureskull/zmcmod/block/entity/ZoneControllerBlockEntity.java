@@ -173,9 +173,9 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
 
     public void tick(World world, BlockPos pos, BlockState state) {
         if(!world.isClient()) {
+            BlockPos mapControllerPos = findMapControllerRecursively(this, new ArrayList<BlockPos>());
 
-            BlockPos mapControllerPos = findMapControllerRecursively(this);
-            if(world.getBlockEntity(mapControllerPos) instanceof MapControllerBlockEntity mapControllerBlockEntity && mapControllerBlockEntity.isStarted()){
+            if(mapControllerPos != null && world.getBlockEntity(mapControllerPos) instanceof MapControllerBlockEntity mapControllerBlockEntity && mapControllerBlockEntity.isStarted()){
 
                 // Create a box representing the zone
                 Box zone = getBox();
@@ -423,22 +423,25 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
 
     }
 
-    public BlockPos findMapControllerRecursively(ZoneControllerBlockEntity zone) {
+    public BlockPos findMapControllerRecursively(ZoneControllerBlockEntity zone, ArrayList<BlockPos> visitedBlockPos) {
         // If this zone is directly linked to a MapControllerBlockEntity, return its BlockPos
         BlockPos mapControllerBP = zone.getLinkedBlock(MapControllerBlockEntity.class);
 
-        if (mapControllerBP != null) {
+        if (mapControllerBP != null)
             return mapControllerBP;
-        }else{
-            //ZMCMod.LOGGER.info("Map controller not found at zone " + zone.getPos());
-        }
+
 
         // Otherwise, recursively search through all parent zones
         //ZMCMod.LOGGER.info("Parents in zone " + zone.getPos() + " are : " + zone.getParent(ZoneControllerBlockEntity.class));
         for (BlockPos parentZoneBP : zone.getParent(ZoneControllerBlockEntity.class)) {
             if (world.getBlockEntity(parentZoneBP) instanceof ZoneControllerBlockEntity parentZoneBE) {
                 //ZMCMod.LOGGER.info("looking for Map Controller in parent Zone" + parentZoneBE.getPos());
-                BlockPos foundBP = findMapControllerRecursively(parentZoneBE);
+
+                //Avoid loop
+                if(visitedBlockPos.contains(parentZoneBP)) continue;
+                else visitedBlockPos.add(parentZoneBP);
+
+                BlockPos foundBP = findMapControllerRecursively(parentZoneBE, visitedBlockPos);
 
                 if (foundBP != null && world.getBlockEntity(foundBP) instanceof MapControllerBlockEntity) {
                     // If one of the parent zones (or their parents, recursively) is linked to a MapController, return its BlockPos
