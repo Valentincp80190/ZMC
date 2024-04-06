@@ -8,6 +8,7 @@ import com.aureskull.zmcmod.management.GamePlayerManager;
 import com.aureskull.zmcmod.networking.ModMessages;
 import com.aureskull.zmcmod.screen.mapcontroller.MapControllerScreenHandler;
 import com.aureskull.zmcmod.sound.ModSounds;
+import com.aureskull.zmcmod.util.ChatMessages;
 import com.aureskull.zmcmod.util.PlayerData;
 import com.aureskull.zmcmod.util.StateSaverAndLoader;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -60,7 +61,7 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
     private BlockPos linkedZoneController = null;
 
-    private GamePlayerManager playerManager = new GamePlayerManager();
+    private GamePlayerManager playerManager = new GamePlayerManager(this);
 
     public MapControllerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.MAP_CONTROLLER_BLOCK_ENTITY, pos, state);
@@ -162,7 +163,14 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
         if (!started) return;
 
+        //Stop the game if there is no players
+        if(playerManager.getSubscribedPlayers().size() == 0){
+            setStart(false, null);
+            return;
+        }
+
         manageRounds();
+
         if (roundStarted && getAllZombies().size() < MAX_ZOMBIES) {
             spawnZombie();
         }
@@ -320,22 +328,15 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
                 if(gameUUID != null)
                     GamesManager.getInstance().removeGame(gameUUID);
-                playerManager = new GamePlayerManager();
+                playerManager = new GamePlayerManager(this);
 
                 generateGameUUID();
                 GamesManager.getInstance().addGame(gameUUID, getPos(), getWorld().getRegistryKey());
                 subscribePlayer(player.getUuid());
-                //GamesManager.GameInfo infos = GamesManager.getInstance().getGame(gameUUID);
-                //ZMCMod.LOGGER.info("ID saved :" + infos.getGameUUID().toString());
+                ChatMessages.sendGameSubscriptionConfirmationMessage(player, mapName);
 
                 teleportAllPlayerInFirstZone();
                 roundStartDelay = 40;
-
-                /*ServerWorld world = player.getServerWorld();
-                for(ServerPlayerEntity playerReceiver : world.getPlayers()){
-                    GameInvitePlayerManager.sendGameInviteMessage(playerReceiver, gameUUID);
-                }*/
-
             }else{
                 this.setStart(false, null);
             }
@@ -480,6 +481,7 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         this.roundStarted = false;
 
         unsubscribeAllPlayer();
+        GamesManager.getInstance().removeGame(this.gameUUID);
     }
 
     private void spawnZombie(){
@@ -563,7 +565,7 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
         MinecraftServer server = getWorld().getServer();
         PlayerData playerData = StateSaverAndLoader.getPlayerState(server.getPlayerManager().getPlayer(playerUuid));
-        playerData.gameUUID = gameUUID;
+        playerData.setGameUUID(gameUUID);
 
         markDirty();
     }
@@ -580,9 +582,10 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         for(UUID playerUUID : subscribedPlayers){
             try {
                 ServerPlayerEntity player = server.getPlayerManager().getPlayer(playerUUID);
-
-                PlayerData playerData = StateSaverAndLoader.getPlayerState(player);
-                playerData.gameUUID = null;
+                if(player != null){//Player is connected
+                    PlayerData playerData = StateSaverAndLoader.getPlayerState(player);
+                    playerData.setGameUUID(null);
+                }
             }catch (Exception e){
                 ZMCMod.LOGGER.error(e.getMessage(), e);
             }

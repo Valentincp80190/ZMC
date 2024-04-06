@@ -104,22 +104,23 @@ public class SmallZombieWindowBlockEntity extends BlockEntity implements Extende
 
     public void tick(World world, BlockPos pos, BlockState state) {
         if(world.isClient()) {
+            //Show if the player can rebuild the barrier
+            if(plank < MAX_PLANK){
+                Direction facing = state.get(SmallZombieWindowBlock.FACING);
+                Box searchArea = getSearchArea(pos, facing);
+
+                List<PlayerEntity> players = world.getNonSpectatingEntities(PlayerEntity.class, searchArea);
+                for (PlayerEntity player : players) {
+                    if(InteractionHelper.isFacingInteractable(player, facing) &&
+                            Math.abs(player.getY() - pos.getY()) <= 1.5) {
+                        MessageHudOverlay.setMessage("Hold [" + ModKeyInputHandler.INTERACT.getBoundKeyLocalizedText().getLiteralString() + "] to Rebuild Barrier", 100);
+                    }
+                }
+            }
+
             return;
         }
 
-        //Show if the player can rebuild the barrier
-        if(plank < MAX_PLANK){
-            Direction facing = state.get(SmallZombieWindowBlock.FACING);
-            Box searchArea = getSearchArea(pos, facing);
-
-            List<PlayerEntity> players = world.getNonSpectatingEntities(PlayerEntity.class, searchArea);
-            for (PlayerEntity player : players) {
-                if(InteractionHelper.isFacingInteractable(player, facing) &&
-                    Math.abs(player.getY() - pos.getY()) <= 1.5) {
-                        MessageHudOverlay.setMessage("Hold [" + ModKeyInputHandler.INTERACT.getBoundKeyLocalizedText().getLiteralString() + "] to Rebuild Barrier", 100);
-                }
-            }
-        }
 
         // Update canZombiePassThrough based on the cooldown
         long currentTime = world.getTime();

@@ -1,7 +1,10 @@
 package com.aureskull.zmcmod.management;
 
+import com.aureskull.zmcmod.block.entity.MapControllerBlockEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +12,11 @@ import java.util.UUID;
 
 public class GamePlayerManager {
     private final List<UUID> subscribedPlayers = new ArrayList<>();
+    MapControllerBlockEntity mapControllerBlockEntity;
+
+    public GamePlayerManager(MapControllerBlockEntity mapControllerBlockEntity) {
+        this.mapControllerBlockEntity = mapControllerBlockEntity;
+    }
 
     public void subscribePlayer(UUID playerUuid) {
         if (!subscribedPlayers.contains(playerUuid)) {

@@ -5,11 +5,23 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import java.util.UUID;
 
 public class PlayerData {
-    public UUID gameUUID;
+    private UUID gameUUID;
+    private boolean ready;
 
-    public static UUID getGameUUID(ServerPlayerEntity player) {
-        // Retrieve the player's game UUID from their NBT data or another data source
-        PlayerData playerData = StateSaverAndLoader.getPlayerState(player);
-        return playerData.gameUUID == null ? null : playerData.gameUUID;
+    public UUID getGameUUID() {
+        return gameUUID;
+    }
+
+    public void setGameUUID(UUID gameUUID) {
+        this.gameUUID = gameUUID;
+        this.ready = false;
+    }
+
+    public boolean isReady() {
+        return ready;
+    }
+
+    public void setReady(boolean ready) {
+        this.ready = ready;
     }
 }

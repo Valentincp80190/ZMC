@@ -1,6 +1,7 @@
 package com.aureskull.zmcmod.util;
 
 import com.aureskull.zmcmod.ZMCMod;
+import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
@@ -20,8 +21,10 @@ public class StateSaverAndLoader extends PersistentState {
         players.forEach((uuid, playerData) -> {
             NbtCompound playerNbt = new NbtCompound();
 
-            if(playerData.gameUUID != null)
-                playerNbt.putUuid("zmcmod.player.gameUUID", playerData.gameUUID);
+            if(playerData.getGameUUID() != null)
+                playerNbt.putUuid("zmcmod.player.gameUUID", playerData.getGameUUID());
+
+            nbt.putBoolean("zmcmod.player.ready", playerData.isReady());
 
             playersNbt.put(uuid.toString(), playerNbt);
         });
@@ -36,8 +39,13 @@ public class StateSaverAndLoader extends PersistentState {
         playersNbt.getKeys().forEach(key -> {
             PlayerData playerData = new PlayerData();
 
-            if(playersNbt.getCompound(key).getUuid("zmcmod.player.gameUUID") != null)
-                playerData.gameUUID = playersNbt.getCompound(key).getUuid("zmcmod.player.gameUUID");
+            NbtCompound playerCompound = playersNbt.getCompound(key);
+
+            if (playerCompound.contains("zmcmod.player.gameUUID", 11))
+                playerData.setGameUUID(playerCompound.getUuid("zmcmod.player.gameUUID"));
+
+            if (playerCompound.contains("zmcmod.player.ready", 1))
+                playerData.setReady(playerCompound.getBoolean("zmcmod.player.ready"));
 
             UUID uuid = UUID.fromString(key);
             state.players.put(uuid, playerData);
@@ -75,7 +83,11 @@ public class StateSaverAndLoader extends PersistentState {
         StateSaverAndLoader serverState = getServerState(player.getWorld().getServer());
 
         // Either get the player by the uuid, or we don't have data for him yet, make a new player state
-        PlayerData playerState = serverState.players.computeIfAbsent(player.getUuid(), uuid -> new PlayerData());
+        PlayerData playerState = serverState.players.computeIfAbsent(player.getUuid(), uuid -> {
+            PlayerData newData = new PlayerData();
+            newData.setReady(false); // Set the 'ready' attribute to false when creating new data
+            return newData;
+        });
 
         return playerState;
     }
