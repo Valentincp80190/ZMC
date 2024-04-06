@@ -169,6 +169,14 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
             return;
         }
 
+        //If all the players are ready
+        if(round == 0 && !playerManager.areAllSubscribedPlayersReady()) return;
+        //Teleport all the players when all are ready
+        if(round == 0) teleportAllPlayerInFirstZone();
+
+        //Pause if none players connected
+        if(playerManager.getConnectedSubscribedPlayers().size() == 0) return;
+
         manageRounds();
 
         if (roundStarted && getAllZombies().size() < MAX_ZOMBIES) {
@@ -319,7 +327,7 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         ZMCMod.LOGGER.info(this.killedZombiesInRound + "/" + calculateZombiesInRound());
     }
 
-
+    //Press button start -> Create a room -> (If each players are ready) -> Start map
     private void startZombieMap(ServerPlayerEntity player){
         if (!world.isClient()) {
 
@@ -335,7 +343,6 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
                 subscribePlayer(player.getUuid());
                 ChatMessages.sendGameSubscriptionConfirmationMessage(player, mapName);
 
-                teleportAllPlayerInFirstZone();
                 roundStartDelay = 40;
             }else{
                 this.setStart(false, null);
@@ -407,7 +414,14 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         else if(getRound() >= 10)
             multiplier *= (getRound() * 0.15);
 
-        int temp = (int) (MAX_ZOMBIES + (0.5 * ROUND_ONE_ZOMBIES * multiplier));
+        int connectedPlayers = playerManager.getConnectedSubscribedPlayers().size();
+
+        int temp = -1;
+        if(connectedPlayers == 1)
+            temp = (int) (MAX_ZOMBIES + (0.5 * ROUND_ONE_ZOMBIES * multiplier));
+        else if(connectedPlayers > 1){
+            temp = (int) (MAX_ZOMBIES + ((connectedPlayers - 1) * ROUND_ONE_ZOMBIES * multiplier));
+        }
 
         if(getRound() < 2){
             return (int)(temp * 0.25);

@@ -1,10 +1,12 @@
 package com.aureskull.zmcmod.management;
 
 import com.aureskull.zmcmod.block.entity.MapControllerBlockEntity;
+import com.aureskull.zmcmod.util.PlayerData;
+import com.aureskull.zmcmod.util.StateSaverAndLoader;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,5 +64,35 @@ public class GamePlayerManager {
 
     public void clearSubscribedPlayers(){
         subscribedPlayers.clear();
+    }
+
+    public boolean areAllSubscribedPlayersReady(){
+        MinecraftServer server = mapControllerBlockEntity.getWorld().getServer();
+
+        for(UUID subscribedPlayerUUID : subscribedPlayers){
+            PlayerEntity player = server.getPlayerManager().getPlayer(subscribedPlayerUUID);
+
+            //If the disconnected players aren't ready, we consider just the connected players
+            if(player == null) continue;
+
+            PlayerData data = StateSaverAndLoader.getPlayerState(player);
+            if(data.isReady()) continue;
+
+            return false;
+        }
+
+        return true;
+    }
+
+    public List<UUID> getConnectedSubscribedPlayers(){
+        List<UUID> connectedPlayers = new ArrayList<>();
+        MinecraftServer server = mapControllerBlockEntity.getWorld().getServer();
+
+        for(UUID subscribedPlayerUUID : subscribedPlayers){
+            PlayerEntity player = server.getPlayerManager().getPlayer(subscribedPlayerUUID);
+            if(player != null) connectedPlayers.add(subscribedPlayerUUID);
+        }
+
+        return connectedPlayers;
     }
 }
