@@ -7,6 +7,8 @@ import com.aureskull.zmcmod.event.ModKeyInputHandler;
 import com.aureskull.zmcmod.item.custom.Linker;
 import com.aureskull.zmcmod.item.custom.ZoneStick;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
@@ -18,6 +20,7 @@ import net.minecraft.util.math.BlockPos;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
+@Environment(EnvType.CLIENT)
 public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneControllerBlockEntity> {
 
     public ZoneControllerEntityRenderer(BlockEntityRendererFactory.Context context){

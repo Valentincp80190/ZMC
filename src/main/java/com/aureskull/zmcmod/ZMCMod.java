@@ -4,6 +4,7 @@ import com.aureskull.zmcmod.block.ModBlocks;
 import com.aureskull.zmcmod.block.entity.ModBlockEntities;
 import com.aureskull.zmcmod.entity.ModEntities;
 import com.aureskull.zmcmod.entity.custom.StandingZombieEntity;
+import com.aureskull.zmcmod.event.ModCommands;
 import com.aureskull.zmcmod.item.ModItemGroup;
 import com.aureskull.zmcmod.item.ModItems;
 import com.aureskull.zmcmod.networking.ModMessages;
@@ -31,6 +32,8 @@ public class ZMCMod implements ModInitializer {
 		//TODO: BUG - Le joueur entend les sons de commencement de manche alors qu'il n'est pas sur la map
 		//TODO: BUG - Voir pourquoi les zones controller continue de ticker même si l'on est à 1000 blocs
 		//TODO: BUG - les zombies n'attaque pas un joueur qui ne bouge pas.
+		//TODO: BUG - Lorsqu'un zombie n'a pas pu apparaitre (pas de spawner associé à une fenêtre par exemple), le compteur de zombie est tout de même décrémenté. Il faut créer une méthode permettant de décrémenter le nombre de zombie à faire spawner
+
 		ModItemGroup.registerItemGroups();
 		ModItems.registerModItems();
 		ModBlockEntities.registerBlockEntities();
@@ -38,6 +41,7 @@ public class ZMCMod implements ModInitializer {
 		ModBlocks.registerModBlocks();
 		ModMessages.registerC2SPackets();
 		ModSounds.registerModSounds();
+		ModCommands.registerCommands();
 
 		ModEntities.registerModEntities();
 		FabricDefaultAttributeRegistry.register(ModEntities.STANDING_ZOMBIE, StandingZombieEntity.createStandingZombieAttributes());

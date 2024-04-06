@@ -3,14 +3,13 @@ package com.aureskull.zmcmod.networking;
 import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.networking.packet.ExampleC2SPacket;
 import com.aureskull.zmcmod.networking.packet.ExistZMCMapC2SPacket;
+import com.aureskull.zmcmod.networking.packet.InvitePlayerC2SPacket;
 import com.aureskull.zmcmod.networking.packet.link.RemoveDoorwayLinkFromZoneS2CPacket;
 import com.aureskull.zmcmod.networking.packet.link.RemoveLinkS2CPacket;
 import com.aureskull.zmcmod.networking.packet.TriggerInteractionC2SPacket;
 import com.aureskull.zmcmod.networking.packet.link.RemoveZoneLinkFromDoorwayS2CPacket;
 import com.aureskull.zmcmod.networking.packet.link.RemoveZoneLinkFromZoneS2CPacket;
-import com.aureskull.zmcmod.networking.packet.mapcontroller.MapControllerUpdateMapNameC2SPacket;
-import com.aureskull.zmcmod.networking.packet.mapcontroller.MapControllerUpdateStartStateC2SPacket;
-import com.aureskull.zmcmod.networking.packet.mapcontroller.MapControllerUpdateRoundS2CPacket;
+import com.aureskull.zmcmod.networking.packet.mapcontroller.*;
 import com.aureskull.zmcmod.networking.packet.zonecontroller.*;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -30,6 +29,10 @@ public class ModMessages {
     public static final Identifier MAP_CONTROLLER_UPDATE_MAP_NAME = new Identifier(ZMCMod.MOD_ID, "mapcontroller_update_mapname");
     public static final Identifier MAP_CONTROLLER_UPDATE_START_STATE = new Identifier(ZMCMod.MOD_ID, "mapcontroller_update_start_state");
     public static final Identifier MAP_CONTROLLER_UPDATE_ROUND = new Identifier(ZMCMod.MOD_ID, "mapcontroller_update_round");
+    public static final Identifier MAP_CONTROLLER_SUBSCRIBE_PLAYER = new Identifier(ZMCMod.MOD_ID, "mapcontroller_subscribe_player");
+    public static final Identifier MAP_CONTROLLER_UNSUBSCRIBE_PLAYER = new Identifier(ZMCMod.MOD_ID, "mapcontroller_unsubcribe_player");
+
+    public static final Identifier INVITE_PLAYER = new Identifier(ZMCMod.MOD_ID, "invite_player");
 
     //ZONE CONTROLLER
     public static final Identifier ZONE_CONTROLLER_UPDATE_ZONE_COLOR = new Identifier(ZMCMod.MOD_ID, "zonecontroller_update_color");
@@ -54,8 +57,13 @@ public class ModMessages {
     public static void registerC2SPackets(){
         ServerPlayNetworking.registerGlobalReceiver(EXAMPLE_ID, ExampleC2SPacket::receive);
         ServerPlayNetworking.registerGlobalReceiver(EXIST_ZMC_MAP_CHECKER, ExistZMCMapC2SPacket::receive);
+
         ServerPlayNetworking.registerGlobalReceiver(MAP_CONTROLLER_UPDATE_MAP_NAME, MapControllerUpdateMapNameC2SPacket::receive);
         ServerPlayNetworking.registerGlobalReceiver(MAP_CONTROLLER_UPDATE_START_STATE, MapControllerUpdateStartStateC2SPacket::receive);
+        ServerPlayNetworking.registerGlobalReceiver(MAP_CONTROLLER_SUBSCRIBE_PLAYER, MapControllerSubscribePlayerC2SPacket::receive);
+        ServerPlayNetworking.registerGlobalReceiver(MAP_CONTROLLER_UNSUBSCRIBE_PLAYER, MapControllerUnsubscribePlayerC2SPacket::receive);
+
+        ServerPlayNetworking.registerGlobalReceiver(INVITE_PLAYER, InvitePlayerC2SPacket::receive);
 
 
         ServerPlayNetworking.registerGlobalReceiver(ZONE_CONTROLLER_UPDATE_ZONE_COLOR, ZoneControllerUpdateZoneColorC2SPacket::receive);

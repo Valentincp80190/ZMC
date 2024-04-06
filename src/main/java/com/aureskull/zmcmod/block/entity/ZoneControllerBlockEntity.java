@@ -48,6 +48,9 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
 
     private List<BlockPos> linkedWindows = new ArrayList<>();
 
+    private final int UPDATE_PLAYERS_ZONE_TIME = 20;//1 second
+    private int last_update_players_zone_time = 0;
+
     public ZoneControllerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.ZONE_CONTROLLER_BLOCK_ENTITY, pos, state);
     }
@@ -173,23 +176,28 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
 
     public void tick(World world, BlockPos pos, BlockState state) {
         if(!world.isClient()) {
-            BlockPos mapControllerPos = findMapControllerRecursively(this, new ArrayList<BlockPos>());
 
-            if(mapControllerPos != null && world.getBlockEntity(mapControllerPos) instanceof MapControllerBlockEntity mapControllerBlockEntity && mapControllerBlockEntity.isStarted()){
-
-                // Create a box representing the zone
-                Box zone = getBox();
-
-                // Check for players within the zone
-                //TODO : Voir s'il est nécéssaire de répéter l'opération toute les secondes au lieu de 20x par seconde.
-                List<PlayerEntity> playersInZone = world.getNonSpectatingEntities(PlayerEntity.class, zone);
-                for(PlayerEntity player : playersInZone) {
-                    //player.sendMessage(Text.literal(player.getName().getString() + " has entered the zone at " + pos.toString()), true);
-                    mapControllerBlockEntity.playerCurrentZone.put(player.getUuid(), this.getPos());
-                }
+            if(last_update_players_zone_time == UPDATE_PLAYERS_ZONE_TIME) {
+                updatePlayerZonePosition();
+                last_update_players_zone_time = 0;
             }
+            else last_update_players_zone_time++;
 
             return;
+        }
+    }
+
+    private void updatePlayerZonePosition(){
+        BlockPos mapControllerPos = findMapControllerRecursively(this, new ArrayList<BlockPos>());
+        if(mapControllerPos != null && world.getBlockEntity(mapControllerPos) instanceof MapControllerBlockEntity mapControllerBlockEntity && mapControllerBlockEntity.isStarted()){
+            // Create a box representing the zone
+            Box zone = getBox();
+            // Check for players within the zone
+            List<PlayerEntity> playersInZone = world.getNonSpectatingEntities(PlayerEntity.class, zone);
+            for(PlayerEntity player : playersInZone) {
+                //player.sendMessage(Text.literal(player.getName().getString() + " has entered the zone at " + pos.toString()), true);
+                mapControllerBlockEntity.playerCurrentZone.put(player.getUuid(), this.getPos());
+            }
         }
     }
 
@@ -399,6 +407,9 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
                 || spawnInZoneOrInNeighborhood == false){
 
                 SmallZombieWindowBlockEntity smallZombieWindowBlockEntity = ((SmallZombieWindowBlockEntity) world.getBlockEntity(linkedWindows.get(new Random().nextInt(linkedWindows.size()))));
+
+                if(smallZombieWindowBlockEntity.getLinkedBlock(ZombieSpawnerBlockEntity.class) == null) return;
+
                 ZombieSpawnerBlockEntity zombieSpawnerBlockEntity = ((ZombieSpawnerBlockEntity) world.getBlockEntity(smallZombieWindowBlockEntity.getLinkedBlock(ZombieSpawnerBlockEntity.class)));
                 zombieSpawnerBlockEntity.spawnZombie();
             }else{
@@ -417,10 +428,6 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
         }catch (Exception e){
             ZMCMod.LOGGER.error("ZoneController - Spawn Zombie :" + e.getMessage() + e.getStackTrace());
         }
-    }
-
-    public void spawnZombieInAdjacentZone(){
-
     }
 
     public BlockPos findMapControllerRecursively(ZoneControllerBlockEntity zone, ArrayList<BlockPos> visitedBlockPos) {

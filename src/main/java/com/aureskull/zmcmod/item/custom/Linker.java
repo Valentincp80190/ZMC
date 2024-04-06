@@ -49,7 +49,6 @@ public class Linker extends Item {
             }
 
             BlockState state = world.getBlockState(pos);
-            ZMCMod.LOGGER.info(state.getBlock().toString());
             if (state.getBlock() instanceof ZombieSpawnerBlock
                     || state.getBlock() instanceof SmallZombieWindowBlock
                     || state.getBlock() instanceof MapControllerBlock

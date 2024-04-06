@@ -1,28 +1,34 @@
 package com.aureskull.zmcmod.block.entity.renderer;
 
+import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.entity.MapControllerBlockEntity;
-import com.aureskull.zmcmod.block.entity.ZombieSpawnerBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZoneControllerBlockEntity;
 import com.aureskull.zmcmod.item.custom.Linker;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import org.joml.Matrix4f;
 
+@Environment(EnvType.CLIENT)
 public class MapControllerEntityRenderer implements BlockEntityRenderer<MapControllerBlockEntity> {
-    //TODO : Dessiner une texture de 1*3 pixels qui représente un fil
-
     public MapControllerEntityRenderer(BlockEntityRendererFactory.Context context){
 
     }
 
     @Override
     public void render(MapControllerBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+        renderZoneControllerBlockEntityLink(entity, matrices);
+    }
+
+    private void renderZoneControllerBlockEntityLink(MapControllerBlockEntity entity, MatrixStack matrices){
         if(entity.getLinkedBlock(ZoneControllerBlockEntity.class) != null){
             MinecraftClient minecraftClient = MinecraftClient.getInstance();
 
@@ -39,6 +45,7 @@ public class MapControllerEntityRenderer implements BlockEntityRenderer<MapContr
     }
 
     private void renderLine(BlockPos posA, BlockPos posB, MatrixStack matrices) {
+        matrices.push();
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         //RenderSystem.enableDepthTest();
 
@@ -55,6 +62,7 @@ public class MapControllerEntityRenderer implements BlockEntityRenderer<MapContr
         buffer.vertex(positionMatrix, (float) deltaX + 0.5F, (float) deltaY + 0.5F, (float) deltaZ + 0.5F).color(1f, 0f, 0f, 1f).next();
 
         Tessellator.getInstance().draw();
+        matrices.pop();
     }
 
 }

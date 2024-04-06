@@ -4,6 +4,8 @@ import com.aureskull.zmcmod.block.entity.SmallZombieWindowBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZombieSpawnerBlockEntity;
 import com.aureskull.zmcmod.item.custom.Linker;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
@@ -13,6 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import org.joml.Matrix4f;
 
+@Environment(EnvType.CLIENT)
 public class SmallZombieDoorwayEntityRenderer  implements BlockEntityRenderer<SmallZombieWindowBlockEntity> {
     //TODO : Dessiner une texture de 1*3 pixels qui représente un fil
 

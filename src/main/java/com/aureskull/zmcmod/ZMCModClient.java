@@ -4,6 +4,7 @@ import com.aureskull.zmcmod.block.entity.renderer.ModBlockEntityRenderers;
 import com.aureskull.zmcmod.block.ModBlockRenderLayerMaps;
 import com.aureskull.zmcmod.client.MessageHudOverlay;
 import com.aureskull.zmcmod.client.ModColorProviders;
+import com.aureskull.zmcmod.client.RoundOverlay;
 import com.aureskull.zmcmod.entity.ModEntities;
 import com.aureskull.zmcmod.entity.client.ModModelLayers;
 import com.aureskull.zmcmod.entity.client.StandingZombieModel;
@@ -34,6 +35,7 @@ public class ZMCModClient implements ClientModInitializer {
 		EntityRendererRegistry.register(ModEntities.STANDING_ZOMBIE, StandingZombieRenderer::new);
 		EntityModelLayerRegistry.registerModelLayer(ModModelLayers.STANDING_ZOMBIE, StandingZombieModel::getTexturedModelData);
 
+		HudRenderCallback.EVENT.register(new RoundOverlay());
 		//ctrl e + h
 		//Si un bug dans le debug arrive, il faut pull le projet dans un nouveau dossier.
 	}

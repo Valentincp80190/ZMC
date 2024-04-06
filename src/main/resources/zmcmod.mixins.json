@@ -3,7 +3,7 @@
 	"package": "com.aureskull.zmcmod.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
-		"ExampleMixin"
+		"ExampleClientMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

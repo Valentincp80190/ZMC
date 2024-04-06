@@ -3,20 +3,24 @@ package com.aureskull.zmcmod.block.entity;
 import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.ILinkable;
 import com.aureskull.zmcmod.entity.custom.StandingZombieEntity;
+import com.aureskull.zmcmod.management.GamesManager;
+import com.aureskull.zmcmod.management.GamePlayerManager;
 import com.aureskull.zmcmod.networking.ModMessages;
 import com.aureskull.zmcmod.screen.mapcontroller.MapControllerScreenHandler;
 import com.aureskull.zmcmod.sound.ModSounds;
+import com.aureskull.zmcmod.util.PlayerData;
+import com.aureskull.zmcmod.util.StateSaverAndLoader;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
@@ -37,16 +41,17 @@ import java.util.*;
 
 public class MapControllerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ILinkable {
     private static final int MAX_ZOMBIES = 24;//TODO: A multiplier par le nombre de joueur
-    private final int ROUND_ONE_ZOMBIES = 6;
+    private final int ROUND_ONE_ZOMBIES = 6;//TODO: Faire une classe GameRoundManager
 
     private static final int NEXT_ROUND_DELAY_TICKS = 220; // 11 seconds in ticks
 
     public String mapName = "";
+    public UUID gameUUID;
     private boolean started = false;
     private int round = 0;
     private int zombiesInRound = 0;
     private int killedZombiesInRound = 0;
-    private int spawnLuck = 7;
+    private int spawnLuck = 7;//TODO: Faire une classe GameSpawnManager
     private int roundStartDelay = 0;
     private boolean canStartRound = false;
     private boolean roundStarted = false;
@@ -54,6 +59,8 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
     public static final Map<UUID, BlockPos> playerCurrentZone = new HashMap<>();
 
     private BlockPos linkedZoneController = null;
+
+    private GamePlayerManager playerManager = new GamePlayerManager();
 
     public MapControllerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.MAP_CONTROLLER_BLOCK_ENTITY, pos, state);
@@ -84,6 +91,9 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         nbt.putInt("map_controller.killed_zombies_in_round", this.killedZombiesInRound);
         nbt.putBoolean("map_controller.started", this.started);
 
+        if(this.gameUUID != null)
+            nbt.putUuid("map_controller.game_uuid", this.gameUUID);
+
         if (nbt.contains("map_controller.linked_zone_controller")) {
             this.linkedZoneController = NbtHelper.toBlockPos(nbt.getCompound("map_controller.linked_zone_controller"));
         }
@@ -91,6 +101,10 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         if (linkedZoneController != null) {
             nbt.put("map_controller.linked_zone_controller", NbtHelper.fromBlockPos(linkedZoneController));
         }
+
+        nbt.put("map_controller.subscribed_players", playerManager.writeSubscribedPlayersToNbt());
+        ZMCMod.LOGGER.info("Writing Subscribed Players to NBT: " + playerManager.getSubscribedPlayers());
+
         super.writeNbt(nbt);
     }
 
@@ -115,9 +129,21 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         if (nbt.contains("map_controller.started"))
             this.started = nbt.getBoolean("map_controller.started");
 
+        if (nbt.contains("map_controller.game_uuid"))
+            this.gameUUID = nbt.getUuid("map_controller.game_uuid");
+
         if (nbt.contains("map_controller.linked_zone_controller")) {
             this.linkedZoneController = NbtHelper.toBlockPos(nbt.getCompound("map_controller.linked_zone_controller"));
         }
+
+        if (nbt.contains("map_controller.subscribed_players", 9)) {
+            NbtList uuidList = nbt.getList("map_controller.subscribed_players", 10); // 10 is the tag type for compound
+            playerManager.readSubscribedPlayersFromNbt(uuidList);
+            ZMCMod.LOGGER.info("Subscribed players after reading from NBT: " + playerManager.getSubscribedPlayers());
+        }
+
+        if(started && gameUUID != null && getWorld() != null)
+            GamesManager.getInstance().addGame(gameUUID, getPos(), getWorld().getRegistryKey());
     }
 
     @Nullable
@@ -140,6 +166,8 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         if (roundStarted && getAllZombies().size() < MAX_ZOMBIES) {
             spawnZombie();
         }
+
+        //ZMCMod.LOGGER.info(mapName + ": " + playerManager.getSubscribedPlayers().toString());
     }
 
     private void manageRounds() {
@@ -190,8 +218,6 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
                 (entity) -> true);
     }
 
-
-
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
@@ -239,7 +265,6 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
     @Override
     public void removeLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
-
     }
 
     @Override
@@ -254,13 +279,14 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
     public void setStart(boolean p_started, ServerPlayerEntity playerEntity) {
         this.started = p_started;
         markDirty();
+
         ZMCMod.LOGGER.info("Started state changed to " + this.started);
 
-        if(!world.isClient()){
+        if(!world.isClient()) {
             killAllZombies();
-            if(p_started)
+            if (p_started)
                 startZombieMap(playerEntity);
-            else{
+            else {
                 stopZombieMap();
             }
         }
@@ -291,16 +317,44 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
             if(isMapAvailable(player)){
                 ZMCMod.LOGGER.info("Starting Zombie Map on Server...");
+
+                if(gameUUID != null)
+                    GamesManager.getInstance().removeGame(gameUUID);
+                playerManager = new GamePlayerManager();
+
+                generateGameUUID();
+                GamesManager.getInstance().addGame(gameUUID, getPos(), getWorld().getRegistryKey());
+                subscribePlayer(player.getUuid());
+                //GamesManager.GameInfo infos = GamesManager.getInstance().getGame(gameUUID);
+                //ZMCMod.LOGGER.info("ID saved :" + infos.getGameUUID().toString());
+
                 teleportAllPlayerInFirstZone();
                 roundStartDelay = 40;
-                //goToNextRound();
+
+                /*ServerWorld world = player.getServerWorld();
+                for(ServerPlayerEntity playerReceiver : world.getPlayers()){
+                    GameInvitePlayerManager.sendGameInviteMessage(playerReceiver, gameUUID);
+                }*/
+
             }else{
                 this.setStart(false, null);
             }
         }
     }
 
+    private void generateGameUUID(){
+        gameUUID = UUID.randomUUID();
+        markDirty();
+    }
+
     private void teleportAllPlayerInFirstZone() {
+        if (!(world instanceof ServerWorld)) {
+            return; // Exit if not on the server side.
+        }
+
+        ServerWorld serverWorld = (ServerWorld) world;
+        MinecraftServer server = serverWorld.getServer();
+
         ZoneControllerBlockEntity zoneControllerBlockEntity = ((ZoneControllerBlockEntity) world.getBlockEntity(this.linkedZoneController));
 
         BlockPos spawnPoint = zoneControllerBlockEntity.getSpawnPoint();
@@ -308,12 +362,12 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         double spawnY = spawnPoint.getY();
         double spawnZ = spawnPoint.getZ() + 0.5;
 
-        for (PlayerEntity player : world.getPlayers()) {
-            if (player instanceof ServerPlayerEntity) {
-                ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+        List<UUID> playersUUID = playerManager.getSubscribedPlayers();
 
-                // Teleport each server player
-                serverPlayer.teleport((ServerWorld) world, spawnX, spawnY, spawnZ, player.getYaw(), player.getPitch());
+        for (UUID playerUUID : playersUUID) {
+            ServerPlayerEntity player = server.getPlayerManager().getPlayer(playerUUID);
+            if (player != null) {
+                player.teleport(serverWorld, spawnX, spawnY, spawnZ, player.getYaw(), player.getPitch());
             }
         }
     }
@@ -389,7 +443,7 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
     }
 
     private void playEndRoundSoundForPlayers() {
-        for (UUID playerUUID : playerCurrentZone.keySet()) {
+        for (UUID playerUUID : playerManager.getSubscribedPlayers()) {
             PlayerEntity player = world.getPlayerByUuid(playerUUID);
             if (player == null) {
                 playerCurrentZone.remove(playerUUID);
@@ -424,6 +478,8 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
     private void stopZombieMap(){
         this.setRound(0);
         this.roundStarted = false;
+
+        unsubscribeAllPlayer();
     }
 
     private void spawnZombie(){
@@ -431,11 +487,12 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         int luck = random.nextInt(1000);
 
         //Map started => SpawnZombie if we doesn't exceed the number of zombie on the map
-        //Normaly chance < 7
+        //Normally chance < 7
         if(luck < spawnLuck && this.zombiesInRound > 0) {
 
             ZoneControllerBlockEntity zone = getRandomZoneOccupiedByPlayer();
-            if(zone != null){
+            if(zone != null &&
+                zone.getAllLinkedBlocks(SmallZombieWindowBlockEntity.class).size() > 0){
                 try{
                     zone.spawnZombie(true);
                     zombiesInRound--;
@@ -499,5 +556,43 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
             }
         }
         return false;
+    }
+
+    public void subscribePlayer(UUID playerUuid) {
+        playerManager.subscribePlayer(playerUuid);
+
+        MinecraftServer server = getWorld().getServer();
+        PlayerData playerData = StateSaverAndLoader.getPlayerState(server.getPlayerManager().getPlayer(playerUuid));
+        playerData.gameUUID = gameUUID;
+
+        markDirty();
+    }
+
+    public void unsubscribePlayer(UUID playerUuid) {
+        playerManager.unsubscribePlayer(playerUuid);
+        markDirty();
+    }
+
+    public void unsubscribeAllPlayer(){
+        List<UUID> subscribedPlayers = playerManager.getSubscribedPlayers();
+        MinecraftServer server = getWorld().getServer();
+
+        for(UUID playerUUID : subscribedPlayers){
+            try {
+                ServerPlayerEntity player = server.getPlayerManager().getPlayer(playerUUID);
+
+                PlayerData playerData = StateSaverAndLoader.getPlayerState(player);
+                playerData.gameUUID = null;
+            }catch (Exception e){
+                ZMCMod.LOGGER.error(e.getMessage(), e);
+            }
+        }
+
+        playerManager.clearSubscribedPlayers();
+        markDirty();
+    }
+
+    public boolean existSubscribedPlayer(UUID plauerUuid){
+        return playerManager.existSubscribedPlayer(plauerUuid);
     }
 }
