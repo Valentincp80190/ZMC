@@ -1,5 +1,6 @@
 package com.aureskull.zmcmod.screen.mapcontroller;
 
+import com.aureskull.zmcmod.client.RoundOverlay;
 import com.aureskull.zmcmod.screen.ScreenConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;

@@ -84,13 +84,13 @@ public class GamePlayerManager {
         return true;
     }
 
-    public List<UUID> getConnectedSubscribedPlayers(){
-        List<UUID> connectedPlayers = new ArrayList<>();
+    public List<PlayerEntity> getConnectedSubscribedPlayers(){
+        List<PlayerEntity> connectedPlayers = new ArrayList<>();
         MinecraftServer server = mapControllerBlockEntity.getWorld().getServer();
 
         for(UUID subscribedPlayerUUID : subscribedPlayers){
             PlayerEntity player = server.getPlayerManager().getPlayer(subscribedPlayerUUID);
-            if(player != null) connectedPlayers.add(subscribedPlayerUUID);
+            if(player != null) connectedPlayers.add(player);
         }
 
         return connectedPlayers;

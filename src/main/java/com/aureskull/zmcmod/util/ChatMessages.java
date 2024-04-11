@@ -50,7 +50,7 @@ public class ChatMessages {
     }
 
     public static void sendGameSubscriptionConfirmationMessage(ServerPlayerEntity player, String mapName) {
-        MutableText message = Text.literal("You've successfully joined the map ['" + (mapName.isEmpty() ? "Unnamed Map" : mapName) + "]'. Please wait until the game starts. Click ")
+        MutableText message = Text.literal("You've successfully joined the map ['" + (mapName.isEmpty() ? "Unnamed Map" : mapName) + "']. Please wait until the game starts. Click ")
                 .formatted(Formatting.DARK_GREEN);
 
         MutableText clickableText1 = Text.literal("[HERE]")

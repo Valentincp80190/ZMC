@@ -1,7 +1,6 @@
 package com.aureskull.zmcmod.networking;
 
 import com.aureskull.zmcmod.ZMCMod;
-import com.aureskull.zmcmod.networking.packet.ExampleC2SPacket;
 import com.aureskull.zmcmod.networking.packet.ExistZMCMapC2SPacket;
 import com.aureskull.zmcmod.networking.packet.link.RemoveDoorwayLinkFromZoneS2CPacket;
 import com.aureskull.zmcmod.networking.packet.link.RemoveLinkS2CPacket;
@@ -9,6 +8,8 @@ import com.aureskull.zmcmod.networking.packet.TriggerInteractionC2SPacket;
 import com.aureskull.zmcmod.networking.packet.link.RemoveZoneLinkFromDoorwayS2CPacket;
 import com.aureskull.zmcmod.networking.packet.link.RemoveZoneLinkFromZoneS2CPacket;
 import com.aureskull.zmcmod.networking.packet.mapcontroller.*;
+import com.aureskull.zmcmod.networking.packet.player.PlayerUpdateOverlayStatusS2CPacket;
+import com.aureskull.zmcmod.networking.packet.player.PlayerUpdateRoundHUDS2CPacket;
 import com.aureskull.zmcmod.networking.packet.zonecontroller.*;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -39,7 +40,6 @@ public class ModMessages {
 
 
     //OTHER
-    public static final Identifier EXAMPLE_ID = new Identifier(ZMCMod.MOD_ID, "example");
     public static final Identifier EXIST_ZMC_MAP_CHECKER = new Identifier(ZMCMod.MOD_ID, "existzmcmapchecker");
     public static final Identifier EXIST_ZMC_MAP_CHECKER_RESPONSE = new Identifier(ZMCMod.MOD_ID, "existzmcmapchecker_response");
 
@@ -50,8 +50,12 @@ public class ModMessages {
     public static final Identifier REMOVE_ZONE_LINK_FROM_DOORWAY = new Identifier(ZMCMod.MOD_ID, "remove_zone_link_from_doorway");
     public static final Identifier REMOVE_ZONE_LINK_FROM_ZONE = new Identifier(ZMCMod.MOD_ID, "remove_zone_link_from_zone");
 
+
+    //PLAYER
+    public static final Identifier PLAYER_UPDATE_OVERLAY = new Identifier(ZMCMod.MOD_ID, "player_update_overlay");
+    public static final Identifier PLAYER_UPDATE_ROUND_HUD = new Identifier(ZMCMod.MOD_ID, "player_update_round_hud");
+
     public static void registerC2SPackets(){
-        ServerPlayNetworking.registerGlobalReceiver(EXAMPLE_ID, ExampleC2SPacket::receive);
         ServerPlayNetworking.registerGlobalReceiver(EXIST_ZMC_MAP_CHECKER, ExistZMCMapC2SPacket::receive);
 
         ServerPlayNetworking.registerGlobalReceiver(MAP_CONTROLLER_UPDATE_MAP_NAME, MapControllerUpdateMapNameC2SPacket::receive);
@@ -72,6 +76,10 @@ public class ModMessages {
 
         //MapController
         ClientPlayNetworking.registerGlobalReceiver(MAP_CONTROLLER_UPDATE_ROUND, MapControllerUpdateRoundS2CPacket::receive);
+
+        //PLAYER
+        ClientPlayNetworking.registerGlobalReceiver(PLAYER_UPDATE_OVERLAY, PlayerUpdateOverlayStatusS2CPacket::receive);
+        ClientPlayNetworking.registerGlobalReceiver(PLAYER_UPDATE_ROUND_HUD, PlayerUpdateRoundHUDS2CPacket::receive);
     }
 
     public static void sendExistZMCMapCheckerResponse(ServerPlayerEntity player, boolean exists) {
@@ -120,5 +128,20 @@ public class ModMessages {
         PlayerLookup.tracking((ServerWorld) world, zonePos).forEach(player -> {
             ServerPlayNetworking.send(player, ModMessages.REMOVE_ZONE_LINK_FROM_ZONE, buf);
         });
+    }
+
+
+    public static void sendUpdateDisplayOverlayPacket(ServerPlayerEntity player, boolean displayOverlay) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeBoolean(displayOverlay);
+
+        ServerPlayNetworking.send(player, ModMessages.PLAYER_UPDATE_OVERLAY, buf);
+    }
+
+    public static void sendUpdateRoundHUDPacket(ServerPlayerEntity player, int newRound) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeInt(newRound);
+
+        ServerPlayNetworking.send(player, ModMessages.PLAYER_UPDATE_ROUND_HUD, buf);
     }
 }

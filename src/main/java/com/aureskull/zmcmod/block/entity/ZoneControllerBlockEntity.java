@@ -30,8 +30,6 @@ import java.util.Random;
 import java.util.random.RandomGenerator;
 
 public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ILinkable {
-    //TODO : Faire une relation parent/enfant de façon unique, un parent ne peux pas être à la fois l'enfant de l'autre...
-
     public BlockPos posA = new BlockPos(pos.getX() - 5, pos.getY() + 1, pos.getZ() - 5);
     public BlockPos posB = new BlockPos(pos.getX() + 5, pos.getY() + 5, pos.getZ() + 5);
     public BlockPos spawnPoint = new BlockPos(pos.getX(), pos.getY() + 2, pos.getZ());

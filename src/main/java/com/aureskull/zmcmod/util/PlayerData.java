@@ -1,12 +1,13 @@
 package com.aureskull.zmcmod.util;
 
-import net.minecraft.server.network.ServerPlayerEntity;
-
 import java.util.UUID;
 
 public class PlayerData {
     private UUID gameUUID;
     private boolean ready;
+
+    //NOT NBT
+    public static boolean displayHUD = false;
 
     public UUID getGameUUID() {
         return gameUUID;

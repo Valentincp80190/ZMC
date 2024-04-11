@@ -17,6 +17,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.nbt.NbtCompound;
@@ -41,6 +42,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class MapControllerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ILinkable {
+    public BlockPos posA = new BlockPos(pos.getX() - 64, pos.getY() - 10, pos.getZ() - 64);
+    public BlockPos posB = new BlockPos(pos.getX() + 64, pos.getY() + 24, pos.getZ() + 64);
+
     private static final int MAX_ZOMBIES = 24;//TODO: A multiplier par le nombre de joueur
     private final int ROUND_ONE_ZOMBIES = 6;//TODO: Faire une classe GameRoundManager
 
@@ -91,6 +95,8 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         nbt.putInt("map_controller.zombies_in_round", this.zombiesInRound);
         nbt.putInt("map_controller.killed_zombies_in_round", this.killedZombiesInRound);
         nbt.putBoolean("map_controller.started", this.started);
+        nbt.put("map_controller.position_a", NbtHelper.fromBlockPos(posA));
+        nbt.put("map_controller.position_b", NbtHelper.fromBlockPos(posB));
 
         if(this.gameUUID != null)
             nbt.putUuid("map_controller.game_uuid", this.gameUUID);
@@ -130,6 +136,14 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         if (nbt.contains("map_controller.started"))
             this.started = nbt.getBoolean("map_controller.started");
 
+        if (nbt.contains("map_controller.position_a")) {
+            this.posA = NbtHelper.toBlockPos(nbt.getCompound("map_controller.position_a"));
+        }
+
+        if (nbt.contains("map_controller.position_b")) {
+            this.posB = NbtHelper.toBlockPos(nbt.getCompound("map_controller.position_b"));
+        }
+
         if (nbt.contains("map_controller.game_uuid"))
             this.gameUUID = nbt.getUuid("map_controller.game_uuid");
 
@@ -159,31 +173,57 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
     }
 
     public void tick(World world, BlockPos pos, BlockState state) {
-        if (world.isClient) return;
+        if(world.isClient){
+            MinecraftClient minecraftClient = MinecraftClient.getInstance();
+            // Check if the client instance and the player are not null
+            if (minecraftClient != null && minecraftClient.player != null) {
+                PlayerEntity player = minecraftClient.player;
 
-        if (!started) return;
+                if(playerManager.getSubscribedPlayers().contains(player.getUuid())){
+                    if(started && getBox().contains(player.getPos().x, player.getPos().y, player.getPos().z)){
+                        PlayerData.displayHUD = true;
+                    }else PlayerData.displayHUD = false;
+                }
+            }
+        }else{
+            if (!started) return;
 
-        //Stop the game if there is no players
-        if(playerManager.getSubscribedPlayers().size() == 0){
-            setStart(false, null);
-            return;
+            //Stop the game if there is no players
+            if(playerManager.getSubscribedPlayers().size() == 0){
+                setStart(false, null);
+                return;
+            }
+
+            //If all the players are ready
+            if(round == 0 && !playerManager.areAllSubscribedPlayersReady()) return;
+            //Teleport all the players when all are ready
+            if(round == 0) teleportAllPlayerInFirstZone();
+
+            //Pause if none players connected
+            if(playerManager.getConnectedSubscribedPlayers().size() == 0) return;
+
+            manageRounds();
+
+            if (roundStarted && getAllZombies().size() < MAX_ZOMBIES) {
+                spawnZombie();
+            }
         }
-
-        //If all the players are ready
-        if(round == 0 && !playerManager.areAllSubscribedPlayersReady()) return;
-        //Teleport all the players when all are ready
-        if(round == 0) teleportAllPlayerInFirstZone();
-
-        //Pause if none players connected
-        if(playerManager.getConnectedSubscribedPlayers().size() == 0) return;
-
-        manageRounds();
-
-        if (roundStarted && getAllZombies().size() < MAX_ZOMBIES) {
-            spawnZombie();
-        }
-
         //ZMCMod.LOGGER.info(mapName + ": " + playerManager.getSubscribedPlayers().toString());
+    }
+
+    public Box getBox(){
+        // Calculate the minimum and maximum coordinates to define the zone
+        int minX = Math.min(posA.getX(), posB.getX());
+        int minY = Math.min(posA.getY(), posB.getY());
+        int minZ = Math.min(posA.getZ(), posB.getZ());
+        int maxX = Math.max(posA.getX(), posB.getX());
+        int maxY = Math.max(posA.getY(), posB.getY());
+        int maxZ = Math.max(posA.getZ(), posB.getZ());
+
+        // Create a box representing the zone
+        Box box = new Box(minX, minY, minZ, maxX+1, maxY+1, maxZ+1);
+
+        return box;
     }
 
     private void manageRounds() {
@@ -209,6 +249,10 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         endRound();
         killAllZombies();
         roundStartDelay = NEXT_ROUND_DELAY_TICKS;
+
+        //Update player HUD for animation
+        for(PlayerEntity player : playerManager.getConnectedSubscribedPlayers())
+            ModMessages.sendUpdateRoundHUDPacket(((ServerPlayerEntity) player), getRound()+1);
     }
 
     private void killAllZombies() {
@@ -450,6 +494,12 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         roundStarted = true;
         canStartRound = false;
         broadcastRoundUpdate();
+
+        //Update player HUD for animation
+        if(getRound() == 1){
+            for(PlayerEntity player : playerManager.getConnectedSubscribedPlayers())
+                ModMessages.sendUpdateRoundHUDPacket(((ServerPlayerEntity) player), getRound());
+        }
     }
 
     private void endRound() {
@@ -478,6 +528,8 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
         ServerWorld serverWorld = (ServerWorld) world;
         PacketByteBuf buffer = createRoundUpdatePacket();
+        buffer.writeInt(round);
+
         PlayerLookup.tracking(serverWorld, getPos()).forEach(player ->
                 ServerPlayNetworking.send(player, ModMessages.MAP_CONTROLLER_UPDATE_ROUND, buffer)
         );
@@ -572,6 +624,10 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
             }
         }
         return false;
+    }
+
+    public boolean isPlayerPlaying(UUID playerUUID){
+        return playerManager.getSubscribedPlayers().contains(playerUUID);
     }
 
     public void subscribePlayer(UUID playerUuid) {
