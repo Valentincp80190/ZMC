@@ -13,16 +13,13 @@ import java.util.EnumSet;
 
 public class CrawlThroughWindowGoal extends Goal {
     private final StandingZombieEntity zombie;
-    private final double speed;
     private BlockPos windowSouthPos;
     private SmallZombieWindowBlockEntity window;
     private boolean isCrawling;
-
     private Direction windowDirection;
 
-    public CrawlThroughWindowGoal(StandingZombieEntity zombie, double speed) {
+    public CrawlThroughWindowGoal(StandingZombieEntity zombie) {
         this.zombie = zombie;
-        this.speed = speed;
         this.setControls(EnumSet.of(Control.MOVE));
     }
 

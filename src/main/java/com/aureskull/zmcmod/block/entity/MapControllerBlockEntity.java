@@ -630,6 +630,10 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         return playerManager.getSubscribedPlayers().contains(playerUUID);
     }
 
+    public GamePlayerManager getPlayerManager() {
+        return playerManager;
+    }
+
     public void subscribePlayer(UUID playerUuid) {
         playerManager.subscribePlayer(playerUuid);
 

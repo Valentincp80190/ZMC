@@ -2,7 +2,6 @@ package com.aureskull.zmcmod.entity.custom;
 
 import com.aureskull.zmcmod.block.entity.MapControllerBlockEntity;
 import com.aureskull.zmcmod.entity.goal.*;
-import com.aureskull.zmcmod.entity.goal.ZombieAttackGoal;
 import com.aureskull.zmcmod.sound.ModSounds;
 import net.minecraft.entity.AnimationState;
 import net.minecraft.entity.EntityPose;
@@ -31,8 +30,6 @@ public class StandingZombieEntity extends HostileEntity {
     private boolean passedThroughWindow = false;
 
     private BlockPos mapControllerBlockPos;
-
-    public boolean asJoinedPlayer = false;
 
     public StandingZombieEntity(EntityType<? extends HostileEntity> entityType, World world) {
         super(entityType, world);
@@ -67,11 +64,10 @@ public class StandingZombieEntity extends HostileEntity {
         this.goalSelector.add(0, new SwimGoal(this));
 
 
-        this.goalSelector.add(3, new CrawlThroughWindowGoal(this, 0.5D));
+        this.goalSelector.add(3, new CrawlThroughWindowGoal(this));
 
-        this.goalSelector.add(3, new MoveToNearestPlayerGoal(this, 2.0D));
+        this.goalSelector.add(3, new AttackNearestPlayerGoal(this, 2.0D, false));
         //Pour attaquer c'est juste un set sur le zombie. On pourrait donc se passer de ce goal si on fait un mix de l'attaque et du MoveToBlockGoal
-        this.goalSelector.add(3, new ZombieAttackGoal(this, 1.7, false)); // Consider adjusting the speed as per your requirement
         this.goalSelector.add(2, new LookAtEntityGoal(this, PlayerEntity.class, 256.0F));
     }
 

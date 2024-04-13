@@ -90,7 +90,12 @@ public class GamePlayerManager {
 
         for(UUID subscribedPlayerUUID : subscribedPlayers){
             PlayerEntity player = server.getPlayerManager().getPlayer(subscribedPlayerUUID);
-            if(player != null) connectedPlayers.add(player);
+            if(player != null){
+                PlayerData playerData = StateSaverAndLoader.getPlayerState(player);
+                if(playerData.getGameUUID() != null && playerData.getGameUUID() == mapControllerBlockEntity.gameUUID)
+                    connectedPlayers.add(player);
+                else subscribedPlayers.remove(player.getUuid());
+            }
         }
 
         return connectedPlayers;

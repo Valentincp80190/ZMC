@@ -79,7 +79,7 @@ public class RoundOverlay implements HudRenderCallback {
 
     private void drawRoundNumber(DrawContext drawContext, int windowWidth, int windowHeight){
         if(flashing){
-            if(lastUpdateTickTime == 4){
+            if(lastUpdateTickTime >= 4){
                 if(green < 1f){
                     green = green + .1f;
                     if(green > 1f) green = 1f;
@@ -106,7 +106,7 @@ public class RoundOverlay implements HudRenderCallback {
                 lastUpdateTickTime = 0;
             }else lastUpdateTickTime++;
 
-            if(lastFlashingTickTime == FLASHING_TICK_TIME){
+            if(lastFlashingTickTime >= FLASHING_TICK_TIME){
                 flashing = false;
                 lastFlashingTickTime = 0;
                 lastUpdateTickTime = 0;
@@ -123,7 +123,7 @@ public class RoundOverlay implements HudRenderCallback {
                     alpha = 0f;
             }
 
-            if(lastWaitForTwoSeconds == WAIT_TWO_SECONDS_TICK){
+            if(lastWaitForTwoSeconds >= WAIT_TWO_SECONDS_TICK){
                 wait_two_seconds = false;
                 lastWaitForTwoSeconds = 0;
 
@@ -134,7 +134,7 @@ public class RoundOverlay implements HudRenderCallback {
 
         //Smooth increase
         if(!flashing && !wait_two_seconds){
-            if(lastUpdateTickTime == 6){
+            if(lastUpdateTickTime >= 6){
                 if(alpha < 1f){
                     alpha += 0.1;
                     if(alpha > 1)
@@ -193,14 +193,17 @@ public class RoundOverlay implements HudRenderCallback {
         texture3 = null;
 
         // Assign textures based on the number of digits in the round number
-        if (length >= 1) {
+        if (length == 1) {
             texture1 = getTextureForDigit(roundStr.charAt(length - 1) - '0');
-        }
-        if (length >= 2) {
+
+        }else if (length == 2) {
+            texture2 = getTextureForDigit(roundStr.charAt(length - 1) - '0');
+            texture1 = getTextureForDigit(roundStr.charAt(length - 2) - '0');
+
+        }else if(length == 3) {
+            texture3 = getTextureForDigit(roundStr.charAt(length - 1) - '0');
             texture2 = getTextureForDigit(roundStr.charAt(length - 2) - '0');
-        }
-        if (length >= 3) {
-            texture3 = getTextureForDigit(roundStr.charAt(length - 3) - '0');
+            texture1 = getTextureForDigit(roundStr.charAt(length - 3) - '0');
         }
     }
 
