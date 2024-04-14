@@ -54,7 +54,8 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
     public UUID gameUUID;
     private boolean started = false;
     private int round = 0;
-    private int zombiesInRound = 0;
+    private int zombiesRemainingInRound = 0;
+    private int zombiesInRound;
     private int killedZombiesInRound = 0;
     private int spawnLuck = 7;//TODO: Faire une classe GameSpawnManager
     private int roundStartDelay = 0;
@@ -90,10 +91,14 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
     @Override
     protected void writeNbt(NbtCompound nbt){
         nbt.putString("map_controller.mapname", this.mapName);
+
         nbt.putInt("map_controller.round", this.round);
         nbt.putBoolean("map_controller.round_started", this.roundStarted);
+
+        nbt.putInt("map_controller.zombies_remaining_in_round", this.zombiesRemainingInRound);
         nbt.putInt("map_controller.zombies_in_round", this.zombiesInRound);
         nbt.putInt("map_controller.killed_zombies_in_round", this.killedZombiesInRound);
+
         nbt.putBoolean("map_controller.started", this.started);
         nbt.put("map_controller.position_a", NbtHelper.fromBlockPos(posA));
         nbt.put("map_controller.position_b", NbtHelper.fromBlockPos(posB));
@@ -126,6 +131,9 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
         if (nbt.contains("map_controller.round_started"))
             this.roundStarted = nbt.getBoolean("map_controller.round_started");
+
+        if (nbt.contains("map_controller.zombies_remaining_in_round"))
+            this.zombiesRemainingInRound = nbt.getInt("map_controller.zombies_remaining_in_round");
 
         if (nbt.contains("map_controller.zombies_in_round"))
             this.zombiesInRound = nbt.getInt("map_controller.zombies_in_round");
@@ -196,10 +204,12 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
             //If all the players are ready
             if(round == 0 && !playerManager.areAllSubscribedPlayersReady()) return;
+
             //Teleport all the players when all are ready
             if(round == 0) teleportAllPlayerInFirstZone();
 
             //Pause if none players connected
+            //Pay attention from the fact that your UUID change everytime in dev
             if(playerManager.getConnectedSubscribedPlayers().size() == 0) return;
 
             manageRounds();
@@ -242,7 +252,7 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
     }
 
     private boolean haveAllZombiesBeenKilled() {
-        return killedZombiesInRound == calculateZombiesInRound() && roundStarted;
+        return killedZombiesInRound == zombiesInRound && roundStarted;
     }
 
     private void prepareForNextRound() {
@@ -274,7 +284,7 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
         return serverWorld.getEntitiesByClass(
                 StandingZombieEntity.class,
-                new Box(this.pos.getX()-1500, this.pos.getY()-512, this.pos.getZ()-1500, this.pos.getX() + 1500, this.pos.getY() + 512, this.pos.getZ()+1500),
+                new Box(this.posA.getX(), this.posA.getY(), this.posA.getZ(), this.posB.getX(), this.posB.getY(), this.posB.getZ()),
                 (entity) -> true);
     }
 
@@ -368,7 +378,7 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
     public void setKilledZombiesInRound(int killedZombiesInRound) {
         this.killedZombiesInRound = killedZombiesInRound;
         markDirty();
-        ZMCMod.LOGGER.info(this.killedZombiesInRound + "/" + calculateZombiesInRound());
+        ZMCMod.LOGGER.info(killedZombiesInRound + "/" + zombiesInRound);
     }
 
     //Press button start -> Create a room -> (If each players are ready) -> Start map
@@ -405,7 +415,6 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         }
 
         ServerWorld serverWorld = (ServerWorld) world;
-        MinecraftServer server = serverWorld.getServer();
 
         ZoneControllerBlockEntity zoneControllerBlockEntity = ((ZoneControllerBlockEntity) world.getBlockEntity(this.linkedZoneController));
 
@@ -414,13 +423,8 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         double spawnY = spawnPoint.getY();
         double spawnZ = spawnPoint.getZ() + 0.5;
 
-        List<UUID> playersUUID = playerManager.getSubscribedPlayers();
-
-        for (UUID playerUUID : playersUUID) {
-            ServerPlayerEntity player = server.getPlayerManager().getPlayer(playerUUID);
-            if (player != null) {
-                player.teleport(serverWorld, spawnX, spawnY, spawnZ, player.getYaw(), player.getPitch());
-            }
+        for (PlayerEntity player : playerManager.getConnectedSubscribedPlayers()) {
+            ((ServerPlayerEntity) player).teleport(serverWorld, spawnX, spawnY, spawnZ, player.getYaw(), player.getPitch());
         }
     }
 
@@ -520,6 +524,7 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
     public void setZombiesInRound(int zombiesInRound) {
         this.zombiesInRound = zombiesInRound;
+        this.zombiesRemainingInRound = zombiesInRound;
         markDirty();
     }
 
@@ -556,14 +561,14 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
         //Map started => SpawnZombie if we doesn't exceed the number of zombie on the map
         //Normally chance < 7
-        if(luck < spawnLuck && this.zombiesInRound > 0) {
+        if(luck < spawnLuck && this.zombiesRemainingInRound > 0) {
 
             ZoneControllerBlockEntity zone = getRandomZoneOccupiedByPlayer();
             if(zone != null &&
                 zone.getAllLinkedBlocks(SmallZombieWindowBlockEntity.class).size() > 0){
                 try{
                     zone.spawnZombie(true);
-                    zombiesInRound--;
+                    zombiesRemainingInRound--;
                 }catch (Exception e){
                     ZMCMod.LOGGER.error(e.getMessage(), e);
                 }

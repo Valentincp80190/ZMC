@@ -3,13 +3,13 @@ package com.aureskull.zmcmod.util;
 import java.util.UUID;
 
 public class PlayerData {
-    private UUID gameUUID;
+    private static UUID gameUUID;
     private boolean ready;
 
     //NOT NBT
     public static boolean displayHUD = false;
 
-    public UUID getGameUUID() {
+    public static UUID getGameUUID() {
         return gameUUID;
     }
 

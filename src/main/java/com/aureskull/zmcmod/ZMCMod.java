@@ -31,7 +31,6 @@ public class ZMCMod implements ModInitializer {
 		//TODO: BUG - Des zombies restent bloqués dans la porte de temps en temps
 		//TODO: BUG - Le joueur entend les sons de commencement de manche alors qu'il n'est pas sur la map
 		//TODO: BUG - Voir pourquoi les zones controller continue de ticker même si l'on est à 1000 blocs
-		//TODO: BUG - les zombies n'attaque pas un joueur qui ne bouge pas.
 		//TODO: BUG - Lorsqu'un zombie n'a pas pu apparaitre (pas de spawner associé à une fenêtre par exemple), le compteur de zombie est tout de même décrémenté. Il faut créer une méthode permettant de décrémenter le nombre de zombie à faire spawner
 		ModItemGroup.registerItemGroups();
 		ModItems.registerModItems();

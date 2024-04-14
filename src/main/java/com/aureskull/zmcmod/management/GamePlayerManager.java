@@ -1,5 +1,6 @@
 package com.aureskull.zmcmod.management;
 
+import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.entity.MapControllerBlockEntity;
 import com.aureskull.zmcmod.util.PlayerData;
 import com.aureskull.zmcmod.util.StateSaverAndLoader;
@@ -9,6 +10,7 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.server.MinecraftServer;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -88,16 +90,30 @@ public class GamePlayerManager {
         List<PlayerEntity> connectedPlayers = new ArrayList<>();
         MinecraftServer server = mapControllerBlockEntity.getWorld().getServer();
 
-        for(UUID subscribedPlayerUUID : subscribedPlayers){
-            PlayerEntity player = server.getPlayerManager().getPlayer(subscribedPlayerUUID);
-            if(player != null){
-                PlayerData playerData = StateSaverAndLoader.getPlayerState(player);
-                if(playerData.getGameUUID() != null && playerData.getGameUUID() == mapControllerBlockEntity.gameUUID)
-                    connectedPlayers.add(player);
-                else subscribedPlayers.remove(player.getUuid());
+        if (server == null) {
+            ZMCMod.LOGGER.error("Server instance is null");
+            return connectedPlayers;
+        }
+
+        try{
+            Iterator<UUID> iterator = subscribedPlayers.iterator();
+            while(iterator.hasNext()){
+                UUID subscribedPlayerUUID = iterator.next();
+                PlayerEntity player = server.getPlayerManager().getPlayer(subscribedPlayerUUID);
+                if(player != null){
+                    PlayerData playerData = StateSaverAndLoader.getPlayerState(player);
+                    if(playerData.getGameUUID() != null && playerData.getGameUUID().equals(mapControllerBlockEntity.gameUUID)) {
+                        connectedPlayers.add(player);
+                    } else {
+                        iterator.remove();
+                    }
+                }
             }
+        }catch (Exception e){
+            ZMCMod.LOGGER.error("An error occurred when recover the subscribed players : " + e.getMessage() + e.getStackTrace());
         }
 
         return connectedPlayers;
     }
+
 }

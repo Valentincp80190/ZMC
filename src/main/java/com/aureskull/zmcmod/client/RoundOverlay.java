@@ -60,10 +60,15 @@ public class RoundOverlay implements HudRenderCallback {
     @Override
     public void onHudRender(DrawContext drawContext, float tickDelta) {
         MinecraftClient client = MinecraftClient.getInstance();
-        if (currentRoundNumber > 0 && client != null && client.world != null && client.player != null && PlayerData.displayHUD) {
+        if (currentRoundNumber > 0 &&
+                client != null &&
+                client.world != null &&
+                client.player != null &&
+                PlayerData.displayHUD &&
+                PlayerData.getGameUUID() != null) {
             if(currentRoundNumber > 1 && currentRoundNumber != tempRoundNumber){
                 flashing = true;
-            }
+            }else if(currentRoundNumber == 1) refreshRoundTextures();
 
             tempRoundNumber = currentRoundNumber;
 
