@@ -42,15 +42,15 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class MapControllerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ILinkable {
-    public BlockPos posA = new BlockPos(pos.getX() - 64, pos.getY() - 10, pos.getZ() - 64);
-    public BlockPos posB = new BlockPos(pos.getX() + 64, pos.getY() + 24, pos.getZ() + 64);
+    private BlockPos posA = new BlockPos(pos.getX() - 64, pos.getY() - 10, pos.getZ() - 64);
+    private BlockPos posB = new BlockPos(pos.getX() + 64, pos.getY() + 24, pos.getZ() + 64);
 
     private static final int MAX_ZOMBIES = 24;//TODO: A multiplier par le nombre de joueur
     private final int ROUND_ONE_ZOMBIES = 6;//TODO: Faire une classe GameRoundManager
 
     private static final int NEXT_ROUND_DELAY_TICKS = 220; // 11 seconds in ticks
 
-    public String mapName = "";
+    private String mapName = "";
     public UUID gameUUID;
     private boolean started = false;
     private int round = 0;
@@ -115,7 +115,7 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         }
 
         nbt.put("map_controller.subscribed_players", playerManager.writeSubscribedPlayersToNbt());
-        ZMCMod.LOGGER.info("Writing Subscribed Players to NBT: " + playerManager.getSubscribedPlayers());
+        //ZMCMod.LOGGER.info("Writing Subscribed Players to NBT: " + playerManager.getSubscribedPlayers());
 
         super.writeNbt(nbt);
     }
@@ -162,7 +162,7 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         if (nbt.contains("map_controller.subscribed_players", 9)) {
             NbtList uuidList = nbt.getList("map_controller.subscribed_players", 10); // 10 is the tag type for compound
             playerManager.readSubscribedPlayersFromNbt(uuidList);
-            ZMCMod.LOGGER.info("Subscribed players after reading from NBT: " + playerManager.getSubscribedPlayers());
+            //ZMCMod.LOGGER.info("Subscribed players after reading from NBT: " + playerManager.getSubscribedPlayers());
         }
 
         if(started && gameUUID != null && getWorld() != null)
@@ -676,5 +676,29 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
     public boolean existSubscribedPlayer(UUID plauerUuid){
         return playerManager.existSubscribedPlayer(plauerUuid);
+    }
+
+    public BlockPos getPosA() {
+        return posA;
+    }
+
+    public BlockPos getPosB() {
+        return posB;
+    }
+
+    public void setPosA(BlockPos posA) {
+        this.posA = posA;
+    }
+
+    public void setPosB(BlockPos posB) {
+        this.posB = posB;
+    }
+
+    public String getMapName() {
+        return mapName;
+    }
+
+    public void setMapName(String mapName) {
+        this.mapName = mapName;
     }
 }

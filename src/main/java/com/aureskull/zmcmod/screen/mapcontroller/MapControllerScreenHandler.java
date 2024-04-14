@@ -11,9 +11,10 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.util.math.BlockPos;
 
 public class MapControllerScreenHandler extends ScreenHandler {
-    public final MapControllerBlockEntity blockEntity;
+    public final MapControllerBlockEntity mapControllerBlockEntity;
 
     public MapControllerScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
         this(syncId, playerInventory.player.getWorld().getBlockEntity(buf.readBlockPos()));
@@ -21,7 +22,7 @@ public class MapControllerScreenHandler extends ScreenHandler {
 
     public MapControllerScreenHandler(int syncId, BlockEntity blockEntity) {
         super(ModScreenHandlers.MAP_CONTROLLER_SCREEN_HANDLER, syncId);
-        this.blockEntity = ((MapControllerBlockEntity) blockEntity);
+        this.mapControllerBlockEntity = ((MapControllerBlockEntity) blockEntity);
     }
 
     @Override
@@ -37,26 +38,40 @@ public class MapControllerScreenHandler extends ScreenHandler {
     public void updateMapName(String newMapName) {
         updateMapNameOnServer(newMapName);
 
-        this.blockEntity.mapName = newMapName;
-        this.blockEntity.markDirty();
+        this.mapControllerBlockEntity.setMapName(newMapName);
+        this.mapControllerBlockEntity.markDirty();
     }
 
     public void updateMapNameOnServer(String newMapName) {
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
         buf.writeString(newMapName);
-        buf.writeBlockPos(this.blockEntity.getPos());
+        buf.writeBlockPos(this.mapControllerBlockEntity.getPos());
         ClientPlayNetworking.send(ModMessages.MAP_CONTROLLER_UPDATE_MAP_NAME, buf);
     }
-
-    public String getMapName(){
-        return this.blockEntity.mapName;
-    }
-
 
     public void updateStartGameOnServer(Boolean isStarted) {
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
         buf.writeBoolean(isStarted);
-        buf.writeBlockPos(this.blockEntity.getPos());
+        buf.writeBlockPos(this.mapControllerBlockEntity.getPos());
         ClientPlayNetworking.send(ModMessages.MAP_CONTROLLER_UPDATE_START_STATE, buf);
+    }
+
+    private void updatePosOnServer(BlockPos newPos, String posVariable) {
+        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+        buf.writeBlockPos(this.mapControllerBlockEntity.getPos());
+        buf.writeBlockPos(newPos);
+        buf.writeString(posVariable);
+        ClientPlayNetworking.send(ModMessages.MAP_CONTROLLER_UPDATE_POS, buf);
+    }
+
+    public void updatePos(BlockPos newPos, String posVariable){
+        updatePosOnServer(newPos, posVariable);
+
+        if(posVariable.equals("posA"))
+            mapControllerBlockEntity.setPosA(newPos);
+        else if(posVariable.equals("posB"))
+            mapControllerBlockEntity.setPosB(newPos);
+
+        mapControllerBlockEntity.markDirty();
     }
 }

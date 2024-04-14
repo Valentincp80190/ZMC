@@ -36,10 +36,10 @@ public class ZoneControllerScreen extends HandledScreen<ZoneControllerScreenHand
 
 
 
-    public SliderWidget redSlider = new SliderWidget(0, 0, SLIDER_WIDTH, 20, Text.literal("Red: " + convertTo255( handler.getRed() )).styled(style -> style.withColor(TextColor.fromRgb(0xFF0000))), handler.getRed()) {
+    public SliderWidget redSlider = new SliderWidget(0, 0, SLIDER_WIDTH, 20, Text.literal("Red: " + convertTo255( handler.zoneControllerBlockEntity.getRed() )).styled(style -> style.withColor(TextColor.fromRgb(0xFF0000))), handler.zoneControllerBlockEntity.getRed()) {
         @Override
         protected void updateMessage() {
-            this.setMessage(Text.literal("Red: " + convertTo255( handler.getRed() )).styled(style -> style.withColor(TextColor.fromRgb(0xFF0000))));
+            this.setMessage(Text.literal("Red: " + convertTo255( handler.zoneControllerBlockEntity.getRed() )).styled(style -> style.withColor(TextColor.fromRgb(0xFF0000))));
         }
 
         @Override
@@ -48,10 +48,10 @@ public class ZoneControllerScreen extends HandledScreen<ZoneControllerScreenHand
         }
     };
 
-    public SliderWidget greenSlider = new SliderWidget(0, 0, SLIDER_WIDTH, 20, Text.literal("Green: " + convertTo255( handler.getGreen() )).styled(style -> style.withColor(TextColor.fromRgb(0x00FF00))), handler.getGreen()) {
+    public SliderWidget greenSlider = new SliderWidget(0, 0, SLIDER_WIDTH, 20, Text.literal("Green: " + convertTo255( handler.zoneControllerBlockEntity.getGreen() )).styled(style -> style.withColor(TextColor.fromRgb(0x00FF00))), handler.zoneControllerBlockEntity.getGreen()) {
         @Override
         protected void updateMessage() {
-            this.setMessage(Text.literal("Green: " + convertTo255( handler.getGreen() )).styled(style -> style.withColor(TextColor.fromRgb(0x00FF00))));
+            this.setMessage(Text.literal("Green: " + convertTo255( handler.zoneControllerBlockEntity.getGreen() )).styled(style -> style.withColor(TextColor.fromRgb(0x00FF00))));
         }
 
         @Override
@@ -60,10 +60,10 @@ public class ZoneControllerScreen extends HandledScreen<ZoneControllerScreenHand
         }
     };
 
-    public SliderWidget blueSlider = new SliderWidget(0, 0, SLIDER_WIDTH, 20, Text.literal("Blue: " + convertTo255( handler.getBlue() )).styled(style -> style.withColor(TextColor.fromRgb(0x0000FF))), handler.getBlue()) {
+    public SliderWidget blueSlider = new SliderWidget(0, 0, SLIDER_WIDTH, 20, Text.literal("Blue: " + convertTo255( handler.zoneControllerBlockEntity.getBlue() )).styled(style -> style.withColor(TextColor.fromRgb(0x0000FF))), handler.zoneControllerBlockEntity.getBlue()) {
         @Override
         protected void updateMessage() {
-            this.setMessage(Text.literal("Blue: " + convertTo255( handler.getBlue() )).styled(style -> style.withColor(TextColor.fromRgb(0x0000FF))));
+            this.setMessage(Text.literal("Blue: " + convertTo255( handler.zoneControllerBlockEntity.getBlue() )).styled(style -> style.withColor(TextColor.fromRgb(0x0000FF))));
         }
 
         @Override
@@ -76,23 +76,23 @@ public class ZoneControllerScreen extends HandledScreen<ZoneControllerScreenHand
     private TextFieldWidget posAXTextField;
 
     public ButtonWidget incrementPosAXButtonWidget = ButtonWidget.builder(Text.literal("˄"), button -> {
-                BlockPos posA = this.handler.getPosA();
+                BlockPos posA = this.handler.zoneControllerBlockEntity.getPosA();
 
                 BlockPos newPosA = new BlockPos(posA.getX() + 1, posA.getY(), posA.getZ());
                 this.handler.updatePos(newPosA, "posA");
 
-                posAXTextField.setText(String.valueOf(this.handler.getPosA().getX()));
+                posAXTextField.setText(String.valueOf(this.handler.zoneControllerBlockEntity.getPosA().getX()));
             })
             .dimensions(0, 0, 10, 10)
             .build();
 
     public ButtonWidget decrementPosAXButtonWidget = ButtonWidget.builder(Text.literal("˅"), button -> {
-                BlockPos posA = this.handler.getPosA();
+                BlockPos posA = this.handler.zoneControllerBlockEntity.getPosA();
 
                 BlockPos newPosA = new BlockPos(posA.getX() - 1, posA.getY(), posA.getZ());
                 this.handler.updatePos(newPosA, "posA");
 
-                posAXTextField.setText(String.valueOf(this.handler.getPosA().getX()));
+                posAXTextField.setText(String.valueOf(this.handler.zoneControllerBlockEntity.getPosA().getX()));
             })
             .dimensions(0, 0, 10, 10)
             .build();
@@ -100,23 +100,23 @@ public class ZoneControllerScreen extends HandledScreen<ZoneControllerScreenHand
     private TextFieldWidget posAYTextField;
 
     public ButtonWidget incrementPosAYButtonWidget = ButtonWidget.builder(Text.literal("˄"), button -> {
-                BlockPos posA = this.handler.getPosA();
+                BlockPos posA = this.handler.zoneControllerBlockEntity.getPosA();
 
                 BlockPos newPosA = new BlockPos(posA.getX(), posA.getY() + 1, posA.getZ());
                 this.handler.updatePos(newPosA, "posA");
 
-                posAYTextField.setText(String.valueOf(this.handler.getPosA().getY()));
+                posAYTextField.setText(String.valueOf(this.handler.zoneControllerBlockEntity.getPosA().getY()));
             })
             .dimensions(0, 0, INC_DEC_SIZE_POS_BUTTON, INC_DEC_SIZE_POS_BUTTON)
             .build();
 
     public ButtonWidget decrementPosAYButtonWidget = ButtonWidget.builder(Text.literal("˅"), button -> {
-                BlockPos posA = this.handler.getPosA();
+                BlockPos posA = this.handler.zoneControllerBlockEntity.getPosA();
 
                 BlockPos newPosA = new BlockPos(posA.getX(), posA.getY() - 1, posA.getZ());
                 this.handler.updatePos(newPosA, "posA");
 
-                posAYTextField.setText(String.valueOf(this.handler.getPosA().getY()));
+                posAYTextField.setText(String.valueOf(this.handler.zoneControllerBlockEntity.getPosA().getY()));
             })
             .dimensions(0, 0, INC_DEC_SIZE_POS_BUTTON, INC_DEC_SIZE_POS_BUTTON)
             .build();
@@ -124,23 +124,23 @@ public class ZoneControllerScreen extends HandledScreen<ZoneControllerScreenHand
     private TextFieldWidget posAZTextField;
 
     public ButtonWidget incrementPosAZButtonWidget = ButtonWidget.builder(Text.literal("˄"), button -> {
-                BlockPos posA = this.handler.getPosA();
+                BlockPos posA = this.handler.zoneControllerBlockEntity.getPosA();
 
                 BlockPos newPosA = new BlockPos(posA.getX(), posA.getY(), posA.getZ() + 1);
                 this.handler.updatePos(newPosA, "posA");
 
-                posAZTextField.setText(String.valueOf(this.handler.getPosA().getZ()));
+                posAZTextField.setText(String.valueOf(this.handler.zoneControllerBlockEntity.getPosA().getZ()));
             })
             .dimensions(0, 0, INC_DEC_SIZE_POS_BUTTON, INC_DEC_SIZE_POS_BUTTON)
             .build();
 
     public ButtonWidget decrementPosAZButtonWidget = ButtonWidget.builder(Text.literal("˅"), button -> {
-                BlockPos posA = this.handler.getPosA();
+                BlockPos posA = this.handler.zoneControllerBlockEntity.getPosA();
 
                 BlockPos newPosA = new BlockPos(posA.getX(), posA.getY(), posA.getZ() - 1);
                 this.handler.updatePos(newPosA, "posA");
 
-                posAZTextField.setText(String.valueOf(this.handler.getPosA().getZ()));
+                posAZTextField.setText(String.valueOf(this.handler.zoneControllerBlockEntity.getPosA().getZ()));
             })
             .dimensions(0, 0, INC_DEC_SIZE_POS_BUTTON, INC_DEC_SIZE_POS_BUTTON)
             .build();
@@ -151,23 +151,23 @@ public class ZoneControllerScreen extends HandledScreen<ZoneControllerScreenHand
     private TextFieldWidget posBXTextField;
 
     public ButtonWidget incrementPosBXButtonWidget = ButtonWidget.builder(Text.literal("˄"), button -> {
-                BlockPos posB = this.handler.getPosB();
+                BlockPos posB = this.handler.zoneControllerBlockEntity.getPosB();
 
                 BlockPos newPosB = new BlockPos(posB.getX() + 1, posB.getY(), posB.getZ());
                 this.handler.updatePos(newPosB, "posB");
 
-                posBXTextField.setText(String.valueOf(this.handler.getPosB().getX()));
+                posBXTextField.setText(String.valueOf(this.handler.zoneControllerBlockEntity.getPosB().getX()));
             })
             .dimensions(0, 0, 10, 10)
             .build();
 
     public ButtonWidget decrementPosBXButtonWidget = ButtonWidget.builder(Text.literal("˅"), button -> {
-                BlockPos posB = this.handler.getPosB();
+                BlockPos posB = this.handler.zoneControllerBlockEntity.getPosB();
 
                 BlockPos newPosB = new BlockPos(posB.getX() - 1, posB.getY(), posB.getZ());
                 this.handler.updatePos(newPosB, "posB");
 
-                posBXTextField.setText(String.valueOf(this.handler.getPosB().getX()));
+                posBXTextField.setText(String.valueOf(this.handler.zoneControllerBlockEntity.getPosB().getX()));
             })
             .dimensions(0, 0, 10, 10)
             .build();
@@ -175,23 +175,23 @@ public class ZoneControllerScreen extends HandledScreen<ZoneControllerScreenHand
     private TextFieldWidget posBYTextField;
 
     public ButtonWidget incrementPosBYButtonWidget = ButtonWidget.builder(Text.literal("˄"), button -> {
-                BlockPos posB = this.handler.getPosB();
+                BlockPos posB = this.handler.zoneControllerBlockEntity.getPosB();
 
                 BlockPos newPosB = new BlockPos(posB.getX(), posB.getY() + 1, posB.getZ());
                 this.handler.updatePos(newPosB, "posB");
 
-                posBYTextField.setText(String.valueOf(this.handler.getPosB().getY()));
+                posBYTextField.setText(String.valueOf(this.handler.zoneControllerBlockEntity.getPosB().getY()));
             })
             .dimensions(0, 0, INC_DEC_SIZE_POS_BUTTON, INC_DEC_SIZE_POS_BUTTON)
             .build();
 
     public ButtonWidget decrementPosBYButtonWidget = ButtonWidget.builder(Text.literal("˅"), button -> {
-                BlockPos posB = this.handler.getPosB();
+                BlockPos posB = this.handler.zoneControllerBlockEntity.getPosB();
 
                 BlockPos newPosB = new BlockPos(posB.getX(), posB.getY() - 1, posB.getZ());
                 this.handler.updatePos(newPosB, "posB");
 
-                posBYTextField.setText(String.valueOf(this.handler.getPosB().getY()));
+                posBYTextField.setText(String.valueOf(this.handler.zoneControllerBlockEntity.getPosB().getY()));
             })
             .dimensions(0, 0, INC_DEC_SIZE_POS_BUTTON, INC_DEC_SIZE_POS_BUTTON)
             .build();
@@ -199,23 +199,23 @@ public class ZoneControllerScreen extends HandledScreen<ZoneControllerScreenHand
     private TextFieldWidget posBZTextField;
 
     public ButtonWidget incrementPosBZButtonWidget = ButtonWidget.builder(Text.literal("˄"), button -> {
-                BlockPos posB = this.handler.getPosB();
+                BlockPos posB = this.handler.zoneControllerBlockEntity.getPosB();
 
                 BlockPos newPosB = new BlockPos(posB.getX(), posB.getY(), posB.getZ() + 1);
                 this.handler.updatePos(newPosB, "posB");
 
-                posBZTextField.setText(String.valueOf(this.handler.getPosB().getZ()));
+                posBZTextField.setText(String.valueOf(this.handler.zoneControllerBlockEntity.getPosB().getZ()));
             })
             .dimensions(0, 0, INC_DEC_SIZE_POS_BUTTON, INC_DEC_SIZE_POS_BUTTON)
             .build();
 
     public ButtonWidget decrementPosBZButtonWidget = ButtonWidget.builder(Text.literal("˅"), button -> {
-                BlockPos posB = this.handler.getPosB();
+                BlockPos posB = this.handler.zoneControllerBlockEntity.getPosB();
 
                 BlockPos newPosB = new BlockPos(posB.getX(), posB.getY(), posB.getZ() - 1);
                 this.handler.updatePos(newPosB, "posB");
 
-                posBZTextField.setText(String.valueOf(this.handler.getPosB().getZ()));
+                posBZTextField.setText(String.valueOf(this.handler.zoneControllerBlockEntity.getPosB().getZ()));
             })
             .dimensions(0, 0, INC_DEC_SIZE_POS_BUTTON, INC_DEC_SIZE_POS_BUTTON)
             .build();
@@ -225,7 +225,7 @@ public class ZoneControllerScreen extends HandledScreen<ZoneControllerScreenHand
     private TextFieldWidget spawnPosXTextField;
 
     public ButtonWidget incrementSpawnPosXButtonWidget = ButtonWidget.builder(Text.literal("˄"), button -> {
-                BlockPos spawnPoint = this.handler.blockEntity.getSpawnPoint();
+                BlockPos spawnPoint = this.handler.zoneControllerBlockEntity.getSpawnPoint();
 
                 BlockPos newSpawnPoint = new BlockPos(spawnPoint.getX() + 1, spawnPoint.getY(), spawnPoint.getZ());
                 this.handler.updatePos(newSpawnPoint, "spawnPos");
@@ -236,7 +236,7 @@ public class ZoneControllerScreen extends HandledScreen<ZoneControllerScreenHand
             .build();
 
     public ButtonWidget decrementSpawnPosXButtonWidget = ButtonWidget.builder(Text.literal("˅"), button -> {
-                BlockPos spawnPoint = this.handler.blockEntity.getSpawnPoint();
+                BlockPos spawnPoint = this.handler.zoneControllerBlockEntity.getSpawnPoint();
 
                 BlockPos newSpawnPoint = new BlockPos(spawnPoint.getX() - 1, spawnPoint.getY(), spawnPoint.getZ());
                 this.handler.updatePos(newSpawnPoint, "spawnPos");
@@ -249,7 +249,7 @@ public class ZoneControllerScreen extends HandledScreen<ZoneControllerScreenHand
     private TextFieldWidget spawnPosYTextField;
 
     public ButtonWidget incrementSpawnPosYButtonWidget = ButtonWidget.builder(Text.literal("˄"), button -> {
-                BlockPos spawnPoint = this.handler.blockEntity.getSpawnPoint();
+                BlockPos spawnPoint = this.handler.zoneControllerBlockEntity.getSpawnPoint();
 
                 BlockPos newSpawnPoint = new BlockPos(spawnPoint.getX(), spawnPoint.getY() + 1, spawnPoint.getZ());
                 this.handler.updatePos(newSpawnPoint, "spawnPos");
@@ -260,7 +260,7 @@ public class ZoneControllerScreen extends HandledScreen<ZoneControllerScreenHand
             .build();
 
     public ButtonWidget decrementSpawnPosYButtonWidget = ButtonWidget.builder(Text.literal("˅"), button -> {
-                BlockPos spawnPoint = this.handler.blockEntity.getSpawnPoint();
+                BlockPos spawnPoint = this.handler.zoneControllerBlockEntity.getSpawnPoint();
 
                 BlockPos newSpawnPoint = new BlockPos(spawnPoint.getX(), spawnPoint.getY() - 1, spawnPoint.getZ());
                 this.handler.updatePos(newSpawnPoint, "spawnPos");
@@ -273,7 +273,7 @@ public class ZoneControllerScreen extends HandledScreen<ZoneControllerScreenHand
     private TextFieldWidget spawnPosZTextField;
 
     public ButtonWidget incrementSpawnPosZButtonWidget = ButtonWidget.builder(Text.literal("˄"), button -> {
-                BlockPos spawnPoint = this.handler.blockEntity.getSpawnPoint();
+                BlockPos spawnPoint = this.handler.zoneControllerBlockEntity.getSpawnPoint();
 
                 BlockPos newSpawnPoint = new BlockPos(spawnPoint.getX(), spawnPoint.getY(), spawnPoint.getZ() + 1);
                 this.handler.updatePos(newSpawnPoint, "spawnPos");
@@ -284,7 +284,7 @@ public class ZoneControllerScreen extends HandledScreen<ZoneControllerScreenHand
             .build();
 
     public ButtonWidget decrementSpawnPosZButtonWidget = ButtonWidget.builder(Text.literal("˅"), button -> {
-                BlockPos spawnPoint = this.handler.blockEntity.getSpawnPoint();
+                BlockPos spawnPoint = this.handler.zoneControllerBlockEntity.getSpawnPoint();
 
                 BlockPos newSpawnPoint = new BlockPos(spawnPoint.getX(), spawnPoint.getY(), spawnPoint.getZ() - 1);
                 this.handler.updatePos(newSpawnPoint, "spawnPos");
@@ -301,17 +301,17 @@ public class ZoneControllerScreen extends HandledScreen<ZoneControllerScreenHand
         createElements();
         addElements();
 
-        posAXTextField.setText(String.valueOf(this.handler.getPosA().getX()));
-        posAYTextField.setText(String.valueOf(this.handler.getPosA().getY()));
-        posAZTextField.setText(String.valueOf(this.handler.getPosA().getZ()));
+        posAXTextField.setText(String.valueOf(this.handler.zoneControllerBlockEntity.getPosA().getX()));
+        posAYTextField.setText(String.valueOf(this.handler.zoneControllerBlockEntity.getPosA().getY()));
+        posAZTextField.setText(String.valueOf(this.handler.zoneControllerBlockEntity.getPosA().getZ()));
 
-        posBXTextField.setText(String.valueOf(this.handler.getPosB().getX()));
-        posBYTextField.setText(String.valueOf(this.handler.getPosB().getY()));
-        posBZTextField.setText(String.valueOf(this.handler.getPosB().getZ()));
+        posBXTextField.setText(String.valueOf(this.handler.zoneControllerBlockEntity.getPosB().getX()));
+        posBYTextField.setText(String.valueOf(this.handler.zoneControllerBlockEntity.getPosB().getY()));
+        posBZTextField.setText(String.valueOf(this.handler.zoneControllerBlockEntity.getPosB().getZ()));
 
-        spawnPosXTextField.setText(String.valueOf(this.handler.blockEntity.getSpawnPoint().getX()));
-        spawnPosYTextField.setText(String.valueOf(this.handler.blockEntity.getSpawnPoint().getY()));
-        spawnPosZTextField.setText(String.valueOf(this.handler.blockEntity.getSpawnPoint().getZ()));
+        spawnPosXTextField.setText(String.valueOf(this.handler.zoneControllerBlockEntity.getSpawnPoint().getX()));
+        spawnPosYTextField.setText(String.valueOf(this.handler.zoneControllerBlockEntity.getSpawnPoint().getY()));
+        spawnPosZTextField.setText(String.valueOf(this.handler.zoneControllerBlockEntity.getSpawnPoint().getZ()));
 
         redSlider.setPosition(width - redSlider.getWidth() - RIGHT_PADDING, 23);
         greenSlider.setPosition(width - redSlider.getWidth() - RIGHT_PADDING, redSlider.getY() + redSlider.getHeight() + PADDING);
@@ -396,17 +396,17 @@ public class ZoneControllerScreen extends HandledScreen<ZoneControllerScreenHand
     }
 
     private void createElements(){
-        posAXTextField = new TextFieldWidget(this.textRenderer, 0,  0, TEXTFIELD_WIDTH, 18, Text.of(String.valueOf(this.handler.getPosA().getX())));
-        posAYTextField = new TextFieldWidget(this.textRenderer, 0,  0, TEXTFIELD_WIDTH, 18, Text.of(String.valueOf(this.handler.getPosA().getY())));
-        posAZTextField = new TextFieldWidget(this.textRenderer, 0,  0, TEXTFIELD_WIDTH, 18, Text.of(String.valueOf(this.handler.getPosA().getZ())));
+        posAXTextField = new TextFieldWidget(this.textRenderer, 0,  0, TEXTFIELD_WIDTH, 18, Text.of(String.valueOf(this.handler.zoneControllerBlockEntity.getPosA().getX())));
+        posAYTextField = new TextFieldWidget(this.textRenderer, 0,  0, TEXTFIELD_WIDTH, 18, Text.of(String.valueOf(this.handler.zoneControllerBlockEntity.getPosA().getY())));
+        posAZTextField = new TextFieldWidget(this.textRenderer, 0,  0, TEXTFIELD_WIDTH, 18, Text.of(String.valueOf(this.handler.zoneControllerBlockEntity.getPosA().getZ())));
 
-        posBXTextField = new TextFieldWidget(this.textRenderer, 0,  0, TEXTFIELD_WIDTH, 18, Text.of(String.valueOf(this.handler.getPosB().getX())));
-        posBYTextField = new TextFieldWidget(this.textRenderer, 0,  0, TEXTFIELD_WIDTH, 18, Text.of(String.valueOf(this.handler.getPosB().getY())));
-        posBZTextField = new TextFieldWidget(this.textRenderer, 0,  0, TEXTFIELD_WIDTH, 18, Text.of(String.valueOf(this.handler.getPosB().getZ())));
+        posBXTextField = new TextFieldWidget(this.textRenderer, 0,  0, TEXTFIELD_WIDTH, 18, Text.of(String.valueOf(this.handler.zoneControllerBlockEntity.getPosB().getX())));
+        posBYTextField = new TextFieldWidget(this.textRenderer, 0,  0, TEXTFIELD_WIDTH, 18, Text.of(String.valueOf(this.handler.zoneControllerBlockEntity.getPosB().getY())));
+        posBZTextField = new TextFieldWidget(this.textRenderer, 0,  0, TEXTFIELD_WIDTH, 18, Text.of(String.valueOf(this.handler.zoneControllerBlockEntity.getPosB().getZ())));
 
-        spawnPosXTextField = new TextFieldWidget(this.textRenderer, 0,  0, TEXTFIELD_WIDTH, 18, Text.of(String.valueOf(this.handler.blockEntity.getSpawnPoint().getX())));
-        spawnPosYTextField = new TextFieldWidget(this.textRenderer, 0,  0, TEXTFIELD_WIDTH, 18, Text.of(String.valueOf(this.handler.blockEntity.getSpawnPoint().getY())));
-        spawnPosZTextField = new TextFieldWidget(this.textRenderer, 0,  0, TEXTFIELD_WIDTH, 18, Text.of(String.valueOf(this.handler.blockEntity.getSpawnPoint().getZ())));
+        spawnPosXTextField = new TextFieldWidget(this.textRenderer, 0,  0, TEXTFIELD_WIDTH, 18, Text.of(String.valueOf(this.handler.zoneControllerBlockEntity.getSpawnPoint().getX())));
+        spawnPosYTextField = new TextFieldWidget(this.textRenderer, 0,  0, TEXTFIELD_WIDTH, 18, Text.of(String.valueOf(this.handler.zoneControllerBlockEntity.getSpawnPoint().getY())));
+        spawnPosZTextField = new TextFieldWidget(this.textRenderer, 0,  0, TEXTFIELD_WIDTH, 18, Text.of(String.valueOf(this.handler.zoneControllerBlockEntity.getSpawnPoint().getZ())));
     }
 
     private void addElements(){
@@ -452,5 +452,103 @@ public class ZoneControllerScreen extends HandledScreen<ZoneControllerScreenHand
         addDrawableChild(spawnPosZTextField);
         addDrawableChild(incrementSpawnPosZButtonWidget);
         addDrawableChild(decrementSpawnPosZButtonWidget);
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        boolean result = super.mouseClicked(mouseX, mouseY, button);
+        updatePositionOnFocusLost(posAXTextField, "AX");
+        updatePositionOnFocusLost(posAYTextField, "AY");
+        updatePositionOnFocusLost(posAZTextField, "AZ");
+
+        updatePositionOnFocusLost(posBXTextField, "BX");
+        updatePositionOnFocusLost(posBYTextField, "BY");
+        updatePositionOnFocusLost(posBZTextField, "BZ");
+
+        updatePositionOnFocusLost(spawnPosXTextField, "CX");
+        updatePositionOnFocusLost(spawnPosYTextField, "CY");
+        updatePositionOnFocusLost(spawnPosZTextField, "CZ");
+        return result;
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        boolean handled = super.keyPressed(keyCode, scanCode, modifiers);
+        if (handled) {
+            updatePositionOnFocusLost(posAXTextField, "AX");
+            updatePositionOnFocusLost(posAYTextField, "AY");
+            updatePositionOnFocusLost(posAZTextField, "AZ");
+
+            updatePositionOnFocusLost(posBXTextField, "BX");
+            updatePositionOnFocusLost(posBYTextField, "BY");
+            updatePositionOnFocusLost(posBZTextField, "BZ");
+
+            updatePositionOnFocusLost(spawnPosXTextField, "CX");
+            updatePositionOnFocusLost(spawnPosYTextField, "CY");
+            updatePositionOnFocusLost(spawnPosZTextField, "CZ");
+        }
+        return handled;
+    }
+
+    private void updatePositionOnFocusLost(TextFieldWidget textField, String axis) {
+        try {
+            int newValue = Integer.parseInt(textField.getText());
+            BlockPos currentPos = null;
+
+            if(axis.startsWith("A")){
+                currentPos = handler.zoneControllerBlockEntity.getPosA();
+            }else if(axis.startsWith("B")){
+                currentPos = handler.zoneControllerBlockEntity.getPosB();
+            }else if(axis.startsWith("C")){
+                currentPos = handler.zoneControllerBlockEntity.getSpawnPoint();
+            }
+
+            BlockPos newPos = switch (axis) {
+                case "AX" -> new BlockPos(newValue, currentPos.getY(), currentPos.getZ());
+                case "AY" -> new BlockPos(currentPos.getX(), newValue, currentPos.getZ());
+                case "AZ" -> new BlockPos(currentPos.getX(), currentPos.getY(), newValue);
+                case "BX" -> new BlockPos(newValue, currentPos.getY(), currentPos.getZ());
+                case "BY" -> new BlockPos(currentPos.getX(), newValue, currentPos.getZ());
+                case "BZ" -> new BlockPos(currentPos.getX(), currentPos.getY(), newValue);
+                case "CX" -> new BlockPos(newValue, currentPos.getY(), currentPos.getZ());
+                case "CY" -> new BlockPos(currentPos.getX(), newValue, currentPos.getZ());
+                case "CZ" -> new BlockPos(currentPos.getX(), currentPos.getY(), newValue);
+                default -> currentPos;
+            };
+
+            if (axis.startsWith("A")) {
+                handler.zoneControllerBlockEntity.setPosA(newPos);
+                handler.updatePos(newPos, "posA");
+            } else if(axis.startsWith("B")){
+                handler.zoneControllerBlockEntity.setPosB(newPos);
+                handler.updatePos(newPos, "posB");
+            } else if(axis.startsWith("C")){
+                handler.zoneControllerBlockEntity.setSpawnPoint(newPos);
+                handler.updatePos(newPos, "spawnPos");
+            }
+
+            textField.setText(String.valueOf(newValue)); // Update the text field with the new value
+        } catch (NumberFormatException e) {
+            // Reset to the last valid value if the new text is not an integer
+            if (axis.charAt(0) == 'A') {
+                switch (axis.charAt(1)) {
+                    case 'X' -> textField.setText(String.valueOf(handler.zoneControllerBlockEntity.getPosA().getX()));
+                    case 'Y' -> textField.setText(String.valueOf(handler.zoneControllerBlockEntity.getPosA().getY()));
+                    case 'Z' -> textField.setText(String.valueOf(handler.zoneControllerBlockEntity.getPosA().getZ()));
+                }
+            } else if(axis.charAt(0) == 'B') {
+                switch (axis.charAt(1)) {
+                    case 'X' -> textField.setText(String.valueOf(handler.zoneControllerBlockEntity.getPosB().getX()));
+                    case 'Y' -> textField.setText(String.valueOf(handler.zoneControllerBlockEntity.getPosB().getY()));
+                    case 'Z' -> textField.setText(String.valueOf(handler.zoneControllerBlockEntity.getPosB().getZ()));
+                }
+            } else if(axis.charAt(0) == 'C') {
+                switch (axis.charAt(1)) {
+                    case 'X' -> textField.setText(String.valueOf(handler.zoneControllerBlockEntity.getSpawnPoint().getX()));
+                    case 'Y' -> textField.setText(String.valueOf(handler.zoneControllerBlockEntity.getSpawnPoint().getY()));
+                    case 'Z' -> textField.setText(String.valueOf(handler.zoneControllerBlockEntity.getSpawnPoint().getZ()));
+                }
+            }
+        }
     }
 }

@@ -27,7 +27,7 @@ public class TriggerInteractionC2SPacket {
 
             if (blockEntity instanceof SmallZombieWindowBlockEntity) {
                 ((SmallZombieWindowBlockEntity) blockEntity).rebuild();
-                //player.sendMessage(Text.literal("nbr planks : " + ((SmallZombieWindowBlockEntity) blockEntity).plank), false);
+                //player.sendMessage(Text.literal("nbr planks : " + ((SmallZombieWindowBlockEntity) mapControllerBlockEntity).plank), false);
             }
         });
     }

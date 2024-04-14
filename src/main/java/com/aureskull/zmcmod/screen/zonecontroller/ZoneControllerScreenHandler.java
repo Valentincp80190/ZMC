@@ -14,7 +14,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.math.BlockPos;
 
 public class ZoneControllerScreenHandler extends ScreenHandler {
-    public final ZoneControllerBlockEntity blockEntity;
+    public final ZoneControllerBlockEntity zoneControllerBlockEntity;
 
     public ZoneControllerScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
         this(syncId, playerInventory.player.getWorld().getBlockEntity(buf.readBlockPos()));
@@ -22,7 +22,7 @@ public class ZoneControllerScreenHandler extends ScreenHandler {
 
     public ZoneControllerScreenHandler(int syncId, BlockEntity blockEntity) {
         super(ModScreenHandlers.ZONE_CONTROLLER_SCREEN_HANDLER, syncId);
-        this.blockEntity = ((ZoneControllerBlockEntity) blockEntity);
+        this.zoneControllerBlockEntity = ((ZoneControllerBlockEntity) blockEntity);
     }
 
     @Override
@@ -35,27 +35,9 @@ public class ZoneControllerScreenHandler extends ScreenHandler {
         return true;
     }
 
-    public float getRed(){
-        return this.blockEntity.red;
-    }
-
-    public float getGreen(){return this.blockEntity.green;}
-
-    public float getBlue(){
-        return this.blockEntity.blue;
-    }
-
-    public BlockPos getPosA(){
-        return this.blockEntity.posA;
-    }
-
-    public BlockPos getPosB(){
-        return this.blockEntity.posB;
-    }
-
     private void updateZoneColorOnServer(float newColor, String colorVariable) {
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-        buf.writeBlockPos(this.blockEntity.getPos());
+        buf.writeBlockPos(this.zoneControllerBlockEntity.getPos());
         buf.writeFloat(newColor);
         buf.writeString(colorVariable);
         ClientPlayNetworking.send(ModMessages.ZONE_CONTROLLER_UPDATE_ZONE_COLOR, buf);
@@ -66,22 +48,22 @@ public class ZoneControllerScreenHandler extends ScreenHandler {
 
         switch (colorVariable){
             case("red"):
-                blockEntity.red = newColor;
+                zoneControllerBlockEntity.setRed(newColor);
                 break;
             case("green"):
-                blockEntity.green = newColor;
+                zoneControllerBlockEntity.setGreen(newColor);
                 break;
             case("blue"):
-                blockEntity.blue = newColor;
+                zoneControllerBlockEntity.setBlue(newColor);
                 break;
         }
 
-        blockEntity.markDirty();
+        zoneControllerBlockEntity.markDirty();
     }
 
     private void updatePosOnServer(BlockPos newPos, String posVariable) {
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-        buf.writeBlockPos(this.blockEntity.getPos());
+        buf.writeBlockPos(this.zoneControllerBlockEntity.getPos());
         buf.writeBlockPos(newPos);
         buf.writeString(posVariable);
         ClientPlayNetworking.send(ModMessages.ZONE_CONTROLLER_UPDATE_POS, buf);
@@ -91,12 +73,12 @@ public class ZoneControllerScreenHandler extends ScreenHandler {
         updatePosOnServer(newPos, posVariable);
 
         if(posVariable.equals("posA"))
-            blockEntity.posA = newPos;
+            zoneControllerBlockEntity.setPosA(newPos);
         else if(posVariable.equals("posB"))
-            blockEntity.posB = newPos;
+            zoneControllerBlockEntity.setPosB(newPos);
         else if(posVariable.equals("spawnPos"))
-            blockEntity.spawnPoint = newPos;
+            zoneControllerBlockEntity.setSpawnPoint(newPos);
 
-        blockEntity.markDirty();
+        zoneControllerBlockEntity.markDirty();
     }
 }

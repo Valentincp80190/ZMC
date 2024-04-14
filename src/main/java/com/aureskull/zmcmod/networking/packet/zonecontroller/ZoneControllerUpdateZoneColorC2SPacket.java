@@ -20,13 +20,13 @@ public class ZoneControllerUpdateZoneColorC2SPacket {
             if (blockEntity != null) {
                 switch (colorVariable){
                     case("red"):
-                        blockEntity.red = newColor;
+                        blockEntity.setRed(newColor);
                         break;
                     case("green"):
-                        blockEntity.green = newColor;
+                        blockEntity.setGreen(newColor);
                         break;
                     case("blue"):
-                        blockEntity.blue = newColor;
+                        blockEntity.setBlue(newColor);
                         break;
                 }
                 blockEntity.markDirty();

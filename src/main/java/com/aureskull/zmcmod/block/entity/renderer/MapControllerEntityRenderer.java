@@ -30,8 +30,8 @@ public class MapControllerEntityRenderer implements BlockEntityRenderer<MapContr
         renderZoneControllerBlockEntityLink(entity, matrices);
 
         MinecraftClient minecraftClient = MinecraftClient.getInstance();
-        BlockPos posA = entity.posA;
-        BlockPos posB = entity.posB;
+        BlockPos posA = entity.getPosA();
+        BlockPos posB = entity.getPosB();
 
         if(posA == null || posB == null) return;
 
@@ -76,8 +76,8 @@ public class MapControllerEntityRenderer implements BlockEntityRenderer<MapContr
                 renderLine(entity, matrices, f_x1, f_x2, f_y1, f_y2, f_z1, f_z2);
                 renderSide(entity, matrices, f_x1, f_x2, f_y1, f_y2, f_z1, f_z2);
 
-                renderCube(entity, matrices, entity.posA);
-                renderCube(entity, matrices, entity.posB);
+                renderCube(entity, matrices, entity.getPosA());
+                renderCube(entity, matrices, entity.getPosB());
             }
         }
     }

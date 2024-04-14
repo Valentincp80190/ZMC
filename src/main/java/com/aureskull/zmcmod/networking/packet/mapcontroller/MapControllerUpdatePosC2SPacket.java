@@ -1,27 +1,30 @@
 package com.aureskull.zmcmod.networking.packet.mapcontroller;
 
-import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.entity.MapControllerBlockEntity;
-import com.aureskull.zmcmod.networking.ModMessages;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 
-public class MapControllerUpdateMapNameC2SPacket {
-
+public class MapControllerUpdatePosC2SPacket {
     public static void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender){
-        String newMapName = buf.readString();
         BlockPos blockPos = buf.readBlockPos();
+        BlockPos newPos = buf.readBlockPos();
+        String posVariable = buf.readString();
 
         server.execute(() -> {
-            MapControllerBlockEntity blockEntity = (MapControllerBlockEntity) player.getWorld().getBlockEntity(blockPos);
+            BlockEntity blockEntity = player.getWorld().getBlockEntity(blockPos);
 
-            if (blockEntity != null) {
-                blockEntity.setMapName(newMapName);
+            if (blockEntity != null && blockEntity instanceof MapControllerBlockEntity mapControllerBlockEntity) {
+                if(new String(posVariable).equals("posA"))
+                    mapControllerBlockEntity.setPosA(newPos);
+
+                else if(new String(posVariable).equals("posB"))
+                    mapControllerBlockEntity.setPosB(newPos);
+
                 blockEntity.markDirty();
             }
         });

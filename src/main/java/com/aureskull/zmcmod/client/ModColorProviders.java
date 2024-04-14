@@ -19,9 +19,9 @@ public class ModColorProviders {
             BlockEntity entity = view.getBlockEntity(pos);
             if (entity instanceof ZoneControllerBlockEntity) {
                 ZoneControllerBlockEntity zoneControllerBlockEntity = (ZoneControllerBlockEntity) entity;
-                int red = (int)(zoneControllerBlockEntity.red * 255) & 0xFF;
-                int green = (int)(zoneControllerBlockEntity.green * 255) & 0xFF;
-                int blue = (int)(zoneControllerBlockEntity.blue * 255) & 0xFF;
+                int red = (int)(zoneControllerBlockEntity.getRed() * 255) & 0xFF;
+                int green = (int)(zoneControllerBlockEntity.getGreen() * 255) & 0xFF;
+                int blue = (int)(zoneControllerBlockEntity.getBlue() * 255) & 0xFF;
                 // Now apply the bit shifts correctly on integers
                 return (red << 16) + (green << 8) + blue;}
             return -1; // No color change for other layers

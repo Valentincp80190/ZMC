@@ -153,7 +153,7 @@ public class ModCommands {
                         }else{
                             mapControllerBlockEntity.subscribePlayer(player.getUuid());
                             if(mapControllerBlockEntity.existSubscribedPlayer(player.getUuid()))
-                                ChatMessages.sendGameSubscriptionConfirmationMessage(player, mapControllerBlockEntity.mapName);
+                                ChatMessages.sendGameSubscriptionConfirmationMessage(player, mapControllerBlockEntity.getMapName());
                             return true;
                         }
                     }

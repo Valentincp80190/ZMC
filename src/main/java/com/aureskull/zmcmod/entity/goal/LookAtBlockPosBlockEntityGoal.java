@@ -53,8 +53,8 @@ public class LookAtBlockPosBlockEntityGoal extends Goal {
 
     /*@Override
     public boolean shouldContinue(){
-        if(this.blockEntity != null){
-            if(blockEntity instanceof SmallZombieWindowBlockEntity window
+        if(this.mapControllerBlockEntity != null){
+            if(mapControllerBlockEntity instanceof SmallZombieWindowBlockEntity window
                 && entity instanceof StandingZombieEntity standingZombie) {
                 if(!standingZombie.isPassedThroughWindow()){
                     return true;

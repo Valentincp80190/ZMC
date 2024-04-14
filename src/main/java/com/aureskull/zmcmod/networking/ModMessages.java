@@ -29,6 +29,7 @@ public class ModMessages {
     public static final Identifier MAP_CONTROLLER_UPDATE_MAP_NAME = new Identifier(ZMCMod.MOD_ID, "mapcontroller_update_mapname");
     public static final Identifier MAP_CONTROLLER_UPDATE_START_STATE = new Identifier(ZMCMod.MOD_ID, "mapcontroller_update_start_state");
     public static final Identifier MAP_CONTROLLER_UPDATE_ROUND = new Identifier(ZMCMod.MOD_ID, "mapcontroller_update_round");
+    public static final Identifier MAP_CONTROLLER_UPDATE_POS = new Identifier(ZMCMod.MOD_ID, "mapcontroller_update_pos");
 
 
     //ZONE CONTROLLER
@@ -60,6 +61,7 @@ public class ModMessages {
 
         ServerPlayNetworking.registerGlobalReceiver(MAP_CONTROLLER_UPDATE_MAP_NAME, MapControllerUpdateMapNameC2SPacket::receive);
         ServerPlayNetworking.registerGlobalReceiver(MAP_CONTROLLER_UPDATE_START_STATE, MapControllerUpdateStartStateC2SPacket::receive);
+        ServerPlayNetworking.registerGlobalReceiver(MAP_CONTROLLER_UPDATE_POS, MapControllerUpdatePosC2SPacket::receive);
 
         ServerPlayNetworking.registerGlobalReceiver(ZONE_CONTROLLER_UPDATE_ZONE_COLOR, ZoneControllerUpdateZoneColorC2SPacket::receive);
         ServerPlayNetworking.registerGlobalReceiver(ZONE_CONTROLLER_UPDATE_POS, ZoneControllerUpdatePosC2SPacket::receive);
@@ -119,7 +121,7 @@ public class ModMessages {
         });
     }
 
-    public static void sendRemoveZoneLinkFromZonePacket(World world, BlockPos zonePos, BlockPos zonePosToRemove) {
+    /*public static void sendRemoveZoneLinkFromZonePacket(World world, BlockPos zonePos, BlockPos zonePosToRemove) {
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeBlockPos(zonePos);
         buf.writeBlockPos(zonePosToRemove);
@@ -128,7 +130,7 @@ public class ModMessages {
         PlayerLookup.tracking((ServerWorld) world, zonePos).forEach(player -> {
             ServerPlayNetworking.send(player, ModMessages.REMOVE_ZONE_LINK_FROM_ZONE, buf);
         });
-    }
+    }*/
 
 
     public static void sendUpdateDisplayOverlayPacket(ServerPlayerEntity player, boolean displayOverlay) {

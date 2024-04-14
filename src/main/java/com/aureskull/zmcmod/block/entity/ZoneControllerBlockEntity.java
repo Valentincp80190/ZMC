@@ -30,13 +30,13 @@ import java.util.Random;
 import java.util.random.RandomGenerator;
 
 public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ILinkable {
-    public BlockPos posA = new BlockPos(pos.getX() - 5, pos.getY() + 1, pos.getZ() - 5);
-    public BlockPos posB = new BlockPos(pos.getX() + 5, pos.getY() + 5, pos.getZ() + 5);
-    public BlockPos spawnPoint = new BlockPos(pos.getX(), pos.getY() + 2, pos.getZ());
+    private BlockPos posA = new BlockPos(pos.getX() - 5, pos.getY() + 1, pos.getZ() - 5);
+    private BlockPos posB = new BlockPos(pos.getX() + 5, pos.getY() + 5, pos.getZ() + 5);
+    private BlockPos spawnPoint = new BlockPos(pos.getX(), pos.getY() + 2, pos.getZ());
 
-    public float red = 1f;
-    public float green = 1f;
-    public float blue = 1f;
+    private float red = 1f;
+    private float green = 1f;
+    private float blue = 1f;
 
     private BlockPos linkedMapController = null;
 
@@ -457,5 +457,45 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
 
         // If no MapControllerBlockEntity is found in the hierarchy, return null
         return null;
+    }
+
+    public BlockPos getPosA() {
+        return posA;
+    }
+
+    public void setPosA(BlockPos posA) {
+        this.posA = posA;
+    }
+
+    public BlockPos getPosB() {
+        return posB;
+    }
+
+    public void setPosB(BlockPos posB) {
+        this.posB = posB;
+    }
+
+    public float getRed() {
+        return red;
+    }
+
+    public void setRed(float red) {
+        this.red = red;
+    }
+
+    public float getGreen() {
+        return green;
+    }
+
+    public void setGreen(float green) {
+        this.green = green;
+    }
+
+    public float getBlue() {
+        return blue;
+    }
+
+    public void setBlue(float blue) {
+        this.blue = blue;
     }
 }

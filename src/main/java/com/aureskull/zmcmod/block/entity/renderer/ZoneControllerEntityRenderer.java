@@ -43,8 +43,8 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
 
 
 
-        BlockPos posA = entity.posA;
-        BlockPos posB = entity.posB;
+        BlockPos posA = entity.getPosA();
+        BlockPos posB = entity.getPosB();
 
         if(posA == null || posB == null) return;
 
@@ -89,8 +89,8 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
                 renderLine(entity, matrices, f_x1, f_x2, f_y1, f_y2, f_z1, f_z2);
                 renderSide(entity, matrices, f_x1, f_x2, f_y1, f_y2, f_z1, f_z2);
 
-                renderCube(entity, matrices, entity.posA);
-                renderCube(entity, matrices, entity.posB);
+                renderCube(entity, matrices, entity.getPosA());
+                renderCube(entity, matrices, entity.getPosB());
             }
         }
     }
@@ -106,42 +106,42 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
 
         buffer.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
         //Arrêtes verticales
-        buffer.vertex(positionMatrix, f_x1, f_y1, f_z1).color(entity.red, entity.green, entity.blue, 1f).next();
-        buffer.vertex(positionMatrix, f_x1, f_y2, f_z1).color(entity.red, entity.green, entity.blue, 1f).next();
+        buffer.vertex(positionMatrix, f_x1, f_y1, f_z1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), 1f).next();
+        buffer.vertex(positionMatrix, f_x1, f_y2, f_z1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), 1f).next();
 
-        buffer.vertex(positionMatrix, f_x2, f_y1, f_z1).color(entity.red, entity.green, entity.blue, 1f).next();
-        buffer.vertex(positionMatrix, f_x2, f_y2, f_z1).color(entity.red, entity.green, entity.blue, 1f).next();
+        buffer.vertex(positionMatrix, f_x2, f_y1, f_z1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), 1f).next();
+        buffer.vertex(positionMatrix, f_x2, f_y2, f_z1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), 1f).next();
 
-        buffer.vertex(positionMatrix, f_x2, f_y1, f_z2).color(entity.red, entity.green, entity.blue, 1f).next();
-        buffer.vertex(positionMatrix, f_x2, f_y2, f_z2).color(entity.red, entity.green, entity.blue, 1f).next();
+        buffer.vertex(positionMatrix, f_x2, f_y1, f_z2).color(entity.getRed(), entity.getGreen(), entity.getBlue(), 1f).next();
+        buffer.vertex(positionMatrix, f_x2, f_y2, f_z2).color(entity.getRed(), entity.getGreen(), entity.getBlue(), 1f).next();
 
-        buffer.vertex(positionMatrix, f_x1, f_y1, f_z2).color(entity.red, entity.green, entity.blue, 1f).next();
-        buffer.vertex(positionMatrix, f_x1, f_y2, f_z2).color(entity.red, entity.green, entity.blue, 1f).next();
+        buffer.vertex(positionMatrix, f_x1, f_y1, f_z2).color(entity.getRed(), entity.getGreen(), entity.getBlue(), 1f).next();
+        buffer.vertex(positionMatrix, f_x1, f_y2, f_z2).color(entity.getRed(), entity.getGreen(), entity.getBlue(), 1f).next();
 
         //Arrêtes horrizontales
-        buffer.vertex(positionMatrix, f_x1, f_y1, f_z1).color(entity.red, entity.green, entity.blue, 1f).next();
-        buffer.vertex(positionMatrix, f_x2, f_y1, f_z1).color(entity.red, entity.green, entity.blue, 1f).next();
+        buffer.vertex(positionMatrix, f_x1, f_y1, f_z1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), 1f).next();
+        buffer.vertex(positionMatrix, f_x2, f_y1, f_z1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), 1f).next();
 
-        buffer.vertex(positionMatrix, f_x2, f_y1, f_z1).color(entity.red, entity.green, entity.blue, 1f).next();
-        buffer.vertex(positionMatrix, f_x2, f_y1, f_z2).color(entity.red, entity.green, entity.blue, 1f).next();
+        buffer.vertex(positionMatrix, f_x2, f_y1, f_z1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), 1f).next();
+        buffer.vertex(positionMatrix, f_x2, f_y1, f_z2).color(entity.getRed(), entity.getGreen(), entity.getBlue(), 1f).next();
 
-        buffer.vertex(positionMatrix, f_x2, f_y1, f_z2).color(entity.red, entity.green, entity.blue, 1f).next();
-        buffer.vertex(positionMatrix, f_x1, f_y1, f_z2).color(entity.red, entity.green, entity.blue, 1f).next();
+        buffer.vertex(positionMatrix, f_x2, f_y1, f_z2).color(entity.getRed(), entity.getGreen(), entity.getBlue(), 1f).next();
+        buffer.vertex(positionMatrix, f_x1, f_y1, f_z2).color(entity.getRed(), entity.getGreen(), entity.getBlue(), 1f).next();
 
-        buffer.vertex(positionMatrix, f_x1, f_y1, f_z2).color(entity.red, entity.green, entity.blue, 1f).next();
-        buffer.vertex(positionMatrix, f_x1, f_y1, f_z1).color(entity.red, entity.green, entity.blue, 1f).next();
+        buffer.vertex(positionMatrix, f_x1, f_y1, f_z2).color(entity.getRed(), entity.getGreen(), entity.getBlue(), 1f).next();
+        buffer.vertex(positionMatrix, f_x1, f_y1, f_z1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), 1f).next();
 
-        buffer.vertex(positionMatrix, f_x1, f_y2, f_z1).color(entity.red, entity.green, entity.blue, 1f).next();
-        buffer.vertex(positionMatrix, f_x2, f_y2, f_z1).color(entity.red, entity.green, entity.blue, 1f).next();
+        buffer.vertex(positionMatrix, f_x1, f_y2, f_z1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), 1f).next();
+        buffer.vertex(positionMatrix, f_x2, f_y2, f_z1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), 1f).next();
 
-        buffer.vertex(positionMatrix, f_x2, f_y2, f_z1).color(entity.red, entity.green, entity.blue, 1f).next();
-        buffer.vertex(positionMatrix, f_x2, f_y2, f_z2).color(entity.red, entity.green, entity.blue, 1f).next();
+        buffer.vertex(positionMatrix, f_x2, f_y2, f_z1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), 1f).next();
+        buffer.vertex(positionMatrix, f_x2, f_y2, f_z2).color(entity.getRed(), entity.getGreen(), entity.getBlue(), 1f).next();
 
-        buffer.vertex(positionMatrix, f_x2, f_y2, f_z2).color(entity.red, entity.green, entity.blue, 1f).next();
-        buffer.vertex(positionMatrix, f_x1, f_y2, f_z2).color(entity.red, entity.green, entity.blue, 1f).next();
+        buffer.vertex(positionMatrix, f_x2, f_y2, f_z2).color(entity.getRed(), entity.getGreen(), entity.getBlue(), 1f).next();
+        buffer.vertex(positionMatrix, f_x1, f_y2, f_z2).color(entity.getRed(), entity.getGreen(), entity.getBlue(), 1f).next();
 
-        buffer.vertex(positionMatrix, f_x1, f_y2, f_z2).color(entity.red, entity.green, entity.blue, 1f).next();
-        buffer.vertex(positionMatrix, f_x1, f_y2, f_z1).color(entity.red, entity.green, entity.blue, 1f).next();
+        buffer.vertex(positionMatrix, f_x1, f_y2, f_z2).color(entity.getRed(), entity.getGreen(), entity.getBlue(), 1f).next();
+        buffer.vertex(positionMatrix, f_x1, f_y2, f_z1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), 1f).next();
 
         RenderSystem.setShader(GameRenderer::getPositionColorTexProgram);
         //Sans l'image, on ne peut pas afficher les faces du cube => A corriger
@@ -171,35 +171,35 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
         float alpha = .11f;
         RenderSystem.enableBlend(); // Enable blending
 
-        buffer.vertex(positionMatrix, f_x1, f_y2, f_z1 + 0.01F).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x1, f_y1, f_z1 + 0.01F).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x2, f_y1, f_z1 + 0.01F).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x2, f_y2, f_z1 + 0.01F).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x1, f_y2, f_z1 + 0.01F).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, f_x1, f_y1, f_z1 + 0.01F).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, f_x2, f_y1, f_z1 + 0.01F).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, f_x2, f_y2, f_z1 + 0.01F).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
 
-        buffer.vertex(positionMatrix, f_x2 - 0.01F, f_y1, f_z1).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x2 - 0.01F, f_y1, f_z2).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x2 - 0.01F, f_y2, f_z2).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x2 - 0.01F, f_y2, f_z1).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x2 - 0.01F, f_y1, f_z1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, f_x2 - 0.01F, f_y1, f_z2).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, f_x2 - 0.01F, f_y2, f_z2).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, f_x2 - 0.01F, f_y2, f_z1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
 
-        buffer.vertex(positionMatrix, f_x2, f_y1, f_z2 - 0.01F).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x1, f_y1, f_z2 - 0.01F).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x1, f_y2, f_z2 - 0.01F).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x2, f_y2, f_z2 - 0.01F).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x2, f_y1, f_z2 - 0.01F).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, f_x1, f_y1, f_z2 - 0.01F).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, f_x1, f_y2, f_z2 - 0.01F).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, f_x2, f_y2, f_z2 - 0.01F).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
 
-        buffer.vertex(positionMatrix, f_x1 + 0.01F, f_y1, f_z2).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x1 + 0.01F, f_y1, f_z1).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x1 + 0.01F, f_y2, f_z1).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x1 + 0.01F, f_y2, f_z2).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x1 + 0.01F, f_y1, f_z2).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, f_x1 + 0.01F, f_y1, f_z1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, f_x1 + 0.01F, f_y2, f_z1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, f_x1 + 0.01F, f_y2, f_z2).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
 
-        buffer.vertex(positionMatrix, f_x1, f_y1+0.01F, f_z1).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x2, f_y1+0.01F, f_z1).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x2, f_y1+0.01F, f_z2).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x1, f_y1+0.01F, f_z2).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x1, f_y1+0.01F, f_z1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, f_x2, f_y1+0.01F, f_z1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, f_x2, f_y1+0.01F, f_z2).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, f_x1, f_y1+0.01F, f_z2).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
 
-        buffer.vertex(positionMatrix, f_x1, f_y2-0.01F, f_z1).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x2, f_y2-0.01F, f_z1).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x2, f_y2-0.01F, f_z2).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, f_x1, f_y2-0.01F, f_z2).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, f_x1, f_y2-0.01F, f_z1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, f_x2, f_y2-0.01F, f_z1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, f_x2, f_y2-0.01F, f_z2).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, f_x1, f_y2-0.01F, f_z2).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
 
         RenderSystem.setShader(GameRenderer::getPositionColorTexProgram);
         //Sans l'image, on ne peut pas afficher les faces du cube => A corriger
@@ -236,35 +236,35 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
         float alpha = .30f;
         RenderSystem.enableBlend();
 
-        buffer.vertex(positionMatrix, x, y+1, z).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, x+1, y+1, z).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, x+1, y, z).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, x, y, z).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, x, y+1, z).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, x+1, y+1, z).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, x+1, y, z).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, x, y, z).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
 
-        buffer.vertex(positionMatrix, x, y+1, z+1).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, x+1, y+1, z+1).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, x+1, y, z+1).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, x, y, z+1).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, x, y+1, z+1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, x+1, y+1, z+1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, x+1, y, z+1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, x, y, z+1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
 
-        buffer.vertex(positionMatrix, x+1, y+1, z+1).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, x, y+1, z+1).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, x, y+1, z).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, x+1, y+1, z).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, x+1, y+1, z+1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, x, y+1, z+1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, x, y+1, z).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, x+1, y+1, z).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
 
-        buffer.vertex(positionMatrix, x+1, y, z+1).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, x, y, z+1).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, x, y, z).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, x+1, y, z).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, x+1, y, z+1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, x, y, z+1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, x, y, z).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, x+1, y, z).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
 
-        buffer.vertex(positionMatrix, x+1, y+1, z+1).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, x+1, y+1, z).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, x+1, y, z).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, x+1, y, z+1).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, x+1, y+1, z+1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, x+1, y+1, z).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, x+1, y, z).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, x+1, y, z+1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
 
-        buffer.vertex(positionMatrix, x, y+1, z+1).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, x, y+1, z).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, x, y, z).color(entity.red, entity.green, entity.blue, alpha).next();
-        buffer.vertex(positionMatrix, x, y, z+1).color(entity.red, entity.green, entity.blue, alpha).next();
+        buffer.vertex(positionMatrix, x, y+1, z+1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, x, y+1, z).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, x, y, z).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
+        buffer.vertex(positionMatrix, x, y, z+1).color(entity.getRed(), entity.getGreen(), entity.getBlue(), alpha).next();
 
         RenderSystem.setShader(GameRenderer::getPositionColorTexProgram);
         //Sans l'image, on ne peut pas afficher les faces du cube => A corriger
