@@ -4,10 +4,13 @@ import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.ILinkable;
 import com.aureskull.zmcmod.block.custom.SmallZombieWindowBlock;
 import com.aureskull.zmcmod.client.InteractionHelper;
-import com.aureskull.zmcmod.client.MessageHudOverlay;
+import com.aureskull.zmcmod.client.overlay.MessageHudOverlay;
 import com.aureskull.zmcmod.event.ModKeyInputHandler;
 import com.aureskull.zmcmod.networking.ModMessages;
 import com.aureskull.zmcmod.sound.ModSounds;
+import com.aureskull.zmcmod.util.PlayerData;
+import com.aureskull.zmcmod.util.PlayerHelper;
+import com.aureskull.zmcmod.util.StateSaverAndLoader;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalFacingBlock;
@@ -24,6 +27,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -114,7 +118,11 @@ public class SmallZombieWindowBlockEntity extends BlockEntity implements Extende
                     for (PlayerEntity player : players) {
                         if(InteractionHelper.isFacingInteractable(player, facing) &&
                                 Math.abs(player.getY() - pos.getY()) <= 1.5) {
-                            MessageHudOverlay.setMessage("Hold [" + ModKeyInputHandler.INTERACT.getBoundKeyLocalizedText().getLiteralString() + "] to Rebuild Barrier", 100);
+                            if(PlayerHelper.isInHisMapControllerArea(player)){
+                                MessageHudOverlay.setMessage("Hold [" + ModKeyInputHandler.INTERACT.getBoundKeyLocalizedText().getLiteralString() + "] to Rebuild Barrier", Formatting.WHITE, 100);
+                            }else{
+                                MessageHudOverlay.setMessage("You are not playing in this game!", Formatting.DARK_RED, 100);
+                            }
                         }
                     }
                 }
@@ -158,7 +166,7 @@ public class SmallZombieWindowBlockEntity extends BlockEntity implements Extende
         return null;
     }
 
-    public void rebuild(){
+    public void rebuild(ServerPlayerEntity player){
         if(plank < MAX_PLANK){
             plank++;
             markDirty();
@@ -167,6 +175,9 @@ public class SmallZombieWindowBlockEntity extends BlockEntity implements Extende
             if (!world.isClient) {
                 world.setBlockState(pos, world.getBlockState(pos).with(SmallZombieWindowBlock.PLANKS, Integer.valueOf(plank)), 3);
                 world.playSound(null, pos, ModSounds.REBUILD_WINDOW, SoundCategory.BLOCKS, 0.5f, 1.0f);
+
+                PlayerData playerData = StateSaverAndLoader.getPlayerState(player);
+                playerData.addMoney(10);
                 world.playSound(null, pos, ModSounds.REBUILD_WINDOW_MONEY, SoundCategory.BLOCKS, 0.5f, 1.0f);
             }
         }

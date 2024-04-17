@@ -6,6 +6,8 @@ public class PlayerData {
     private static UUID gameUUID;
     private boolean ready;
 
+    private static int money;
+
     //NOT NBT
     public static boolean displayHUD = false;
 
@@ -15,7 +17,8 @@ public class PlayerData {
 
     public void setGameUUID(UUID gameUUID) {
         this.gameUUID = gameUUID;
-        this.ready = false;
+        ready = false;
+        money = 500;
     }
 
     public boolean isReady() {
@@ -24,5 +27,17 @@ public class PlayerData {
 
     public void setReady(boolean ready) {
         this.ready = ready;
+    }
+
+    public static int getMoney() {
+        return money;
+    }
+
+    public void setMoney(int money) {
+        this.money = money;
+    }
+
+    public void addMoney(int amount){
+        money += amount;
     }
 }

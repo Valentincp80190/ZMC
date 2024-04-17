@@ -16,6 +16,7 @@ import java.util.UUID;
 
 public class GamePlayerManager {
     private final List<UUID> subscribedPlayers = new ArrayList<>();
+
     MapControllerBlockEntity mapControllerBlockEntity;
 
     public GamePlayerManager(MapControllerBlockEntity mapControllerBlockEntity) {
@@ -116,4 +117,10 @@ public class GamePlayerManager {
         return connectedPlayers;
     }
 
+    public void resetPlayerMoney() {
+        for(PlayerEntity player : getConnectedSubscribedPlayers()){
+            PlayerData playerData = StateSaverAndLoader.getPlayerState(player);
+            playerData.setMoney(500);
+        }
+    }
 }

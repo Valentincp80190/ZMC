@@ -1,6 +1,6 @@
 package com.aureskull.zmcmod.networking.packet.player;
 
-import com.aureskull.zmcmod.client.RoundOverlay;
+import com.aureskull.zmcmod.client.overlay.RoundOverlay;
 import com.aureskull.zmcmod.util.PlayerData;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;

@@ -2,9 +2,10 @@ package com.aureskull.zmcmod;
 
 import com.aureskull.zmcmod.block.entity.renderer.ModBlockEntityRenderers;
 import com.aureskull.zmcmod.block.ModBlockRenderLayerMaps;
-import com.aureskull.zmcmod.client.MessageHudOverlay;
+import com.aureskull.zmcmod.client.overlay.MessageHudOverlay;
 import com.aureskull.zmcmod.client.ModColorProviders;
-import com.aureskull.zmcmod.client.RoundOverlay;
+import com.aureskull.zmcmod.client.overlay.MoneyOverlay;
+import com.aureskull.zmcmod.client.overlay.RoundOverlay;
 import com.aureskull.zmcmod.entity.ModEntities;
 import com.aureskull.zmcmod.entity.client.ModModelLayers;
 import com.aureskull.zmcmod.entity.client.StandingZombieModel;
@@ -34,7 +35,8 @@ public class ZMCModClient implements ClientModInitializer {
 		ModColorProviders.registerColorProviders();
 
 		HudRenderCallback.EVENT.register(new MessageHudOverlay());
-		HudRenderCallback.EVENT.register(new RoundOverlay());
+		HudRenderCallback.EVENT.register(RoundOverlay.getInstance());
+		HudRenderCallback.EVENT.register(MoneyOverlay.getInstance());
 
 		EntityRendererRegistry.register(ModEntities.STANDING_ZOMBIE, StandingZombieRenderer::new);
 		EntityModelLayerRegistry.registerModelLayer(ModModelLayers.STANDING_ZOMBIE, StandingZombieModel::getTexturedModelData);

@@ -1,21 +1,18 @@
-package com.aureskull.zmcmod.client;
+package com.aureskull.zmcmod.client.overlay;
 
 import com.aureskull.zmcmod.ZMCMod;
-import com.aureskull.zmcmod.block.entity.MapControllerBlockEntity;
 import com.aureskull.zmcmod.util.PlayerData;
-import com.aureskull.zmcmod.util.StateSaverAndLoader;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.render.*;
-import net.minecraft.client.util.Window;
 import net.minecraft.util.Identifier;
 import org.joml.Matrix4f;
 
 public class RoundOverlay implements HudRenderCallback {
+    private static RoundOverlay instance;
+
     private final Identifier DIGIT_0 = new Identifier(ZMCMod.MOD_ID, "textures/gui/sprites/round/round_digit_0.png");
     private final Identifier DIGIT_1 = new Identifier(ZMCMod.MOD_ID, "textures/gui/sprites/round/round_digit_1.png");
     private final Identifier DIGIT_2 = new Identifier(ZMCMod.MOD_ID, "textures/gui/sprites/round/round_digit_2.png");
@@ -53,7 +50,13 @@ public class RoundOverlay implements HudRenderCallback {
     private final int WAIT_TWO_SECONDS_TICK = 140;
     private int lastWaitForTwoSeconds = 0;
 
-    public RoundOverlay() {
+    private RoundOverlay() {
+    }
+
+    public static RoundOverlay getInstance(){
+        if(instance == null)
+            instance = new RoundOverlay();
+        return instance;
     }
 
 

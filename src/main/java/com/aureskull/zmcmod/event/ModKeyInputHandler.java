@@ -3,6 +3,7 @@ package com.aureskull.zmcmod.event;
 import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.networking.ModMessages;
 import com.aureskull.zmcmod.screen.NoZMCMapSavedScreen;
+import com.aureskull.zmcmod.util.PlayerHelper;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -55,9 +56,12 @@ public class ModKeyInputHandler {
                 if (client.player != null) {
                     long currentTime = System.currentTimeMillis();
                     if (currentTime - lastActionTime >= 1000) {
-                        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-                        buf.writeBlockPos(client.player.getBlockPos());
-                        ClientPlayNetworking.send(ModMessages.TRIGGER_INTERACTION, buf);
+
+                        if(PlayerHelper.isInHisMapControllerArea(client.player)){
+                            PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+                            buf.writeBlockPos(client.player.getBlockPos());
+                            ClientPlayNetworking.send(ModMessages.TRIGGER_INTERACTION, buf);
+                        }
 
                         lastActionTime = currentTime;
                     }

@@ -206,7 +206,10 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
             if(round == 0 && !playerManager.areAllSubscribedPlayersReady()) return;
 
             //Teleport all the players when all are ready
-            if(round == 0) teleportAllPlayerInFirstZone();
+            if(round == 0){
+                teleportAllPlayerInFirstZone();
+                playerManager.resetPlayerMoney();
+            }
 
             //Pause if none players connected
             //Pay attention from the fact that your UUID change everytime in dev

@@ -1,7 +1,6 @@
 package com.aureskull.zmcmod.util;
 
 import com.aureskull.zmcmod.ZMCMod;
-import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
@@ -25,6 +24,7 @@ public class StateSaverAndLoader extends PersistentState {
                 playerNbt.putUuid("zmcmod.player.gameUUID", playerData.getGameUUID());
 
             nbt.putBoolean("zmcmod.player.ready", playerData.isReady());
+            nbt.putInt("zmcmod.player.money", playerData.getMoney());
 
             playersNbt.put(uuid.toString(), playerNbt);
         });
@@ -46,6 +46,9 @@ public class StateSaverAndLoader extends PersistentState {
 
             if (playerCompound.contains("zmcmod.player.ready", 1))
                 playerData.setReady(playerCompound.getBoolean("zmcmod.player.ready"));
+
+            if (playerCompound.contains("zmcmod.player.money"))
+                playerData.setMoney(playerCompound.getInt("zmcmod.player.money"));
 
             UUID uuid = UUID.fromString(key);
             state.players.put(uuid, playerData);

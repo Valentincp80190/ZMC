@@ -1,10 +1,7 @@
 package com.aureskull.zmcmod.networking.packet.mapcontroller;
 
-import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.entity.MapControllerBlockEntity;
-import com.aureskull.zmcmod.client.RoundOverlay;
 import com.aureskull.zmcmod.sound.ModSounds;
-import com.aureskull.zmcmod.util.PlayerData;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
