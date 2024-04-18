@@ -3,20 +3,15 @@ package com.aureskull.zmcmod.event;
 import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.entity.MapControllerBlockEntity;
 import com.aureskull.zmcmod.management.GamesManager;
-import com.aureskull.zmcmod.networking.ModMessages;
 import com.aureskull.zmcmod.util.ChatMessages;
 import com.aureskull.zmcmod.util.PlayerData;
 import com.aureskull.zmcmod.util.StateSaverAndLoader;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import io.netty.buffer.Unpooled;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.command.argument.GameProfileArgumentType;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -27,8 +22,6 @@ import net.minecraft.world.World;
 
 import java.util.Collection;
 import java.util.UUID;
-
-import static net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.*;
 
 public class ModCommands {
     private static final String PREFIX = "zmc";
@@ -124,7 +117,7 @@ public class ModCommands {
                     World world = infos.getWorld(server);
 
                     if(world.getBlockEntity(infos.getBlockPos()) instanceof MapControllerBlockEntity mapControllerBlockEntity){
-                        if(mapControllerBlockEntity.existSubscribedPlayer(player.getUuid())){
+                        if(mapControllerBlockEntity.getPlayerManager().isSubscribedPlayer(player.getUuid())){
                             mapControllerBlockEntity.unsubscribePlayer(player.getUuid());
                             ChatMessages.sendGameUnsubscriptionConfirmationMessage(player);
                         }else{
@@ -148,11 +141,11 @@ public class ModCommands {
                     World world = infos.getWorld(server);
 
                     if(world.getBlockEntity(infos.getBlockPos()) instanceof MapControllerBlockEntity mapControllerBlockEntity){
-                        if(mapControllerBlockEntity.existSubscribedPlayer(player.getUuid())){
+                        if(mapControllerBlockEntity.getPlayerManager().isSubscribedPlayer(player.getUuid())){
                             ChatMessages.sendAlreadyInGameMessage(player);
                         }else{
                             mapControllerBlockEntity.subscribePlayer(player.getUuid());
-                            if(mapControllerBlockEntity.existSubscribedPlayer(player.getUuid()))
+                            if(mapControllerBlockEntity.getPlayerManager().isSubscribedPlayer(player.getUuid()))
                                 ChatMessages.sendGameSubscriptionConfirmationMessage(player, mapControllerBlockEntity.getMapName());
                             return true;
                         }

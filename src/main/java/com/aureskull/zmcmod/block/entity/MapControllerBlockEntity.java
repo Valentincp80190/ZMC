@@ -634,10 +634,6 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         return false;
     }
 
-    public boolean isPlayerPlaying(UUID playerUUID){
-        return playerManager.getSubscribedPlayers().contains(playerUUID);
-    }
-
     public GamePlayerManager getPlayerManager() {
         return playerManager;
     }
@@ -675,10 +671,6 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
         playerManager.clearSubscribedPlayers();
         markDirty();
-    }
-
-    public boolean existSubscribedPlayer(UUID plauerUuid){
-        return playerManager.existSubscribedPlayer(plauerUuid);
     }
 
     public BlockPos getPosA() {

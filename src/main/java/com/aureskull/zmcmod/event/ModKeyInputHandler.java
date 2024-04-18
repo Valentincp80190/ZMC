@@ -57,7 +57,7 @@ public class ModKeyInputHandler {
                     long currentTime = System.currentTimeMillis();
                     if (currentTime - lastActionTime >= 1000) {
 
-                        if(PlayerHelper.isInHisMapControllerArea(client.player)){
+                        if(PlayerHelper.isPlaying(client.player)){
                             PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
                             buf.writeBlockPos(client.player.getBlockPos());
                             ClientPlayNetworking.send(ModMessages.TRIGGER_INTERACTION, buf);

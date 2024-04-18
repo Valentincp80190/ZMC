@@ -2,6 +2,7 @@ package com.aureskull.zmcmod.block.entity;
 
 import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.ILinkable;
+import com.aureskull.zmcmod.block.custom.MapControllerBlock;
 import com.aureskull.zmcmod.block.custom.SmallZombieWindowBlock;
 import com.aureskull.zmcmod.client.InteractionHelper;
 import com.aureskull.zmcmod.client.overlay.MessageHudOverlay;
@@ -118,7 +119,7 @@ public class SmallZombieWindowBlockEntity extends BlockEntity implements Extende
                     for (PlayerEntity player : players) {
                         if(InteractionHelper.isFacingInteractable(player, facing) &&
                                 Math.abs(player.getY() - pos.getY()) <= 1.5) {
-                            if(PlayerHelper.isInHisMapControllerArea(player)){
+                            if(PlayerHelper.isPlaying(player)){
                                 MessageHudOverlay.setMessage("Hold [" + ModKeyInputHandler.INTERACT.getBoundKeyLocalizedText().getLiteralString() + "] to Rebuild Barrier", Formatting.WHITE, 100);
                             }else{
                                 MessageHudOverlay.setMessage("You are not playing in this game!", Formatting.DARK_RED, 100);

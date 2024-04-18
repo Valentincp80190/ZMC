@@ -55,7 +55,7 @@ public class GamePlayerManager {
         }
     }
 
-    public boolean existSubscribedPlayer(UUID playerUuid){
+    public boolean isSubscribedPlayer(UUID playerUuid){
         if(subscribedPlayers.contains(playerUuid))
             return true;
         return false;

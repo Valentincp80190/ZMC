@@ -82,7 +82,7 @@ public class MapControllerBlock extends BlockWithEntity implements BlockEntityPr
                 mapControllerBE.unlink(world, ZoneControllerBlockEntity.class);
 
 
-                if(mapControllerBE.isPlayerPlaying(player.getUuid())){
+                if(mapControllerBE.getPlayerManager().isSubscribedPlayer(player.getUuid())){
                     ModMessages.sendUpdateDisplayOverlayPacket((ServerPlayerEntity) player, false);
                 }
                 mapControllerBE.unsubscribeAllPlayer();
