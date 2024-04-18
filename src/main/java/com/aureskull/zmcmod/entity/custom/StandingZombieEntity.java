@@ -3,6 +3,9 @@ package com.aureskull.zmcmod.entity.custom;
 import com.aureskull.zmcmod.block.entity.MapControllerBlockEntity;
 import com.aureskull.zmcmod.entity.goal.*;
 import com.aureskull.zmcmod.sound.ModSounds;
+import com.aureskull.zmcmod.util.PlayerData;
+import com.aureskull.zmcmod.util.PlayerHelper;
+import com.aureskull.zmcmod.util.StateSaverAndLoader;
 import net.minecraft.entity.AnimationState;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
@@ -141,6 +144,18 @@ public class StandingZombieEntity extends HostileEntity {
 
         if (!this.getWorld().isClient) {
             sendZombieHasBeenKilledToMapController();
+        }
+
+        //Give money to the player
+        if (source.getAttacker() instanceof PlayerEntity &&
+                mapControllerBlockPos != null &&
+                getWorld().getBlockEntity(mapControllerBlockPos) instanceof MapControllerBlockEntity mapControllerBlockEntity) {
+            PlayerEntity killer = (PlayerEntity) source.getAttacker();
+
+            if(PlayerHelper.isPlaying(killer, mapControllerBlockEntity)){
+                PlayerData playerData = StateSaverAndLoader.getPlayerState(killer);
+                if(playerData != null) playerData.addMoney(60);
+            }
         }
     }
 
