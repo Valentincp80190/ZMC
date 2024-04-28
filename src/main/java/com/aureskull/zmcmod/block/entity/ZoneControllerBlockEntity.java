@@ -2,6 +2,7 @@ package com.aureskull.zmcmod.block.entity;
 
 import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.ILinkable;
+import com.aureskull.zmcmod.block.entity.door.DoorBlockEntity;
 import com.aureskull.zmcmod.networking.ModMessages;
 import com.aureskull.zmcmod.screen.zonecontroller.ZoneControllerScreenHandler;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
@@ -25,9 +26,10 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-import java.util.random.RandomGenerator;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ILinkable {
     private BlockPos posA = new BlockPos(pos.getX() - 5, pos.getY() + 1, pos.getZ() - 5);
@@ -48,6 +50,9 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
 
     private final int UPDATE_PLAYERS_ZONE_TIME = 20;//1 second
     private int last_update_players_zone_time = 0;
+
+    private List<BlockPos> linkedDoors = new ArrayList<>();
+    private boolean open = true;
 
     public ZoneControllerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.ZONE_CONTROLLER_BLOCK_ENTITY, pos, state);
@@ -103,6 +108,13 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
         if(zoneParentList.size() > 0)
             nbt.put("zone_controller.linked_parent_zones", zoneParentList);
 
+
+        NbtList doorList = new NbtList();
+        for (BlockPos pos : linkedDoors)
+            doorList.add(NbtHelper.fromBlockPos(pos));
+        if(doorList.size() > 0)
+            nbt.put("zone_controller.linked_doors", doorList);
+
         super.writeNbt(nbt);
     }
 
@@ -131,7 +143,6 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
             this.spawnPoint = NbtHelper.toBlockPos(nbt.getCompound("zone_controller.spawn_point"));
         }
 
-
         if (nbt.contains("zone_controller.spawn_point")) {
             this.spawnPoint = NbtHelper.toBlockPos(nbt.getCompound("zone_controller.spawn_point"));
         }
@@ -158,6 +169,13 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
         linkedParentZoneControllers = new ArrayList<>();
         for (int i = 0; i < zonesParentList.size(); i++) {
             linkedParentZoneControllers.add(NbtHelper.toBlockPos(zonesParentList.getCompound(i)));
+        }
+
+
+        NbtList doorList = nbt.getList("zone_controller.linked_doors", 10);
+        linkedDoors = new ArrayList<>();
+        for (int i = 0; i < doorList.size(); i++) {
+            linkedDoors.add(NbtHelper.toBlockPos(doorList.getCompound(i)));
         }
     }
 
@@ -231,16 +249,28 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
         setLinkedBlock(null, MapControllerBlockEntity.class);
     }
 
-    private void unlinkSmallZombieDoorway(World world, BlockPos doorway){
-        ModMessages.sendRemoveZoneLinkFromDoorwayPacket(world, doorway);
+    private void unlinkDoor(World world, BlockPos door){
+        ModMessages.sendRemoveZoneLinkFromDoorPacket(world, getPos(), door);
+
+        //Remove from the door the zone
+        BlockEntity doorwayBE = world.getBlockEntity(door);
+        if (doorwayBE instanceof DoorBlockEntity doorBlockEntity)
+            doorBlockEntity.removeLinkedBlock(getPos(), ZoneControllerBlockEntity.class);
+
+        removeLinkedBlock(door, DoorBlockEntity.class);
+    }
+
+    private void unlinkSmallZombieWindow(World world, BlockPos window){
+        ModMessages.sendRemoveZoneLinkFromDoorwayPacket(world, window);
 
         //Remove from SmallZombieDoorway the zone
-        BlockEntity doorwayBE = world.getBlockEntity(doorway);
-        if (doorwayBE instanceof SmallZombieWindowBlockEntity)
-            ((SmallZombieWindowBlockEntity) doorwayBE).setLinkedBlock(null, ZoneControllerBlockEntity.class);
+        BlockEntity windowBE = world.getBlockEntity(window);
+        if (windowBE instanceof SmallZombieWindowBlockEntity)
+            ((SmallZombieWindowBlockEntity) windowBE).setLinkedBlock(null, ZoneControllerBlockEntity.class);
 
-        removeLinkedBlock(doorway, SmallZombieWindowBlockEntity.class);
+        removeLinkedBlock(window, SmallZombieWindowBlockEntity.class);
     }
+
 
     private List<BlockPos> getLinkedParentZoneControllers() {
         return new ArrayList<>(linkedParentZoneControllers);
@@ -274,14 +304,24 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
         return new ArrayList<>(linkedWindows);
     }
 
-    private void removeLinkedDoorway(BlockPos doorwayPos) {
-        if(this.linkedWindows.contains(doorwayPos))
-            this.linkedWindows.remove(doorwayPos);
+    private void removeLinkedWindow(BlockPos windowPos) {
+        if(this.linkedWindows.contains(windowPos))
+            this.linkedWindows.remove(windowPos);
     }
 
-    private void addLinkedDoorway(BlockPos doorwayPos) {
-        if (!linkedWindows.contains(doorwayPos))
-            linkedWindows.add(doorwayPos);
+    private void addLinkedWindow(BlockPos windowPos) {
+        if (!linkedWindows.contains(windowPos))
+            linkedWindows.add(windowPos);
+    }
+
+    private void addLinkedDoor(BlockPos doorPos){
+        if (!linkedDoors.contains(doorPos))
+            linkedDoors.add(doorPos);
+    }
+
+    private void removeLinkedDoor(BlockPos doorPos) {
+        if(this.linkedDoors.contains(doorPos))
+            this.linkedDoors.remove(doorPos);
     }
 
     public void addParent(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType){
@@ -324,7 +364,7 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
         markDirty();
     }
 
-    public List<BlockPos> getChild(Class<? extends BlockEntity> linkType){
+    public List<BlockPos> getChildren(Class<? extends BlockEntity> linkType){
         if(ZoneControllerBlockEntity.class.isAssignableFrom(linkType) && linkedChildZoneControllers != null){
             return getLinkedChildZoneControllers();
         }
@@ -334,20 +374,27 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
 
     @Override
     public void unlink(World world, Class<? extends BlockEntity> linkType) {
-        if(MapControllerBlockEntity.class.isAssignableFrom(linkType) && this.linkedMapController != null){
+        if(MapControllerBlockEntity.class.isAssignableFrom(linkType) && linkedMapController != null) {
             unlinkMapController(world);
 
-        }else if(SmallZombieWindowBlockEntity.class.isAssignableFrom(linkType) && this.getLinkedWindows() != null) {
-            List<BlockPos> doorways = this.getLinkedWindows();
-            for (BlockPos doorway : doorways)
-                unlinkSmallZombieDoorway(world, doorway);
+        }else if(DoorBlockEntity.class.isAssignableFrom(linkType) && linkedDoors != null){
+            List<BlockPos> linkedDoors = new CopyOnWriteArrayList<>(getLinkedDoors());
+            for (BlockPos door : linkedDoors) {
+                unlinkDoor(world, door);
+            }
+
+        }else if(SmallZombieWindowBlockEntity.class.isAssignableFrom(linkType) && getLinkedWindows() != null) {
+            List<BlockPos> linkedWindows = new CopyOnWriteArrayList<>(getLinkedWindows());
+            for (BlockPos window : linkedWindows) {
+                unlinkSmallZombieWindow(world, window);
+            }
         }
     }
 
     @Override
     public void setLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
         if(MapControllerBlockEntity.class.isAssignableFrom(linkType))
-            this.linkedMapController = linkedBlockPos;
+            linkedMapController = linkedBlockPos;
 
         markDirty();
     }
@@ -355,14 +402,17 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
     @Override
     public @Nullable BlockPos getLinkedBlock(Class<? extends BlockEntity> linkType) {
         if(MapControllerBlockEntity.class.isAssignableFrom(linkType))
-            return this.linkedMapController;
+            return linkedMapController;
         return null;
     }
 
     @Override
     public void addLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
         if(SmallZombieWindowBlockEntity.class.isAssignableFrom(linkType))
-            addLinkedDoorway(linkedBlockPos);
+            addLinkedWindow(linkedBlockPos);
+
+        if(DoorBlockEntity.class.isAssignableFrom(linkType))
+            addLinkedDoor(linkedBlockPos);
 
         markDirty();
     }
@@ -370,7 +420,10 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
     @Override
     public void removeLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
         if(SmallZombieWindowBlockEntity.class.isAssignableFrom(linkType))
-            removeLinkedDoorway(linkedBlockPos);
+            removeLinkedWindow(linkedBlockPos);
+
+        if(DoorBlockEntity.class.isAssignableFrom(linkType))
+            removeLinkedDoor(linkedBlockPos);
 
         markDirty();
     }
@@ -401,7 +454,7 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
 
             if(randomInt >= 25
                 //75% that the zombie spawn in this zone
-                || (this.getParent(ZoneControllerBlockEntity.class).size() == 0  && this.getChild(ZoneControllerBlockEntity.class).size() == 0)
+                || (this.getParent(ZoneControllerBlockEntity.class).size() == 0  && this.getChildren(ZoneControllerBlockEntity.class).size() == 0)
                 || spawnInZoneOrInNeighborhood == false){
 
                 SmallZombieWindowBlockEntity smallZombieWindowBlockEntity = ((SmallZombieWindowBlockEntity) world.getBlockEntity(linkedWindows.get(new Random().nextInt(linkedWindows.size()))));
@@ -497,5 +550,13 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
 
     public void setBlue(float blue) {
         this.blue = blue;
+    }
+
+    public List<BlockPos> getLinkedDoors() {
+        return linkedDoors;
+    }
+
+    public void setLinkedDoors(List<BlockPos> linkedDoors) {
+        this.linkedDoors = linkedDoors;
     }
 }

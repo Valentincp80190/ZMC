@@ -14,7 +14,7 @@ public class ModEntities {
     public static final EntityType<StandingZombieEntity> STANDING_ZOMBIE = Registry.register(Registries.ENTITY_TYPE,
             new Identifier(ZMCMod.MOD_ID, "standing_zombie"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, StandingZombieEntity::new)
-                    .dimensions(EntityDimensions.fixed(.7f, 2f)).build());
+                    .dimensions(EntityDimensions.fixed(.7f, 1.9f)).build());
 
     public static void registerModEntities() {
         ZMCMod.LOGGER.info("Registering Entities for " + ZMCMod.MOD_ID);

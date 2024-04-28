@@ -9,7 +9,7 @@ import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
 
-public class RemoveZoneLinkFromDoorwayS2CPacket {
+public class RemoveZoneLinkFromWindowS2CPacket {
 
     public static void receive(MinecraftClient client, ClientPlayNetworkHandler clientPlayNetworkHandler, PacketByteBuf buf, PacketSender packetSender) {
         BlockPos doorwayPos = buf.readBlockPos();

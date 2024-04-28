@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "side=left,facing=north,open=false": { "model": "zmcmod:block/door/door_side_right_close"},
+    "side=left,facing=south,open=false": { "model": "zmcmod:block/door/door_side_right_close", "y": 180 },
+    "side=left,facing=west,open=false": { "model": "zmcmod:block/door/door_side_right_close", "y": 270 },
+    "side=left,facing=east,open=false": { "model": "zmcmod:block/door/door_side_right_close", "y": 90},
+
+    "side=left,facing=north,open=true": { "model": "zmcmod:block/door/door_side_left_open", "y": 180},
+    "side=left,facing=south,open=true": { "model": "zmcmod:block/door/door_side_left_open"},
+    "side=left,facing=west,open=true": { "model": "zmcmod:block/door/door_side_left_open", "y": 90},
+    "side=left,facing=east,open=true": { "model": "zmcmod:block/door/door_side_left_open", "y": 270},
+
+
+
+
+    "side=right,facing=north,open=false": { "model": "zmcmod:block/door/door_side_left_close"},
+    "side=right,facing=south,open=false": { "model": "zmcmod:block/door/door_side_left_close", "y": 180 },
+    "side=right,facing=west,open=false": { "model": "zmcmod:block/door/door_side_left_close", "y": 270 },
+    "side=right,facing=east,open=false": { "model": "zmcmod:block/door/door_side_left_close", "y": 90 },
+
+    "side=right,facing=north,open=true": { "model": "zmcmod:block/door/door_side_right_open", "y": 180},
+    "side=right,facing=south,open=true": { "model": "zmcmod:block/door/door_side_right_open"},
+    "side=right,facing=west,open=true": { "model": "zmcmod:block/door/door_side_right_open", "y": 90},
+    "side=right,facing=east,open=true": { "model": "zmcmod:block/door/door_side_right_open", "y": 270},
+
+    "side=center": { "model": "zmcmod:block/transparent"}
+  }
+}

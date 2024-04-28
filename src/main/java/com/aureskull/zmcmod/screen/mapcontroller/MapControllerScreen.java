@@ -325,22 +325,18 @@ public class MapControllerScreen extends HandledScreen<MapControllerScreenHandle
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        boolean handled = super.keyPressed(keyCode, scanCode, modifiers);
-
-        if (handled) {
-            if (keyCode == InputUtil.GLFW_KEY_E) {
-                return true;
-            }
-
-            updatePositionOnFocusLost(posAXTextField, "AX");
-            updatePositionOnFocusLost(posAYTextField, "AY");
-            updatePositionOnFocusLost(posAZTextField, "AZ");
-            updatePositionOnFocusLost(posBXTextField, "BX");
-            updatePositionOnFocusLost(posBYTextField, "BY");
-            updatePositionOnFocusLost(posBZTextField, "BZ");
+        if (keyCode == InputUtil.GLFW_KEY_E) {
+            return true;
         }
 
-        return handled;
+        updatePositionOnFocusLost(posAXTextField, "AX");
+        updatePositionOnFocusLost(posAYTextField, "AY");
+        updatePositionOnFocusLost(posAZTextField, "AZ");
+        updatePositionOnFocusLost(posBXTextField, "BX");
+        updatePositionOnFocusLost(posBYTextField, "BY");
+        updatePositionOnFocusLost(posBZTextField, "BZ");
+
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override

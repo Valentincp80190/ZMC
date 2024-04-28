@@ -1,6 +1,7 @@
 package com.aureskull.zmcmod.networking.packet;
 
 import com.aureskull.zmcmod.block.entity.SmallZombieWindowBlockEntity;
+import com.aureskull.zmcmod.block.entity.door.DoorBlockEntity;
 import com.aureskull.zmcmod.client.InteractionHelper;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.block.entity.BlockEntity;
@@ -25,9 +26,17 @@ public class TriggerInteractionC2SPacket {
             BlockPos checkPos = playerBlockPos.offset(playerDirection);
             BlockEntity blockEntity = world.getBlockEntity(checkPos);
 
-            if (blockEntity instanceof SmallZombieWindowBlockEntity) {
-                ((SmallZombieWindowBlockEntity) blockEntity).rebuild(player);
+            if(blockEntity == null){//In case when we are in the block that we want to interact like a door for example
+                blockEntity = world.getBlockEntity(playerBlockPos);
+            }
+
+            if (blockEntity instanceof SmallZombieWindowBlockEntity smallZombieWindowBlockEntity) {
+                smallZombieWindowBlockEntity.rebuild(player);
                 //player.sendMessage(Text.literal("nbr planks : " + ((SmallZombieWindowBlockEntity) mapControllerBlockEntity).plank), false);
+            }
+
+            if (blockEntity instanceof DoorBlockEntity doorBlockEntity) {
+                doorBlockEntity.buy(player, doorBlockEntity.getPrice());
             }
         });
     }

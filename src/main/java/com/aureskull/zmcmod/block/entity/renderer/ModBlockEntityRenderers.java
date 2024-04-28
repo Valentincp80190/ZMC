@@ -13,5 +13,6 @@ public class ModBlockEntityRenderers {
         BlockEntityRendererFactories.register(ModBlockEntities.ZONE_CONTROLLER_BLOCK_ENTITY, ZoneControllerEntityRenderer::new);
         BlockEntityRendererFactories.register(ModBlockEntities.SMALL_ZOMBIE_WINDOW_BLOCK_ENTITY, SmallZombieDoorwayEntityRenderer::new);
         BlockEntityRendererFactories.register(ModBlockEntities.MAP_CONTROLLER_BLOCK_ENTITY, MapControllerEntityRenderer::new);
+        BlockEntityRendererFactories.register(ModBlockEntities.DOOR_BLOCK_ENTITY, DoorBlockEntityRenderer::new);
     }
 }

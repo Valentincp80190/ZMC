@@ -28,6 +28,7 @@ public class ModItemGroup {
                 entries.add(ModBlocks.ZONE_CONTROLLER);
                 entries.add(ModBlocks.SMALL_ZOMBIE_WINDOW);
                 entries.add(ModBlocks.ZOMBIE_SPAWNER);
+                entries.add(ModBlocks.MEDIUM_DOOR);
             }))
             .displayName(Text.translatable("itemgroup.zmc"))
             .build());

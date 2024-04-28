@@ -2,6 +2,7 @@ package com.aureskull.zmcmod.block.entity;
 
 import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.ModBlocks;
+import com.aureskull.zmcmod.block.entity.door.DoorBlockEntity;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.registry.Registries;
@@ -28,6 +29,16 @@ public class ModBlockEntities {
             Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier(ZMCMod.MOD_ID, "zombie_spawner_be"),
                     FabricBlockEntityTypeBuilder.create(ZombieSpawnerBlockEntity::new,
                             ModBlocks.ZOMBIE_SPAWNER).build());
+
+    public static final BlockEntityType<DoorBlockEntity> MEDIUM_DOOR_BLOCK_ENTITY =
+            Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier(ZMCMod.MOD_ID, "medium_door_be"),
+                    FabricBlockEntityTypeBuilder.create(DoorBlockEntity::new,
+                            ModBlocks.MEDIUM_DOOR).build());
+
+    public static final BlockEntityType<DoorBlockEntity> DOOR_BLOCK_ENTITY =
+            Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier(ZMCMod.MOD_ID, "door_be"),
+                    FabricBlockEntityTypeBuilder.create(DoorBlockEntity::new,
+                            ModBlocks.DOOR_PART).build());
 
     public static void registerBlockEntities(){
         ZMCMod.LOGGER.info("Registering Block Entities for " + ZMCMod.MOD_ID);

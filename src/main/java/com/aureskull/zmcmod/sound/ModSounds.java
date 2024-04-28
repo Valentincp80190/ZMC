@@ -12,6 +12,7 @@ public class ModSounds {
     public static final SoundEvent ROUND_END = registerSoundEvent("round_end");
 
     //DOOR/WINDOW
+    public static final SoundEvent DOOR_OPEN = registerSoundEvent("door_open");
     public static final SoundEvent REBUILD_WINDOW = registerSoundEvent("rebuild_window");
     public static final SoundEvent SNAP_WINDOW = registerSoundEvent("snap_window");
     public static final SoundEvent REBUILD_WINDOW_MONEY = registerSoundEvent("rebuild_window_money");
@@ -20,6 +21,11 @@ public class ModSounds {
     //Standing zombie
     public static final SoundEvent STANDING_ZOMBIE_DEATH= registerSoundEvent("standing_zombie_death");
     public static final SoundEvent STANDING_ZOMBIE_AMB= registerSoundEvent("standing_zombie_amb");
+
+    //Purchase
+    public static final SoundEvent PURCHASE_ACCEPT = registerSoundEvent("purchase_accept");
+    public static final SoundEvent PURCHASE_DENY = registerSoundEvent("purchase_deny");
+
 
 
     private static SoundEvent registerSoundEvent(String name){

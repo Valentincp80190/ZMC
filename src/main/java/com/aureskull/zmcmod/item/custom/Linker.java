@@ -1,14 +1,15 @@
 package com.aureskull.zmcmod.item.custom;
 
-import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.custom.MapControllerBlock;
 import com.aureskull.zmcmod.block.custom.SmallZombieWindowBlock;
 import com.aureskull.zmcmod.block.custom.ZombieSpawnerBlock;
 import com.aureskull.zmcmod.block.custom.ZoneControllerBlock;
+import com.aureskull.zmcmod.block.custom.door.DoorPartBlock;
 import com.aureskull.zmcmod.block.entity.MapControllerBlockEntity;
 import com.aureskull.zmcmod.block.entity.SmallZombieWindowBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZombieSpawnerBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZoneControllerBlockEntity;
+import com.aureskull.zmcmod.block.entity.door.DoorBlockEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -52,7 +53,8 @@ public class Linker extends Item {
             if (state.getBlock() instanceof ZombieSpawnerBlock
                     || state.getBlock() instanceof SmallZombieWindowBlock
                     || state.getBlock() instanceof MapControllerBlock
-                    || state.getBlock() instanceof ZoneControllerBlock) {
+                    || state.getBlock() instanceof ZoneControllerBlock
+                    || state.getBlock() instanceof DoorPartBlock) {
                 handleBlockLinking(world, pos, itemStack, playerEntity);
                 return ActionResult.SUCCESS;
             }
@@ -144,12 +146,23 @@ public class Linker extends Item {
             if(firstPos.getX() == secondPos.getX() && firstPos.getY() == secondPos.getY() && firstPos.getZ() == secondPos.getZ()) return;
 
             //first pos = parent
-            if(((ZoneControllerBlockEntity)secondEntity).getChild(ZoneControllerBlockEntity.class).contains(firstPos)){
+            if(((ZoneControllerBlockEntity)secondEntity).getChildren(ZoneControllerBlockEntity.class).contains(firstPos)){
                 ((ZoneControllerBlockEntity) secondEntity).removeChild(firstPos, ZoneControllerBlockEntity.class);
             }
 
             ((ZoneControllerBlockEntity) firstEntity).addChild(secondPos, ZoneControllerBlockEntity.class);
             ((ZoneControllerBlockEntity) secondEntity).addParent(firstPos, ZoneControllerBlockEntity.class);
+        }
+
+
+        //ZoneController <=> Door (0..* => 0..*)
+        else if (firstEntity instanceof DoorBlockEntity doorBlockEntity && secondEntity instanceof ZoneControllerBlockEntity zoneControllerBlockEntity) {
+            doorBlockEntity.addLinkedBlock(secondPos, ZoneControllerBlockEntity.class);
+            zoneControllerBlockEntity.addLinkedBlock(firstPos, DoorBlockEntity.class);
+
+        } else if (firstEntity instanceof ZoneControllerBlockEntity zoneControllerBlockEntity && secondEntity instanceof DoorBlockEntity doorBlockEntity) {
+            doorBlockEntity.addLinkedBlock(firstPos, ZoneControllerBlockEntity.class);
+            zoneControllerBlockEntity.addLinkedBlock(secondPos, DoorBlockEntity.class);
         }
     }
 }

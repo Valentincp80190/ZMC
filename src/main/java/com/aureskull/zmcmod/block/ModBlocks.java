@@ -1,10 +1,8 @@
 package com.aureskull.zmcmod.block;
 
 import com.aureskull.zmcmod.ZMCMod;
-import com.aureskull.zmcmod.block.custom.MapControllerBlock;
-import com.aureskull.zmcmod.block.custom.SmallZombieWindowBlock;
-import com.aureskull.zmcmod.block.custom.ZombieSpawnerBlock;
-import com.aureskull.zmcmod.block.custom.ZoneControllerBlock;
+import com.aureskull.zmcmod.block.custom.*;
+import com.aureskull.zmcmod.block.custom.door.DoorPartBlock;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
@@ -27,6 +25,12 @@ public class ModBlocks {
 
     public static final Block ZOMBIE_SPAWNER = registerBlock("zombie_spawner",
             new ZombieSpawnerBlock(FabricBlockSettings.copyOf(Blocks.NETHERITE_BLOCK)));
+
+    public static final Block MEDIUM_DOOR = registerBlock("medium_door",
+            new MediumDoorBlock(FabricBlockSettings.copyOf(Blocks.NETHERITE_BLOCK)));
+
+    public static final Block DOOR_PART = registerBlock("door_part",
+            new DoorPartBlock(FabricBlockSettings.copyOf(Blocks.NETHERITE_BLOCK)));
 
     private static Block registerBlock(String name, Block block){
         registerBlockItem(name, block);

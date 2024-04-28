@@ -2,11 +2,9 @@ package com.aureskull.zmcmod.networking;
 
 import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.networking.packet.ExistZMCMapC2SPacket;
-import com.aureskull.zmcmod.networking.packet.link.RemoveDoorwayLinkFromZoneS2CPacket;
-import com.aureskull.zmcmod.networking.packet.link.RemoveLinkS2CPacket;
+import com.aureskull.zmcmod.networking.packet.door.DoorUpdatePriceC2SPacket;
+import com.aureskull.zmcmod.networking.packet.link.*;
 import com.aureskull.zmcmod.networking.packet.TriggerInteractionC2SPacket;
-import com.aureskull.zmcmod.networking.packet.link.RemoveZoneLinkFromDoorwayS2CPacket;
-import com.aureskull.zmcmod.networking.packet.link.RemoveZoneLinkFromZoneS2CPacket;
 import com.aureskull.zmcmod.networking.packet.mapcontroller.*;
 import com.aureskull.zmcmod.networking.packet.player.PlayerUpdateOverlayStatusS2CPacket;
 import com.aureskull.zmcmod.networking.packet.player.PlayerUpdateRoundHUDS2CPacket;
@@ -31,6 +29,8 @@ public class ModMessages {
     public static final Identifier MAP_CONTROLLER_UPDATE_ROUND = new Identifier(ZMCMod.MOD_ID, "mapcontroller_update_round");
     public static final Identifier MAP_CONTROLLER_UPDATE_POS = new Identifier(ZMCMod.MOD_ID, "mapcontroller_update_pos");
 
+    //DOOR
+    public static final Identifier DOOR_UPDATE_PRICE =  new Identifier(ZMCMod.MOD_ID, "door_update_price");
 
     //ZONE CONTROLLER
     public static final Identifier ZONE_CONTROLLER_UPDATE_ZONE_COLOR = new Identifier(ZMCMod.MOD_ID, "zonecontroller_update_color");
@@ -47,9 +47,11 @@ public class ModMessages {
 
     //LINKER
     public static final Identifier REMOVE_LINK_FROM_BLOCK_ENTITY = new Identifier(ZMCMod.MOD_ID, "remove_link_from_block_entity");
-    public static final Identifier REMOVE_DOORWAY_LINK_FROM_ZONE = new Identifier(ZMCMod.MOD_ID, "remove_doorway_link_from_zone");
-    public static final Identifier REMOVE_ZONE_LINK_FROM_DOORWAY = new Identifier(ZMCMod.MOD_ID, "remove_zone_link_from_doorway");
+    public static final Identifier REMOVE_WINDOW_LINK_FROM_ZONE = new Identifier(ZMCMod.MOD_ID, "remove_doorway_link_from_zone");
+    public static final Identifier REMOVE_ZONE_LINK_FROM_WINDOW = new Identifier(ZMCMod.MOD_ID, "remove_zone_link_from_doorway");
     public static final Identifier REMOVE_ZONE_LINK_FROM_ZONE = new Identifier(ZMCMod.MOD_ID, "remove_zone_link_from_zone");
+    public static final Identifier REMOVE_DOOR_LINK_FROM_ZONE = new Identifier(ZMCMod.MOD_ID, "remove_door_link_from_zone");
+    public static final Identifier REMOVE_ZONE_LINK_FROM_DOOR = new Identifier(ZMCMod.MOD_ID, "remove_zone_link_from_door");
 
 
     //PLAYER
@@ -66,15 +68,19 @@ public class ModMessages {
         ServerPlayNetworking.registerGlobalReceiver(ZONE_CONTROLLER_UPDATE_ZONE_COLOR, ZoneControllerUpdateZoneColorC2SPacket::receive);
         ServerPlayNetworking.registerGlobalReceiver(ZONE_CONTROLLER_UPDATE_POS, ZoneControllerUpdatePosC2SPacket::receive);
 
+        ServerPlayNetworking.registerGlobalReceiver(DOOR_UPDATE_PRICE, DoorUpdatePriceC2SPacket::receive);
+
         ServerPlayNetworking.registerGlobalReceiver(TRIGGER_INTERACTION, TriggerInteractionC2SPacket::receive);
     }
 
     public static void registerS2CPackets(){
         //LINKER
         ClientPlayNetworking.registerGlobalReceiver(REMOVE_LINK_FROM_BLOCK_ENTITY, RemoveLinkS2CPacket::receive);
-        ClientPlayNetworking.registerGlobalReceiver(REMOVE_DOORWAY_LINK_FROM_ZONE, RemoveDoorwayLinkFromZoneS2CPacket::receive);
-        ClientPlayNetworking.registerGlobalReceiver(REMOVE_ZONE_LINK_FROM_DOORWAY, RemoveZoneLinkFromDoorwayS2CPacket::receive);
+        ClientPlayNetworking.registerGlobalReceiver(REMOVE_WINDOW_LINK_FROM_ZONE, RemoveWindowLinkFromZoneS2CPacket::receive);
+        ClientPlayNetworking.registerGlobalReceiver(REMOVE_ZONE_LINK_FROM_WINDOW, RemoveZoneLinkFromWindowS2CPacket::receive);
         ClientPlayNetworking.registerGlobalReceiver(REMOVE_ZONE_LINK_FROM_ZONE, RemoveZoneLinkFromZoneS2CPacket::receive);
+        ClientPlayNetworking.registerGlobalReceiver(REMOVE_DOOR_LINK_FROM_ZONE, RemoveDoorLinkFromZoneS2CPacket::receive);
+        ClientPlayNetworking.registerGlobalReceiver(REMOVE_ZONE_LINK_FROM_DOOR, RemoveZoneLinkFromDoorS2CPacket::receive);
 
         //MapController
         ClientPlayNetworking.registerGlobalReceiver(MAP_CONTROLLER_UPDATE_ROUND, MapControllerUpdateRoundS2CPacket::receive);
@@ -106,7 +112,7 @@ public class ModMessages {
 
         // Send this packet to all players in the world
         PlayerLookup.tracking((ServerWorld) world, blockPos).forEach(player -> {
-            ServerPlayNetworking.send(player, ModMessages.REMOVE_ZONE_LINK_FROM_DOORWAY, buf);
+            ServerPlayNetworking.send(player, ModMessages.REMOVE_ZONE_LINK_FROM_WINDOW, buf);
         });
     }
 
@@ -117,20 +123,32 @@ public class ModMessages {
 
         // Send this packet to all players in the world
         PlayerLookup.tracking((ServerWorld) world, zonePos).forEach(player -> {
-            ServerPlayNetworking.send(player, ModMessages.REMOVE_DOORWAY_LINK_FROM_ZONE, buf);
+            ServerPlayNetworking.send(player, ModMessages.REMOVE_WINDOW_LINK_FROM_ZONE, buf);
         });
     }
 
-    /*public static void sendRemoveZoneLinkFromZonePacket(World world, BlockPos zonePos, BlockPos zonePosToRemove) {
+    public static void sendRemoveDoorLinkFromZonePacket(World world, BlockPos zonePos, BlockPos doorPos) {
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeBlockPos(zonePos);
-        buf.writeBlockPos(zonePosToRemove);
+        buf.writeBlockPos(doorPos);
 
         // Send this packet to all players in the world
         PlayerLookup.tracking((ServerWorld) world, zonePos).forEach(player -> {
-            ServerPlayNetworking.send(player, ModMessages.REMOVE_ZONE_LINK_FROM_ZONE, buf);
+            ServerPlayNetworking.send(player, ModMessages.REMOVE_DOOR_LINK_FROM_ZONE, buf);
         });
-    }*/
+    }
+
+    public static void sendRemoveZoneLinkFromDoorPacket(World world, BlockPos zonePos, BlockPos doorPos) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeBlockPos(zonePos);
+        buf.writeBlockPos(doorPos);
+
+        // Send this packet to all players in the world
+        PlayerLookup.tracking((ServerWorld) world, zonePos).forEach(player -> {
+            ServerPlayNetworking.send(player, ModMessages.REMOVE_ZONE_LINK_FROM_DOOR, buf);
+        });
+    }
+
 
 
     public static void sendUpdateDisplayOverlayPacket(ServerPlayerEntity player, boolean displayOverlay) {

@@ -1,6 +1,7 @@
 package com.aureskull.zmcmod.util;
 
 import com.aureskull.zmcmod.ZMCMod;
+import com.aureskull.zmcmod.ZMCModClient;
 import com.aureskull.zmcmod.block.entity.MapControllerBlockEntity;
 import com.aureskull.zmcmod.management.GamesManager;
 import net.minecraft.entity.player.PlayerEntity;
@@ -88,5 +89,35 @@ public class PlayerHelper {
         }
 
         return false;
+    }
+
+    public static int getMoney(PlayerEntity player) {
+        if (player == null || player.getWorld() == null) {
+            ZMCModClient.LOGGER.error("Player or player world cannot be null.");
+            return -1;
+        }
+
+        if(isPlaying(player))
+            return getPlayerData(player).getMoney();
+
+        ZMCModClient.LOGGER.error("Player's balance not found.");
+        return -1;
+    }
+
+    public static PlayerData getPlayerData(PlayerEntity player){
+        if (player == null || player.getWorld() == null) {
+            ZMCModClient.LOGGER.error("Player or player world cannot be null.");
+            return null;
+        }
+
+        return StateSaverAndLoader.getPlayerState(player);
+    }
+
+    public static void addMoney(PlayerEntity player, int amount){
+        try{
+            getPlayerData(player).addMoney(amount);
+        }catch (Exception e){
+            ZMCMod.LOGGER.error("An error occurred when trying to add money to the player " + player.getName());
+        }
     }
 }

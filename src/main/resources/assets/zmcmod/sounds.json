@@ -34,6 +34,24 @@
       "zmcmod:rebuild_window/rebuild_window_money"
     ]
   },
+  "door_open": {
+    "subtitle": "sounds.zmcmod.door_open",
+    "sounds": [
+      "zmcmod:door/door_open"
+    ]
+  },
+  "purchase_accept": {
+    "subtitle": "sounds.purchase.accept",
+    "sounds": [
+      "zmcmod:purchase/accept"
+    ]
+  },
+  "purchase_deny": {
+    "subtitle": "sounds.purchase.deny",
+    "sounds": [
+      "zmcmod:purchase/deny"
+    ]
+  },
   "standing_zombie_death": {
     "subtitle": "sounds.zmcmod.standing_zombie_death",
     "sounds": [

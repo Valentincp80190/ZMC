@@ -42,7 +42,6 @@ public class SmallZombieWindowBlock extends BlockWithEntity implements BlockEnti
     @Override
     protected void appendProperties(Builder<Block, BlockState> builder) {
         super.appendProperties(builder);
-        // Add the FACING property to the block's state
         builder.add(FACING, PLANKS);
     }
 

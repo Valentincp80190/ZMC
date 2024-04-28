@@ -1,7 +1,6 @@
 package com.aureskull.zmcmod.block.entity.renderer;
 
 import com.aureskull.zmcmod.block.entity.SmallZombieWindowBlockEntity;
-import com.aureskull.zmcmod.block.entity.ZombieSpawnerBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZoneControllerBlockEntity;
 import com.aureskull.zmcmod.event.ModKeyInputHandler;
 import com.aureskull.zmcmod.item.custom.Linker;
@@ -306,7 +305,7 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
     }
 
     public void drawLinesToChildZones(ZoneControllerBlockEntity entity, MatrixStack matrices){
-        if(entity.getChild(ZoneControllerBlockEntity.class).size() == 0) return;
+        if(entity.getChildren(ZoneControllerBlockEntity.class).size() == 0) return;
 
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         //RenderSystem.enableDepthTest();
@@ -317,7 +316,7 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
 
         buffer.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
 
-        for (BlockPos posB: entity.getChild(ZoneControllerBlockEntity.class)) {
+        for (BlockPos posB: entity.getChildren(ZoneControllerBlockEntity.class)) {
             double deltaX = posB.getX() - entity.getPos().getX();
             double deltaY = posB.getY() - entity.getPos().getY();
             double deltaZ = posB.getZ() - entity.getPos().getZ();
