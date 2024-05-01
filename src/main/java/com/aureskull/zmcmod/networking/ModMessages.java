@@ -1,6 +1,7 @@
 package com.aureskull.zmcmod.networking;
 
 import com.aureskull.zmcmod.ZMCMod;
+import com.aureskull.zmcmod.block.BlockEntityType;
 import com.aureskull.zmcmod.networking.packet.ExistZMCMapC2SPacket;
 import com.aureskull.zmcmod.networking.packet.door.DoorUpdatePriceC2SPacket;
 import com.aureskull.zmcmod.networking.packet.link.*;
@@ -14,12 +15,15 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
+import java.util.List;
 
 public class ModMessages {
 
@@ -46,12 +50,9 @@ public class ModMessages {
 
 
     //LINKER
-    public static final Identifier REMOVE_LINK_FROM_BLOCK_ENTITY = new Identifier(ZMCMod.MOD_ID, "remove_link_from_block_entity");
-    public static final Identifier REMOVE_WINDOW_LINK_FROM_ZONE = new Identifier(ZMCMod.MOD_ID, "remove_doorway_link_from_zone");
-    public static final Identifier REMOVE_ZONE_LINK_FROM_WINDOW = new Identifier(ZMCMod.MOD_ID, "remove_zone_link_from_doorway");
-    public static final Identifier REMOVE_ZONE_LINK_FROM_ZONE = new Identifier(ZMCMod.MOD_ID, "remove_zone_link_from_zone");
-    public static final Identifier REMOVE_DOOR_LINK_FROM_ZONE = new Identifier(ZMCMod.MOD_ID, "remove_door_link_from_zone");
-    public static final Identifier REMOVE_ZONE_LINK_FROM_DOOR = new Identifier(ZMCMod.MOD_ID, "remove_zone_link_from_door");
+    public static final Identifier SET_LINK_FROM_BLOCK_ENTITY = new Identifier(ZMCMod.MOD_ID, "set_link_from_block_entity");
+    public static final Identifier SET_PARENT_LINK_FROM_BLOCK_ENTITY = new Identifier(ZMCMod.MOD_ID, "set_parent_link_from_block_entity");
+    public static final Identifier SET_CHILD_LINK_FROM_BLOCK_ENTITY = new Identifier(ZMCMod.MOD_ID, "set_child_link_from_block_entity");
 
 
     //PLAYER
@@ -75,12 +76,9 @@ public class ModMessages {
 
     public static void registerS2CPackets(){
         //LINKER
-        ClientPlayNetworking.registerGlobalReceiver(REMOVE_LINK_FROM_BLOCK_ENTITY, RemoveLinkS2CPacket::receive);
-        ClientPlayNetworking.registerGlobalReceiver(REMOVE_WINDOW_LINK_FROM_ZONE, RemoveWindowLinkFromZoneS2CPacket::receive);
-        ClientPlayNetworking.registerGlobalReceiver(REMOVE_ZONE_LINK_FROM_WINDOW, RemoveZoneLinkFromWindowS2CPacket::receive);
-        ClientPlayNetworking.registerGlobalReceiver(REMOVE_ZONE_LINK_FROM_ZONE, RemoveZoneLinkFromZoneS2CPacket::receive);
-        ClientPlayNetworking.registerGlobalReceiver(REMOVE_DOOR_LINK_FROM_ZONE, RemoveDoorLinkFromZoneS2CPacket::receive);
-        ClientPlayNetworking.registerGlobalReceiver(REMOVE_ZONE_LINK_FROM_DOOR, RemoveZoneLinkFromDoorS2CPacket::receive);
+        ClientPlayNetworking.registerGlobalReceiver(SET_LINK_FROM_BLOCK_ENTITY, SetLinkS2CPacket::receive);
+        ClientPlayNetworking.registerGlobalReceiver(SET_PARENT_LINK_FROM_BLOCK_ENTITY, SetParentLinkS2CPacket::receive);
+        ClientPlayNetworking.registerGlobalReceiver(SET_CHILD_LINK_FROM_BLOCK_ENTITY, SetChildLinkS2CPacket::receive);
 
         //MapController
         ClientPlayNetworking.registerGlobalReceiver(MAP_CONTROLLER_UPDATE_ROUND, MapControllerUpdateRoundS2CPacket::receive);
@@ -96,60 +94,53 @@ public class ModMessages {
         ServerPlayNetworking.send(player, EXIST_ZMC_MAP_CHECKER_RESPONSE, buf);
     }
 
-    public static void sendRemoveLinkPacket(World world, BlockPos blockPos) {
+    public static void sendSetLinkPacket(World world, BlockPos blockPosSource, List<BlockPos> blockPosToRemove, Class<? extends BlockEntity> linkType) {
         PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeBlockPos(blockPos);
+        buf.writeBlockPos(blockPosSource);
+        buf.writeInt(BlockEntityType.fromClass(linkType).ordinal());
+
+        buf.writeInt(blockPosToRemove.size());
+        for (BlockPos pos : blockPosToRemove) {
+            buf.writeBlockPos(pos);
+        }
 
         // Send this packet to all players in the world
-        PlayerLookup.tracking((ServerWorld) world, blockPos).forEach(player -> {
-            ServerPlayNetworking.send(player, ModMessages.REMOVE_LINK_FROM_BLOCK_ENTITY, buf);
+        PlayerLookup.tracking((ServerWorld) world, blockPosSource).forEach(player -> {
+            ServerPlayNetworking.send(player, ModMessages.SET_LINK_FROM_BLOCK_ENTITY, buf);
         });
     }
 
-    public static void sendRemoveZoneLinkFromDoorwayPacket(World world, BlockPos blockPos) {
+    public static void sendSetParentLinkPacket(World world, BlockPos blockPosSource, List<BlockPos> blockPosToRemove, Class<? extends BlockEntity> linkType) {
         PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeBlockPos(blockPos);
+        buf.writeBlockPos(blockPosSource);
+        buf.writeInt(BlockEntityType.fromClass(linkType).ordinal());
+
+        buf.writeInt(blockPosToRemove.size());
+        for (BlockPos pos : blockPosToRemove) {
+            buf.writeBlockPos(pos);
+        }
 
         // Send this packet to all players in the world
-        PlayerLookup.tracking((ServerWorld) world, blockPos).forEach(player -> {
-            ServerPlayNetworking.send(player, ModMessages.REMOVE_ZONE_LINK_FROM_WINDOW, buf);
+        PlayerLookup.tracking((ServerWorld) world, blockPosSource).forEach(player -> {
+            ServerPlayNetworking.send(player, ModMessages.SET_PARENT_LINK_FROM_BLOCK_ENTITY, buf);
         });
     }
 
-    public static void sendRemoveDoorwayLinkFromZonePacket(World world, BlockPos zonePos, BlockPos doorwayPos) {
+    public static void sendSetChildLinkPacket(World world, BlockPos blockPosSource, List<BlockPos> blockPosToRemove, Class<? extends BlockEntity> linkType) {
         PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeBlockPos(zonePos);
-        buf.writeBlockPos(doorwayPos);
+        buf.writeBlockPos(blockPosSource);
+        buf.writeInt(BlockEntityType.fromClass(linkType).ordinal());
+
+        buf.writeInt(blockPosToRemove.size());
+        for (BlockPos pos : blockPosToRemove) {
+            buf.writeBlockPos(pos);
+        }
 
         // Send this packet to all players in the world
-        PlayerLookup.tracking((ServerWorld) world, zonePos).forEach(player -> {
-            ServerPlayNetworking.send(player, ModMessages.REMOVE_WINDOW_LINK_FROM_ZONE, buf);
+        PlayerLookup.tracking((ServerWorld) world, blockPosSource).forEach(player -> {
+            ServerPlayNetworking.send(player, ModMessages.SET_CHILD_LINK_FROM_BLOCK_ENTITY, buf);
         });
     }
-
-    public static void sendRemoveDoorLinkFromZonePacket(World world, BlockPos zonePos, BlockPos doorPos) {
-        PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeBlockPos(zonePos);
-        buf.writeBlockPos(doorPos);
-
-        // Send this packet to all players in the world
-        PlayerLookup.tracking((ServerWorld) world, zonePos).forEach(player -> {
-            ServerPlayNetworking.send(player, ModMessages.REMOVE_DOOR_LINK_FROM_ZONE, buf);
-        });
-    }
-
-    public static void sendRemoveZoneLinkFromDoorPacket(World world, BlockPos zonePos, BlockPos doorPos) {
-        PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeBlockPos(zonePos);
-        buf.writeBlockPos(doorPos);
-
-        // Send this packet to all players in the world
-        PlayerLookup.tracking((ServerWorld) world, zonePos).forEach(player -> {
-            ServerPlayNetworking.send(player, ModMessages.REMOVE_ZONE_LINK_FROM_DOOR, buf);
-        });
-    }
-
-
 
     public static void sendUpdateDisplayOverlayPacket(ServerPlayerEntity player, boolean displayOverlay) {
         PacketByteBuf buf = PacketByteBufs.create();

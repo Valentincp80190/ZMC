@@ -2,7 +2,6 @@ package com.aureskull.zmcmod.block.entity;
 
 import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.ILinkable;
-import com.aureskull.zmcmod.block.custom.MapControllerBlock;
 import com.aureskull.zmcmod.block.custom.SmallZombieWindowBlock;
 import com.aureskull.zmcmod.client.InteractionHelper;
 import com.aureskull.zmcmod.client.overlay.MessageHudOverlay;
@@ -33,6 +32,7 @@ import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SmallZombieWindowBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ILinkable {
@@ -281,74 +281,29 @@ public class SmallZombieWindowBlockEntity extends BlockEntity implements Extende
         }
     }
 
+    @Override
+    public void setLink(List<BlockPos> blocks, Class<? extends BlockEntity> linkType) {
+        if(ZoneControllerBlockEntity.class.isAssignableFrom(linkType))
+            linkedZonePos = blocks.size() > 0 ? blocks.get(0) : null;
 
-    private void unlinkSpawner(World world) {
-        ModMessages.sendRemoveLinkPacket(world, this.getLinkedBlock(ZombieSpawnerBlockEntity.class));
-
-        //Remove from ZombieSpawner the doorway
-        BlockEntity existingZombieSpawnerBE = world.getBlockEntity(this.getLinkedBlock(ZombieSpawnerBlockEntity.class));
-        if(existingZombieSpawnerBE instanceof ZombieSpawnerBlockEntity)
-            ((ZombieSpawnerBlockEntity) existingZombieSpawnerBE).setLinkedBlock(null, SmallZombieWindowBlockEntity.class);
-
-        setLinkedBlock(null, ZombieSpawnerBlockEntity.class);
-    }
-
-    private void unlinkZoneController(World world) {
-        ModMessages.sendRemoveDoorwayLinkFromZonePacket(world,
-                getLinkedBlock(ZoneControllerBlockEntity.class),
-                this.getPos());
-
-        //Remove from ZoneController the doorway
-        BlockEntity zoneControllerBE = world.getBlockEntity(getLinkedBlock(ZoneControllerBlockEntity.class));
-        if(zoneControllerBE instanceof ZoneControllerBlockEntity)
-            ((ZoneControllerBlockEntity) zoneControllerBE).removeLinkedBlock(this.getPos(), SmallZombieWindowBlockEntity.class);
-
-        //Remove from server at the end
-        setLinkedBlock(null, ZoneControllerBlockEntity.class);
+        else if(ZombieSpawnerBlockEntity.class.isAssignableFrom(linkType))
+            linkedSpawnerPos = blocks.size() > 0 ? blocks.get(0) : null;
     }
 
     @Override
-    public void unlink(World world, Class<? extends BlockEntity> linkType) {
-        if (ZombieSpawnerBlockEntity.class.isAssignableFrom(linkType) && linkedSpawnerPos != null) {
-            unlinkSpawner(world);
-        } else if (ZoneControllerBlockEntity.class.isAssignableFrom(linkType) && linkedZonePos != null) {
-            unlinkZoneController(world);
+    public List<BlockPos> getLink(Class<? extends BlockEntity> linkType) {
+        List<BlockPos> blockPosList = new ArrayList<>();
+
+        if(ZoneControllerBlockEntity.class.isAssignableFrom(linkType)){
+            if(linkedZonePos != null) blockPosList.add(linkedZonePos);
+            return blockPosList;
         }
-    }
 
-
-    @Override
-    public void setLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
-        if (ZombieSpawnerBlockEntity.class.isAssignableFrom(linkType)) {
-            this.linkedSpawnerPos = linkedBlockPos;
-        } else if (ZoneControllerBlockEntity.class.isAssignableFrom(linkType)) {
-            this.linkedZonePos = linkedBlockPos;
+        if(ZombieSpawnerBlockEntity.class.isAssignableFrom(linkType)){
+            if(linkedSpawnerPos != null) blockPosList.add(linkedSpawnerPos);
+            return blockPosList;
         }
-        markDirty();
-    }
 
-    @Override
-    public BlockPos getLinkedBlock(Class<? extends BlockEntity> linkType) {
-        if (ZombieSpawnerBlockEntity.class.isAssignableFrom(linkType)) {
-            return linkedSpawnerPos;
-        } else if (ZoneControllerBlockEntity.class.isAssignableFrom(linkType)) {
-            return linkedZonePos;
-        }
-        return null;
-    }
-
-    @Override
-    public void addLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
-
-    }
-
-    @Override
-    public void removeLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
-
-    }
-
-    @Override
-    public List<BlockPos> getAllLinkedBlocks(Class<? extends BlockEntity> linkType) {
         return null;
     }
 }

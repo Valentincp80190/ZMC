@@ -2,6 +2,7 @@ package com.aureskull.zmcmod.block.entity.renderer;
 
 import com.aureskull.zmcmod.block.entity.SmallZombieWindowBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZombieSpawnerBlockEntity;
+import com.aureskull.zmcmod.block.entity.ZoneControllerBlockEntity;
 import com.aureskull.zmcmod.item.custom.Linker;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
@@ -15,6 +16,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import org.joml.Matrix4f;
 
+import java.util.List;
+
 @Environment(EnvType.CLIENT)
 public class SmallZombieDoorwayEntityRenderer  implements BlockEntityRenderer<SmallZombieWindowBlockEntity> {
     //TODO : Dessiner une texture de 1*3 pixels qui représente un fil
@@ -25,7 +28,10 @@ public class SmallZombieDoorwayEntityRenderer  implements BlockEntityRenderer<Sm
 
     @Override
     public void render(SmallZombieWindowBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-        if(entity.getLinkedBlock(ZombieSpawnerBlockEntity.class) != null){
+        List<BlockPos> spawnerPos = entity.getLink(ZombieSpawnerBlockEntity.class);
+
+        if(spawnerPos != null && spawnerPos.size() > 0){
+
             MinecraftClient minecraftClient = MinecraftClient.getInstance();
 
             // Check if the Minecraft client and the player are not null
@@ -34,7 +40,7 @@ public class SmallZombieDoorwayEntityRenderer  implements BlockEntityRenderer<Sm
 
                 // Check if the item in the main hand is the Linker item
                 if (itemInMainHand.getItem() instanceof Linker) {
-                    renderLine(entity.getPos(), entity.getLinkedBlock(ZombieSpawnerBlockEntity.class), matrices);
+                    renderLine(entity.getPos(), spawnerPos.get(0), matrices);
                 }
             }
         }

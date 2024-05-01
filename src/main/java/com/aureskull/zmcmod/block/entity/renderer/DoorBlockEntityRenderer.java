@@ -35,8 +35,9 @@ public class DoorBlockEntityRenderer implements BlockEntityRenderer<DoorBlockEnt
     public void render(DoorBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
         if(entity.getMasterPos() != null) return;
 
+
         try{
-            List<BlockPos> zoneControllers = entity.getAllLinkedBlocks(ZoneControllerBlockEntity.class);
+            List<BlockPos> zoneControllers = entity.getLink(ZoneControllerBlockEntity.class);
 
             if(zoneControllers != null){
                 MinecraftClient minecraftClient = MinecraftClient.getInstance();

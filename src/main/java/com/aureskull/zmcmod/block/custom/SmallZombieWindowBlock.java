@@ -96,8 +96,8 @@ public class SmallZombieWindowBlock extends BlockWithEntity implements BlockEnti
             if (be instanceof SmallZombieWindowBlockEntity) {
                 SmallZombieWindowBlockEntity smallZombieDoorway = (SmallZombieWindowBlockEntity) be;
 
-                smallZombieDoorway.unlink(world, ZombieSpawnerBlockEntity.class);
-                smallZombieDoorway.unlink(world, ZoneControllerBlockEntity.class);
+                smallZombieDoorway.unlink(be, ZombieSpawnerBlockEntity.class, true);
+                smallZombieDoorway.unlink(be, ZoneControllerBlockEntity.class, true);
             }
         }
         super.onBreak(world, pos, state, player);

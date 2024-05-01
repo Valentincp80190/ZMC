@@ -94,11 +94,10 @@ public class ZombieSpawnerBlockEntity extends BlockEntity implements ExtendedScr
 
     public BlockPos getMapControllerBlockEntityPos() {
         if (getLinkedWindow() != null && world.getBlockEntity(getLinkedWindow()) instanceof SmallZombieWindowBlockEntity window) {
-            BlockPos zoneBP = window.getLinkedBlock(ZoneControllerBlockEntity.class);
+            List<BlockPos> zoneBP = window.getLink(ZoneControllerBlockEntity.class);
 
-            if (world.getBlockEntity(zoneBP) instanceof ZoneControllerBlockEntity zoneBE) {
+            if (world.getBlockEntity(zoneBP.get(0)) instanceof ZoneControllerBlockEntity zoneBE)
                 return zoneBE.findMapControllerRecursively(zoneBE, new ArrayList<BlockPos>());
-            }
         }
         return null; // MapControllerBlockEntity BlockPos not found
     }
@@ -118,53 +117,21 @@ public class ZombieSpawnerBlockEntity extends BlockEntity implements ExtendedScr
         }
     }
 
-    public void unlinkDoorway(World world) {
-        ModMessages.sendRemoveLinkPacket(world, this.getLinkedBlock(SmallZombieWindowBlockEntity.class));
-
-        BlockEntity existingDoorwayEntity = world.getBlockEntity(this.getLinkedBlock(SmallZombieWindowBlockEntity.class));
-        if (existingDoorwayEntity instanceof SmallZombieWindowBlockEntity)
-            ((SmallZombieWindowBlockEntity) existingDoorwayEntity).setLinkedBlock(null, ZombieSpawnerBlockEntity.class);
-
-        setLinkedBlock(null, SmallZombieWindowBlockEntity.class);
+    @Override
+    public void setLink(List<BlockPos> blocks, Class<? extends BlockEntity> linkType) {
+        if(SmallZombieWindowBlockEntity.class.isAssignableFrom(linkType))
+            linkedWindowPos = blocks.size() > 0 ? blocks.get(0) : null;
     }
 
     @Override
-    public void unlink(World world, Class<? extends BlockEntity> linkType) {
-        if(SmallZombieWindowBlockEntity.class.isAssignableFrom(linkType) && getLinkedWindow() != null){
-            unlinkDoorway(world);
-        }
-    }
+    public List<BlockPos> getLink(Class<? extends BlockEntity> linkType) {
+        List<BlockPos> blockPosList = new ArrayList<>();
 
-    @Override
-    public void setLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
-        if(SmallZombieWindowBlockEntity.class.isAssignableFrom(linkType)) {
-            this.linkedWindowPos = linkedBlockPos;
+        if(SmallZombieWindowBlockEntity.class.isAssignableFrom(linkType)){
+            if(linkedWindowPos != null) blockPosList.add(linkedWindowPos);
+            return blockPosList;
         }
 
-        markDirty();
-    }
-
-    @Override
-    public @Nullable BlockPos getLinkedBlock(Class<? extends BlockEntity> linkType) {
-        if(SmallZombieWindowBlockEntity.class.isAssignableFrom(linkType)) {
-            return getLinkedWindow();
-        }
-
-        return null;
-    }
-
-    @Override
-    public void addLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
-
-    }
-
-    @Override
-    public void removeLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
-
-    }
-
-    @Override
-    public List<BlockPos> getAllLinkedBlocks(Class<? extends BlockEntity> linkType) {
         return null;
     }
 }

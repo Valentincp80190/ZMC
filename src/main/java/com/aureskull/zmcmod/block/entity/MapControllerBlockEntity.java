@@ -297,54 +297,6 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         return new MapControllerScreenHandler(syncId, this);
     }
 
-    @Override
-    public void unlink(World world, Class<? extends BlockEntity> linkType) {
-        if(ZoneControllerBlockEntity.class.isAssignableFrom(linkType) && linkedZoneController != null){
-            unlinkZone(world);
-        }
-    }
-
-    private void unlinkZone(World world){
-        ModMessages.sendRemoveLinkPacket(world, this.getLinkedBlock(ZoneControllerBlockEntity.class));
-
-        //Remove from MapController the zone
-        BlockEntity zoneControllerBE = world.getBlockEntity(this.getLinkedBlock(ZoneControllerBlockEntity.class));
-        if(zoneControllerBE instanceof ZoneControllerBlockEntity)
-            ((ZoneControllerBlockEntity) zoneControllerBE).setLinkedBlock(null, MapControllerBlockEntity.class);
-
-        setLinkedBlock(null, ZoneControllerBlockEntity.class);
-    }
-
-    @Override
-    public void setLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
-        if(ZoneControllerBlockEntity.class.isAssignableFrom(linkType)){
-            this.linkedZoneController = linkedBlockPos;
-        }
-        markDirty();
-    }
-
-    @Override
-    public @Nullable BlockPos getLinkedBlock(Class<? extends BlockEntity> linkType) {
-        if(ZoneControllerBlockEntity.class.isAssignableFrom(linkType))
-            return this.linkedZoneController;
-
-        return null;
-    }
-
-    @Override
-    public void addLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
-
-    }
-
-    @Override
-    public void removeLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
-    }
-
-    @Override
-    public List<BlockPos> getAllLinkedBlocks(Class<? extends BlockEntity> linkType) {
-        return null;
-    }
-
     public boolean isStarted() {
         return started;
     }
@@ -568,7 +520,7 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
             ZoneControllerBlockEntity zone = getRandomZoneOccupiedByPlayer();
             if(zone != null &&
-                zone.getAllLinkedBlocks(SmallZombieWindowBlockEntity.class).size() > 0){
+                zone.getLink(SmallZombieWindowBlockEntity.class).size() > 0){
                 try{
                     zone.spawnZombie(true);
                     zombiesRemainingInRound--;
@@ -695,5 +647,23 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
     public void setMapName(String mapName) {
         this.mapName = mapName;
+    }
+
+    @Override
+    public void setLink(List<BlockPos> blocks, Class<? extends BlockEntity> linkType) {
+        if(ZoneControllerBlockEntity.class.isAssignableFrom(linkType))
+            linkedZoneController =  blocks.size() > 0 ? blocks.get(0) : null;
+    }
+
+    @Override
+    public List<BlockPos> getLink(Class<? extends BlockEntity> linkType) {
+        List<BlockPos> blockPosList = new ArrayList<>();
+
+        if(ZoneControllerBlockEntity.class.isAssignableFrom(linkType)){
+            if(linkedZoneController != null) blockPosList.add(linkedZoneController);
+            return blockPosList;
+        }
+
+        return null;
     }
 }

@@ -21,6 +21,9 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ZoneControllerBlock extends BlockWithEntity implements BlockEntityProvider {
     public static final MapCodec<ZoneControllerBlock> CODEC = ZoneControllerBlock.createCodec(ZoneControllerBlock::new);
 
@@ -77,17 +80,16 @@ public class ZoneControllerBlock extends BlockWithEntity implements BlockEntityP
             BlockEntity be = world.getBlockEntity(pos);
             if (be instanceof ZoneControllerBlockEntity) {
                 ZoneControllerBlockEntity zoneControllerBE = (ZoneControllerBlockEntity) be;
-                zoneControllerBE.unlink(world, MapControllerBlockEntity.class);
-                zoneControllerBE.unlink(world, SmallZombieWindowBlockEntity.class);
-                zoneControllerBE.unlink(world, DoorBlockEntity.class);
+                zoneControllerBE.unlink(be, MapControllerBlockEntity.class, true);
+                zoneControllerBE.unlink(be, SmallZombieWindowBlockEntity.class, true);
+                zoneControllerBE.unlink(be, DoorBlockEntity.class, true);
 
                 //Remove child from parent zone
-                for (BlockPos zonePos: zoneControllerBE.getParent(ZoneControllerBlockEntity.class)) {
-                    BlockEntity parentZoneBE = world.getBlockEntity(zonePos);
-                    if (parentZoneBE instanceof ZoneControllerBlockEntity) {
-                        ZoneControllerBlockEntity parentZoneController = ((ZoneControllerBlockEntity) parentZoneBE);
-                        parentZoneController.removeChild(pos, ZoneControllerBlockEntity.class);
-                    }
+                List<BlockPos> parents = new ArrayList<>(zoneControllerBE.getParentLink(ZoneControllerBlockEntity.class));
+                for (BlockPos zonePos: parents) {
+                    BlockEntity BE = world.getBlockEntity(zonePos);
+                    if (BE instanceof ZoneControllerBlockEntity parentZoneBE)
+                        parentZoneBE.removeChildLink(parentZoneBE, pos, ZoneControllerBlockEntity.class, true);
                 }
             }
         }

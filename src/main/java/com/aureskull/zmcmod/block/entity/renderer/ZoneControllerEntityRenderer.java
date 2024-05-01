@@ -2,6 +2,7 @@ package com.aureskull.zmcmod.block.entity.renderer;
 
 import com.aureskull.zmcmod.block.entity.SmallZombieWindowBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZoneControllerBlockEntity;
+import com.aureskull.zmcmod.block.entity.door.DoorBlockEntity;
 import com.aureskull.zmcmod.event.ModKeyInputHandler;
 import com.aureskull.zmcmod.item.custom.Linker;
 import com.aureskull.zmcmod.item.custom.ZoneStick;
@@ -18,6 +19,8 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
+
+import java.util.List;
 
 @Environment(EnvType.CLIENT)
 public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneControllerBlockEntity> {
@@ -281,7 +284,10 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
     }
 
     public void drawLinesToDoorways(ZoneControllerBlockEntity entity, MatrixStack matrices){
-        if(entity.getAllLinkedBlocks(SmallZombieWindowBlockEntity.class).size() == 0) return;
+        List<BlockPos> windows = entity.getLink(SmallZombieWindowBlockEntity.class);
+
+        if(windows == null || windows.size() == 0) return;
+
 
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         //RenderSystem.enableDepthTest();
@@ -292,7 +298,7 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
 
         buffer.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
 
-        for (BlockPos posB: entity.getAllLinkedBlocks(SmallZombieWindowBlockEntity.class)) {
+        for (BlockPos posB: windows) {
             double deltaX = posB.getX() - entity.getPos().getX();
             double deltaY = posB.getY() - entity.getPos().getY();
             double deltaZ = posB.getZ() - entity.getPos().getZ();
@@ -305,7 +311,8 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
     }
 
     public void drawLinesToChildZones(ZoneControllerBlockEntity entity, MatrixStack matrices){
-        if(entity.getChildren(ZoneControllerBlockEntity.class).size() == 0) return;
+        List<BlockPos> childrenZones = entity.getChildLink(ZoneControllerBlockEntity.class);
+        if(childrenZones == null || childrenZones.size() == 0) return;
 
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         //RenderSystem.enableDepthTest();
@@ -316,7 +323,7 @@ public class ZoneControllerEntityRenderer implements BlockEntityRenderer<ZoneCon
 
         buffer.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
 
-        for (BlockPos posB: entity.getChildren(ZoneControllerBlockEntity.class)) {
+        for (BlockPos posB: childrenZones) {
             double deltaX = posB.getX() - entity.getPos().getX();
             double deltaY = posB.getY() - entity.getPos().getY();
             double deltaZ = posB.getZ() - entity.getPos().getZ();

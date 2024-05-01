@@ -79,8 +79,7 @@ public class MapControllerBlock extends BlockWithEntity implements BlockEntityPr
             if (be instanceof MapControllerBlockEntity) {
                 MapControllerBlockEntity mapControllerBE = (MapControllerBlockEntity) be;
 
-                mapControllerBE.unlink(world, ZoneControllerBlockEntity.class);
-
+                mapControllerBE.unlink(be, ZoneControllerBlockEntity.class, true);
 
                 if(mapControllerBE.getPlayerManager().isSubscribedPlayer(player.getUuid())){
                     ModMessages.sendUpdateDisplayOverlayPacket((ServerPlayerEntity) player, false);

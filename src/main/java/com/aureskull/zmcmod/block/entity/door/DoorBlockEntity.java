@@ -40,7 +40,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class DoorBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ILinkable, IBuyable {
     private BlockPos masterPos;
@@ -317,7 +316,7 @@ public class DoorBlockEntity extends BlockEntity implements ExtendedScreenHandle
             }
         }
 
-        unlink(world, ZoneControllerBlockEntity.class);
+        unlink(this, ZoneControllerBlockEntity.class, true);
     }
 
     public void openDoor() {
@@ -382,28 +381,32 @@ public class DoorBlockEntity extends BlockEntity implements ExtendedScreenHandle
         }else getMasterBlockEntity().setPrice(price);
     }
 
-    private void unlinkZone(World world, BlockPos zonePos){
-        ModMessages.sendRemoveDoorLinkFromZonePacket(world, zonePos, getPos());
-
-        //Remove from SmallZombieDoorway the zone
-        BlockEntity zoneBE = world.getBlockEntity(zonePos);
-        if (zoneBE instanceof ZoneControllerBlockEntity zoneControllerBlockEntity)
-            zoneControllerBlockEntity.removeLinkedBlock(getPos(), DoorBlockEntity.class);
-
-        removeLinkedBlock(zonePos, ZoneControllerBlockEntity.class);
+    @Override
+    public void buyEvent(PlayerEntity player) {
+        openDoor();
     }
 
-    private void addLinkedZoneController(BlockPos zoneControllerBlockPos) {
-        if (zoneControllerBlockPos != this.getPos() && !linkedZoneControllers.contains(zoneControllerBlockPos) && world.getBlockEntity(zoneControllerBlockPos) instanceof ZoneControllerBlockEntity)
-            linkedZoneControllers.add(zoneControllerBlockPos);
-    }
 
-    private void removeLinkedZoneController(BlockPos zoneControllerBlockPos) {
-        if(linkedZoneControllers.contains(zoneControllerBlockPos))
-            linkedZoneControllers.remove(zoneControllerBlockPos);
+
+
+
+
+
+    @Override
+    public List<BlockPos> getLink(Class<? extends BlockEntity> linkType) {
+        if(ZoneControllerBlockEntity.class.isAssignableFrom(linkType))
+            return linkedZoneControllers;
+
+        return null;
     }
 
     @Override
+    public void setLink(List<BlockPos> blocks, Class<? extends BlockEntity> linkType) {
+        if(ZoneControllerBlockEntity.class.isAssignableFrom(linkType))
+            linkedZoneControllers = blocks;
+    }
+
+    /*@Override
     public void unlink(World world, Class<? extends BlockEntity> linkType) {
         if(ZoneControllerBlockEntity.class.isAssignableFrom(linkType) && linkedZoneControllers != null && masterPos == null){
             List<BlockPos> zones = new CopyOnWriteArrayList<>(getAllLinkedBlocks(ZoneControllerBlockEntity.class));
@@ -412,28 +415,7 @@ public class DoorBlockEntity extends BlockEntity implements ExtendedScreenHandle
         }
     }
 
-    @Override
-    public void setLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
-
-    }
-
-    @Override
-    public @Nullable BlockPos getLinkedBlock(Class<? extends BlockEntity> linkType) {
-        return null;
-    }
-
-    @Override
-    public void addLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
-        if(masterPos != null) getMasterBlockEntity().addLinkedBlock(linkedBlockPos, linkType);
-
-        if(ZoneControllerBlockEntity.class.isAssignableFrom(linkType)){
-            addLinkedZoneController(linkedBlockPos);
-        }
-
-        markDirty();
-    }
-
-    @Override
+    /*@Override
     public void removeLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
         if(masterPos != null) getMasterBlockEntity().removeLinkedBlock(linkedBlockPos, linkType);
 
@@ -442,21 +424,5 @@ public class DoorBlockEntity extends BlockEntity implements ExtendedScreenHandle
         }
 
         markDirty();
-    }
-
-    @Override
-    public List<BlockPos> getAllLinkedBlocks(Class<? extends BlockEntity> linkType) {
-        if(masterPos != null) getMasterBlockEntity().getAllLinkedBlocks(linkType);
-
-        if(ZoneControllerBlockEntity.class.isAssignableFrom(linkType)){
-            return linkedZoneControllers;
-        }
-
-        return null;
-    }
-
-    @Override
-    public void buyEvent(PlayerEntity player) {
-        openDoor();
-    }
+    }*/
 }

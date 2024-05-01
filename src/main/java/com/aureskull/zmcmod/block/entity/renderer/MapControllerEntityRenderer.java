@@ -19,6 +19,8 @@ import net.minecraft.util.math.BlockPos;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
+import java.util.List;
+
 @Environment(EnvType.CLIENT)
 public class MapControllerEntityRenderer implements BlockEntityRenderer<MapControllerBlockEntity> {
     public MapControllerEntityRenderer(BlockEntityRendererFactory.Context context){
@@ -83,7 +85,9 @@ public class MapControllerEntityRenderer implements BlockEntityRenderer<MapContr
     }
 
     private void renderZoneControllerBlockEntityLink(MapControllerBlockEntity entity, MatrixStack matrices){
-        if(entity.getLinkedBlock(ZoneControllerBlockEntity.class) != null){
+        List<BlockPos> zonePos = entity.getLink(ZoneControllerBlockEntity.class);
+        if(zonePos != null && zonePos.size() > 0){
+
             MinecraftClient minecraftClient = MinecraftClient.getInstance();
 
             // Check if the Minecraft client and the player are not null
@@ -92,7 +96,7 @@ public class MapControllerEntityRenderer implements BlockEntityRenderer<MapContr
 
                 // Check if the item in the main hand is the Linker item
                 if (itemInMainHand.getItem() instanceof Linker) {
-                    renderLinkLine(entity.getPos(), entity.getLinkedBlock(ZoneControllerBlockEntity.class), matrices);
+                    renderLinkLine(entity.getPos(), zonePos.get(0), matrices);
                 }
             }
         }

@@ -229,7 +229,7 @@ public class DoorPartBlock extends BlockWithEntity implements BlockEntityProvide
             if (be instanceof DoorBlockEntity) {
                 DoorBlockEntity doorBlockEntity = (DoorBlockEntity) be;
                 doorBlockEntity.destroyDoor();
-                doorBlockEntity.unlink(world, ZoneControllerBlockEntity.class);
+                doorBlockEntity.unlink(be, ZoneControllerBlockEntity.class, true);
             }
         }
         super.onBreak(world, pos, state, player);
