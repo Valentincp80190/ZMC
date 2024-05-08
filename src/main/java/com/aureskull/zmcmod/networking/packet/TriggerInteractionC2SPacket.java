@@ -36,7 +36,8 @@ public class TriggerInteractionC2SPacket {
             }
 
             if (blockEntity instanceof DoorBlockEntity doorBlockEntity) {
-                doorBlockEntity.buy(player, doorBlockEntity.getPrice());
+                if(!doorBlockEntity.isOpen())
+                    doorBlockEntity.buy(player, doorBlockEntity.getPrice());
             }
         });
     }

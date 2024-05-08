@@ -145,7 +145,7 @@ public class DoorBlockEntity extends BlockEntity implements ExtendedScreenHandle
                 PlayerEntity player = client.player;
                 HitResult hit = InteractionHelper.rayTrace(player, searchArea);
 
-                if(!player.isSpectator()){
+                if(!player.isSpectator() && !isOpen()){
                     if (hit.getType() == HitResult.Type.BLOCK && searchArea.contains(player.getPos())) {
                         if(PlayerHelper.isPlaying(player)){
                             MessageHudOverlay.setMessage("Hold [" + ModKeyInputHandler.INTERACT.getBoundKeyLocalizedText().getLiteralString() + "] to Open Door [Cost: " + price + "]", Formatting.WHITE, 100);
@@ -338,7 +338,12 @@ public class DoorBlockEntity extends BlockEntity implements ExtendedScreenHandle
             }
         }
 
-        if(blockState != null && !blockState.get(DoorPartBlock.OPEN)) world.playSound(null, pos, ModSounds.DOOR_OPEN, SoundCategory.BLOCKS, 0.5f, 1.0f);
+        for(BlockPos pos : linkedZoneControllers){
+            if(world.getBlockEntity(pos) instanceof ZoneControllerBlockEntity zoneControllerBlockEntity)
+                zoneControllerBlockEntity.setOpen(true);
+        }
+
+        if(blockState != null) world.playSound(null, pos, ModSounds.DOOR_OPEN, SoundCategory.BLOCKS, 0.5f, 1.0f);
     }
 
     public void closeDoor() {
@@ -358,6 +363,15 @@ public class DoorBlockEntity extends BlockEntity implements ExtendedScreenHandle
                 world.setBlockState(pos, blockState.with(DoorPartBlock.OPEN, false), 3);
             }
         }
+
+        for(BlockPos pos : linkedZoneControllers){
+            if(world.getBlockEntity(pos) instanceof ZoneControllerBlockEntity zoneControllerBlockEntity)
+                zoneControllerBlockEntity.setOpen(false);
+        }
+    }
+
+    public boolean isOpen(){
+        return world.getBlockState(pos).get(DoorPartBlock.OPEN);
     }
 
     private Box getSearchArea(BlockPos pos, Direction facing) {
@@ -405,24 +419,4 @@ public class DoorBlockEntity extends BlockEntity implements ExtendedScreenHandle
         if(ZoneControllerBlockEntity.class.isAssignableFrom(linkType))
             linkedZoneControllers = blocks;
     }
-
-    /*@Override
-    public void unlink(World world, Class<? extends BlockEntity> linkType) {
-        if(ZoneControllerBlockEntity.class.isAssignableFrom(linkType) && linkedZoneControllers != null && masterPos == null){
-            List<BlockPos> zones = new CopyOnWriteArrayList<>(getAllLinkedBlocks(ZoneControllerBlockEntity.class));
-            for (BlockPos zone : zones)
-                unlinkZone(world, zone);
-        }
-    }
-
-    /*@Override
-    public void removeLinkedBlock(BlockPos linkedBlockPos, Class<? extends BlockEntity> linkType) {
-        if(masterPos != null) getMasterBlockEntity().removeLinkedBlock(linkedBlockPos, linkType);
-
-        if(ZoneControllerBlockEntity.class.isAssignableFrom(linkType)){
-            removeLinkedZoneController(linkedBlockPos);
-        }
-
-        markDirty();
-    }*/
 }

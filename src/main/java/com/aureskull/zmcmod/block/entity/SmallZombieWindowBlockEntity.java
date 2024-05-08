@@ -36,8 +36,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SmallZombieWindowBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ILinkable {
-    public final int MAX_PLANK = 6;
-    public int plank = 0;
+    private final int MAX_PLANK = 6;
+    private int plank = 0;
 
     private boolean canZombiePassThrough = false;
     private long nextPassThroughTime = 0;
@@ -174,7 +174,7 @@ public class SmallZombieWindowBlockEntity extends BlockEntity implements Extende
 
             assert world != null;
             if (!world.isClient) {
-                world.setBlockState(pos, world.getBlockState(pos).with(SmallZombieWindowBlock.PLANKS, Integer.valueOf(plank)), 3);
+                world.setBlockState(pos, world.getBlockState(pos).with(SmallZombieWindowBlock.PLANKS, plank), 3);
                 world.playSound(null, pos, ModSounds.REBUILD_WINDOW, SoundCategory.BLOCKS, 0.5f, 1.0f);
 
                 PlayerData playerData = StateSaverAndLoader.getPlayerState(player);
@@ -191,7 +191,7 @@ public class SmallZombieWindowBlockEntity extends BlockEntity implements Extende
 
             assert world != null;
             if (!world.isClient) {
-                world.setBlockState(pos, world.getBlockState(pos).with(SmallZombieWindowBlock.PLANKS, Integer.valueOf(plank)), 3);
+                world.setBlockState(pos, world.getBlockState(pos).with(SmallZombieWindowBlock.PLANKS, plank), 3);
                 world.playSound(null, pos, ModSounds.SNAP_WINDOW, SoundCategory.BLOCKS, 0.5f, 1.0f);
                 world.playSound(null, pos, ModSounds.SNAP_WINDOW, SoundCategory.BLOCKS, 0.5f, 1.0f);
             }
@@ -200,6 +200,11 @@ public class SmallZombieWindowBlockEntity extends BlockEntity implements Extende
 
     public int getPlank() {
         return plank;
+    }
+
+    public void resetPlank() {
+        this.plank = MAX_PLANK;
+        if(world != null) world.setBlockState(pos, world.getBlockState(pos).with(SmallZombieWindowBlock.PLANKS, plank), 3);
     }
 
     public Direction getWindowFacing() {

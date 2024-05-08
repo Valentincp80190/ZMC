@@ -154,8 +154,8 @@ public interface ILinkable {
      */
     List<BlockPos> getLink(Class<? extends BlockEntity> linkType);
 
-    default List<BlockPos> getParentLink(Class<? extends BlockEntity> linkType){return null;}
-    default List<BlockPos> getChildLink(Class<? extends BlockEntity> linkType){return null;}
+    default List<BlockPos> getParentLink(Class<? extends BlockEntity> linkType){return new ArrayList<>();}
+    default List<BlockPos> getChildLink(Class<? extends BlockEntity> linkType){return new ArrayList<>();}
 
     /**
      * Marks the block entity as needing an update, often due to changes in the state that need to be saved or synchronized.

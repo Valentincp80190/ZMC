@@ -3,7 +3,6 @@ package com.aureskull.zmcmod.block.entity;
 import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.ILinkable;
 import com.aureskull.zmcmod.block.entity.door.DoorBlockEntity;
-import com.aureskull.zmcmod.networking.ModMessages;
 import com.aureskull.zmcmod.screen.zonecontroller.ZoneControllerScreenHandler;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
@@ -28,7 +27,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ILinkable {
     private BlockPos posA = new BlockPos(pos.getX() - 5, pos.getY() + 1, pos.getZ() - 5);
@@ -51,7 +49,7 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
     private int last_update_players_zone_time = 0;
 
     private List<BlockPos> linkedDoors = new ArrayList<>();
-    private boolean open = true;
+    private boolean open = false;
 
     public ZoneControllerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.ZONE_CONTROLLER_BLOCK_ENTITY, pos, state);
@@ -75,6 +73,8 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
 
     @Override
     protected void writeNbt(NbtCompound nbt){
+        nbt.putBoolean("zone_controller.open", open);
+
         nbt.putFloat("zone_controller.red", red);
         nbt.putFloat("zone_controller.green", green);
         nbt.putFloat("zone_controller.blue", blue);
@@ -120,6 +120,9 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
     @Override
     public void readNbt(NbtCompound nbt){
         super.readNbt(nbt);
+
+        if (nbt.contains("zone_controller.open"))
+            this.open = nbt.getBoolean("zone_controller.open");
 
         if (nbt.contains("zone_controller.red"))
             this.red = nbt.getFloat("zone_controller.red");
@@ -253,10 +256,12 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
             Random random = new Random();
             int randomInt = random.nextInt(100);
 
+            List<ZoneControllerBlockEntity> openedZones = getOpenedNeighborhoods();
+
             if(randomInt >= 25
                 //75% that the zombie spawn in this zone
-                || (linkedParentZoneControllers.size() == 0  && linkedChildZoneControllers.size() == 0)
-                || spawnInZoneOrInNeighborhood == false){
+                || !spawnInZoneOrInNeighborhood
+                || openedZones.size() == 0){
 
                 SmallZombieWindowBlockEntity smallZombieWindowBlockEntity = ((SmallZombieWindowBlockEntity) world.getBlockEntity(linkedWindows.get(new Random().nextInt(linkedWindows.size()))));
 
@@ -266,21 +271,29 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
                 ZombieSpawnerBlockEntity zombieSpawnerBlockEntity = ((ZombieSpawnerBlockEntity) world.getBlockEntity(smallZombieWindowBlockEntity.getLink(ZombieSpawnerBlockEntity.class).get(0)));
                 zombieSpawnerBlockEntity.spawnZombie();
             }else{
-                //25% that the zombie spawn in the parent/child zone
-                randomInt = random.nextInt(1);
-                if(randomInt == 0 && linkedParentZoneControllers.size() != 0){
-                    //Spawn in parent random zone
-                    BlockPos randomParentZone = linkedParentZoneControllers.get(new Random().nextInt(linkedParentZoneControllers.size()));
-                    ((ZoneControllerBlockEntity)world.getBlockEntity(randomParentZone)).spawnZombie(false);
-                }else {
-                    //Spawn in child random zone
-                    BlockPos randomChildZone = linkedChildZoneControllers.get(new Random().nextInt(linkedChildZoneControllers.size()));
-                    ((ZoneControllerBlockEntity)world.getBlockEntity(randomChildZone)).spawnZombie(false);
-                }
+                //25% that the zombie spawn in a neighbor zone
+                ZoneControllerBlockEntity spawnableZone = openedZones.get(new Random().nextInt(openedZones.size()));
+                spawnableZone.spawnZombie(false);
             }
         }catch (Exception e){
             ZMCMod.LOGGER.error("ZoneController - Spawn Zombie :" + e.getMessage() + e.getStackTrace());
         }
+    }
+
+    public List<ZoneControllerBlockEntity> getOpenedNeighborhoods(){
+        List<ZoneControllerBlockEntity> openedZones = new ArrayList<>();
+
+        List<BlockPos> positions = new ArrayList<>();
+        positions.addAll(linkedParentZoneControllers);
+        positions.addAll(linkedChildZoneControllers);
+
+        for(BlockPos pos : positions){
+            if(world != null && world.getBlockEntity(pos) instanceof ZoneControllerBlockEntity zone){
+                if(zone.isOpen()) openedZones.add(zone);
+            }
+        }
+
+        return openedZones;
     }
 
     public BlockPos findMapControllerRecursively(ZoneControllerBlockEntity zone, ArrayList<BlockPos> visitedBlockPos) {
@@ -313,6 +326,38 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
 
         // If no MapControllerBlockEntity is found in the hierarchy, return null
         return null;
+    }
+
+    public List<ZoneControllerBlockEntity> getRecursiveChildrenZones(List<ZoneControllerBlockEntity> zones, ArrayList<BlockPos> visitedBlockPos){
+        if(visitedBlockPos.contains(getPos()))
+            return zones;
+
+        if(!zones.contains(this)) zones.add(this);
+        if(!visitedBlockPos.contains(getPos())) visitedBlockPos.add(getPos());
+
+        for(BlockPos pos : linkedChildZoneControllers){
+            if(visitedBlockPos.contains(pos))
+                continue;
+
+            if(world != null && world.getBlockEntity(pos) instanceof ZoneControllerBlockEntity zone){
+                zone.getRecursiveChildrenZones(zones, visitedBlockPos);
+
+                //List<ZoneControllerBlockEntity> tmpZ = zone.getAllChildrenZones(zones, visitedBlockPos);
+                /*for(ZoneControllerBlockEntity z : tmpZ)
+                    if(!zones.contains(z))
+                        zones.add(z);*/
+            }
+        }
+
+        return zones;
+    }
+
+
+    public List<ZoneControllerBlockEntity> getAllChildrenZones(){
+        List<ZoneControllerBlockEntity> zones = getRecursiveChildrenZones(new ArrayList<>(), new ArrayList<>());
+        zones.remove(this);
+
+        return zones;
     }
 
     public BlockPos getPosA() {
@@ -353,6 +398,23 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
 
     public void setBlue(float blue) {
         this.blue = blue;
+    }
+
+    public List<BlockPos> getLinkedDoors() {
+        return linkedDoors;
+    }
+
+    public boolean isOpen(){
+        return open || linkedParentZoneControllers.size() == 0;
+    }
+
+    public void setOpen(boolean open){
+        this.open = open;
+        markDirty();
+    }
+
+    public List<BlockPos> getLinkedWindows() {
+        return linkedWindows;
     }
 
     @Override

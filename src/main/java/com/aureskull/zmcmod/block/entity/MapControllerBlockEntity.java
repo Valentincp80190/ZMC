@@ -2,6 +2,7 @@ package com.aureskull.zmcmod.block.entity;
 
 import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.ILinkable;
+import com.aureskull.zmcmod.block.entity.door.DoorBlockEntity;
 import com.aureskull.zmcmod.entity.custom.StandingZombieEntity;
 import com.aureskull.zmcmod.management.GamesManager;
 import com.aureskull.zmcmod.management.GamePlayerManager;
@@ -353,6 +354,9 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
                 ChatMessages.sendGameSubscriptionConfirmationMessage(player, mapName);
 
                 roundStartDelay = 40;
+
+                //Reset the map before start it
+                resetMap();
             }else{
                 this.setStart(false, null);
             }
@@ -365,21 +369,25 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
     }
 
     private void teleportAllPlayerInFirstZone() {
-        if (!(world instanceof ServerWorld)) {
-            return; // Exit if not on the server side.
-        }
+        try{
+            if (!(world instanceof ServerWorld)) {
+                return; // Exit if not on the server side.
+            }
 
-        ServerWorld serverWorld = (ServerWorld) world;
+            ServerWorld serverWorld = (ServerWorld) world;
 
-        ZoneControllerBlockEntity zoneControllerBlockEntity = ((ZoneControllerBlockEntity) world.getBlockEntity(this.linkedZoneController));
+            ZoneControllerBlockEntity zoneControllerBlockEntity = ((ZoneControllerBlockEntity) world.getBlockEntity(this.linkedZoneController));
 
-        BlockPos spawnPoint = zoneControllerBlockEntity.getSpawnPoint();
-        double spawnX = spawnPoint.getX() + 0.5;
-        double spawnY = spawnPoint.getY();
-        double spawnZ = spawnPoint.getZ() + 0.5;
+            BlockPos spawnPoint = zoneControllerBlockEntity.getSpawnPoint();
+            double spawnX = spawnPoint.getX() + 0.5;
+            double spawnY = spawnPoint.getY();
+            double spawnZ = spawnPoint.getZ() + 0.5;
 
-        for (PlayerEntity player : playerManager.getConnectedSubscribedPlayers()) {
-            ((ServerPlayerEntity) player).teleport(serverWorld, spawnX, spawnY, spawnZ, player.getYaw(), player.getPitch());
+            for (PlayerEntity player : playerManager.getConnectedSubscribedPlayers()) {
+                ((ServerPlayerEntity) player).teleport(serverWorld, spawnX, spawnY, spawnZ, player.getYaw(), player.getPitch());
+            }
+        }catch (Exception e){
+            ZMCMod.LOGGER.error(e.getMessage() + Arrays.toString(e.getStackTrace()));
         }
     }
 
@@ -458,6 +466,33 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
         if(getRound() == 1){
             for(PlayerEntity player : playerManager.getConnectedSubscribedPlayers())
                 ModMessages.sendUpdateRoundHUDPacket(((ServerPlayerEntity) player), getRound());
+        }
+    }
+
+    private void resetMap(){
+        List<ZoneControllerBlockEntity> zones = getAllZones();
+
+        resetWindows(zones);
+        resetDoors(zones);
+    }
+
+    private void resetDoors(List<ZoneControllerBlockEntity> zones){
+        List<DoorBlockEntity> doors = getAllDoors(zones);
+
+        if(doors == null) return;
+
+        for(DoorBlockEntity door : doors){
+            door.closeDoor();
+        }
+    }
+
+    private void resetWindows(List<ZoneControllerBlockEntity> zones){
+        List<SmallZombieWindowBlockEntity> windows = getAllWindows(zones);
+
+        if(windows == null) return;
+
+        for(SmallZombieWindowBlockEntity window : windows){
+            window.resetPlank();
         }
     }
 
@@ -647,6 +682,51 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
     public void setMapName(String mapName) {
         this.mapName = mapName;
+    }
+
+    private List<ZoneControllerBlockEntity> getAllZones(){
+        List<ZoneControllerBlockEntity> zones = new ArrayList<>();
+
+        if(world != null &&
+           linkedZoneController != null &&
+           world.getBlockEntity(linkedZoneController) instanceof ZoneControllerBlockEntity z){
+
+            zones = z.getAllChildrenZones();
+            zones.add(z);
+        }
+
+        return zones;
+    }
+
+    private List<DoorBlockEntity> getAllDoors(List<ZoneControllerBlockEntity> zones){
+        if(world == null) return null;
+
+
+        List<DoorBlockEntity> doors = new ArrayList<>();
+
+        for(ZoneControllerBlockEntity zone : zones)
+            for(BlockPos pos : zone.getLinkedDoors()){
+                if(world.getBlockEntity(pos) instanceof DoorBlockEntity door){
+                    if(!doors.contains(door)) doors.add(door);
+                }
+            }
+
+        return doors;
+    }
+
+    private List<SmallZombieWindowBlockEntity> getAllWindows(List<ZoneControllerBlockEntity> zones){
+        if(world == null) return null;
+
+        List<SmallZombieWindowBlockEntity> windows = new ArrayList<>();
+
+        for(ZoneControllerBlockEntity zone : zones)
+            for(BlockPos pos : zone.getLinkedWindows()){
+                if(world.getBlockEntity(pos) instanceof SmallZombieWindowBlockEntity window){
+                    if(!windows.contains(window)) windows.add(window);
+                }
+            }
+
+        return windows;
     }
 
     @Override

@@ -156,11 +156,11 @@ public class Linker extends Item {
 
         //ZoneController <=> Door (0..* => 0..*)
         else if (firstEntity instanceof DoorBlockEntity doorBlockEntity && secondEntity instanceof ZoneControllerBlockEntity zoneControllerBlockEntity) {
-            doorBlockEntity.addLink(secondPos, ZoneControllerBlockEntity.class);
+            doorBlockEntity.getMasterBlockEntity().addLink(secondPos, ZoneControllerBlockEntity.class);
             zoneControllerBlockEntity.addLink(firstPos, DoorBlockEntity.class);
 
         } else if (firstEntity instanceof ZoneControllerBlockEntity zoneControllerBlockEntity && secondEntity instanceof DoorBlockEntity doorBlockEntity) {
-            doorBlockEntity.addLink(firstPos, ZoneControllerBlockEntity.class);
+            doorBlockEntity.getMasterBlockEntity().addLink(firstPos, ZoneControllerBlockEntity.class);
             zoneControllerBlockEntity.addLink(secondPos, DoorBlockEntity.class);
         }
     }
