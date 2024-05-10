@@ -9,7 +9,7 @@ import net.minecraft.util.math.BlockPos;
 
 public class AttackWindowGoal extends Goal {
     private final StandingZombieEntity zombie;
-    private BlockPos windowBlockPos;
+    private final BlockPos windowBlockPos;
     private long lastAttackTime = 0;
 
     public AttackWindowGoal(StandingZombieEntity zombie, BlockPos windowBlockPos) {

@@ -207,7 +207,7 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
 
     private void updatePlayerZonePosition(){
         BlockPos mapControllerPos = findMapControllerRecursively(this, new ArrayList<BlockPos>());
-        if(mapControllerPos != null && world.getBlockEntity(mapControllerPos) instanceof MapControllerBlockEntity mapControllerBlockEntity && mapControllerBlockEntity.isStarted()){
+        if(mapControllerPos != null && world.getBlockEntity(mapControllerPos) instanceof MapControllerBlockEntity mapControllerBlockEntity && mapControllerBlockEntity.isStarted() && isOpen()){
             // Create a box representing the zone
             Box zone = getBox();
             // Check for players within the zone
@@ -250,7 +250,7 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
         markDirty();
     }
 
-    public void spawnZombie(boolean spawnInZoneOrInNeighborhood){
+    public void spawnZombie(MapControllerBlockEntity mapControllerBE, boolean spawnInZoneOrInNeighborhood){
         //TODO: Lorsque les portes arriveront, vérifier si la salle voisine est ouverte ou non
         try{
             Random random = new Random();
@@ -269,11 +269,11 @@ public class ZoneControllerBlockEntity extends BlockEntity implements ExtendedSc
                     return;
 
                 ZombieSpawnerBlockEntity zombieSpawnerBlockEntity = ((ZombieSpawnerBlockEntity) world.getBlockEntity(smallZombieWindowBlockEntity.getLink(ZombieSpawnerBlockEntity.class).get(0)));
-                zombieSpawnerBlockEntity.spawnZombie();
+                zombieSpawnerBlockEntity.spawnZombie(mapControllerBE);
             }else{
                 //25% that the zombie spawn in a neighbor zone
                 ZoneControllerBlockEntity spawnableZone = openedZones.get(new Random().nextInt(openedZones.size()));
-                spawnableZone.spawnZombie(false);
+                spawnableZone.spawnZombie(mapControllerBE, false);
             }
         }catch (Exception e){
             ZMCMod.LOGGER.error("ZoneController - Spawn Zombie :" + e.getMessage() + e.getStackTrace());

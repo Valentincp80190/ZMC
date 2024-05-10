@@ -551,19 +551,27 @@ public class MapControllerBlockEntity extends BlockEntity implements ExtendedScr
 
         //Map started => SpawnZombie if we doesn't exceed the number of zombie on the map
         //Normally chance < 7
-        if(luck < spawnLuck && this.zombiesRemainingInRound > 0) {
+        if(luck < spawnLuck && zombiesRemainingInRound > 0) {
 
             ZoneControllerBlockEntity zone = getRandomZoneOccupiedByPlayer();
             if(zone != null &&
                 zone.getLink(SmallZombieWindowBlockEntity.class).size() > 0){
                 try{
-                    zone.spawnZombie(true);
-                    zombiesRemainingInRound--;
+                    zone.spawnZombie(this, true);
+                    //zombiesRemainingInRound--;
                 }catch (Exception e){
                     ZMCMod.LOGGER.error(e.getMessage(), e);
                 }
             }
         }
+    }
+
+    public int getZombiesRemainingInRound() {
+        return zombiesRemainingInRound;
+    }
+
+    public void setZombiesRemainingInRound(int zombiesRemainingInRound) {
+        this.zombiesRemainingInRound = zombiesRemainingInRound;
     }
 
     private ZoneControllerBlockEntity getRandomZoneOccupiedByPlayer(){

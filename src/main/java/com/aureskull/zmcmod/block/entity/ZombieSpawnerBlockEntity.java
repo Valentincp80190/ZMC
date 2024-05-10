@@ -102,18 +102,16 @@ public class ZombieSpawnerBlockEntity extends BlockEntity implements ExtendedScr
         return null; // MapControllerBlockEntity BlockPos not found
     }
 
-    public void spawnZombie() {
-        BlockPos mapController = this.getMapControllerBlockEntityPos();
-        if (!world.isClient && getLinkedWindow() != null &&  mapController != null && world.getBlockEntity(mapController) instanceof  MapControllerBlockEntity) {
+    public void spawnZombie(MapControllerBlockEntity mapControllerBE) {
+        if (!world.isClient && getLinkedWindow() != null) {
             // Logic to spawn the zombie
             StandingZombieEntity zombie = ModEntities.STANDING_ZOMBIE.create(world);
             zombie.setWindowBlockPos(getLinkedWindow());
-            zombie.setMapControllerBlockPos(mapController);
+            zombie.setMapControllerBlockPos(mapControllerBE.getPos());
+            zombie.setPosition(getPos().getX() + 0.5, getPos().getY() + 1, getPos().getZ() + 0.5);
+            world.spawnEntity(zombie);
 
-            if (zombie != null) {
-                zombie.setPosition(getPos().getX() + 0.5, getPos().getY() + 1, getPos().getZ() + 0.5);
-                world.spawnEntity(zombie);
-            }
+            mapControllerBE.setZombiesRemainingInRound(mapControllerBE.getZombiesRemainingInRound() - 1);
         }
     }
 

@@ -130,18 +130,14 @@ public class SmallZombieWindowBlockEntity extends BlockEntity implements Extende
             }catch (Exception e){
                 ZMCMod.LOGGER.error("An error occurred in the SmallZombieWindowBlockEntity tick method :" + e.getMessage() + e.getStackTrace());
             }
-
-
-            return;
-        }
-
-
-        // Update canZombiePassThrough based on the cooldown
-        long currentTime = world.getTime();
-        if (currentTime >= nextPassThroughTime) {
-            canZombiePassThrough = true;
-        } else {
-            canZombiePassThrough = false;
+        }else{
+            // Update canZombiePassThrough based on the cooldown
+            long currentTime = world.getTime();
+            if (currentTime >= nextPassThroughTime) {
+                canZombiePassThrough = true;
+            } else {
+                canZombiePassThrough = false;
+            }
         }
     }
 
@@ -281,7 +277,7 @@ public class SmallZombieWindowBlockEntity extends BlockEntity implements Extende
     public void onZombiePassedThrough() {
         if (canZombiePassThrough) {
             long currentTime = world.getTime();
-            nextPassThroughTime = currentTime + 40; // 2 seconds cooldown
+            nextPassThroughTime = currentTime + 20; // 1 second cooldown
             canZombiePassThrough = false; // Prevent further passes until cooldown expires
         }
     }

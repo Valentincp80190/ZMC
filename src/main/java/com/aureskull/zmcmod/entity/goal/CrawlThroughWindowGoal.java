@@ -17,6 +17,7 @@ public class CrawlThroughWindowGoal extends Goal {
     private SmallZombieWindowBlockEntity window;
     private boolean isCrawling;
     private Direction windowDirection;
+    private boolean shouldHaveCrawled = false;
 
     public CrawlThroughWindowGoal(StandingZombieEntity zombie) {
         this.zombie = zombie;
@@ -25,16 +26,20 @@ public class CrawlThroughWindowGoal extends Goal {
 
     @Override
     public boolean canStart() {
-        if (this.zombie.getWindowBlockPos() != null) {
-            BlockEntity entity = this.zombie.getWorld().getBlockEntity(this.zombie.getWindowBlockPos());
-            if (entity instanceof SmallZombieWindowBlockEntity window && window.getPlank() <= 0) {
-                this.window = window;
-                this.windowDirection = window.getWindowFacing();
+        BlockEntity entity = zombie.getWorld().getBlockEntity(zombie.getWindowBlockPos());
+        if (entity instanceof SmallZombieWindowBlockEntity window && window.getPlank() <= 0) {
+            this.window = window;
+            this.windowDirection = window.getWindowFacing();
 
-                windowSouthPos = window.getDirectionPosition(Direction.SOUTH);
-                return !this.zombie.isPassedThroughWindow() && this.zombie.squaredDistanceTo(windowSouthPos.getX() + .5f, windowSouthPos.getY(), windowSouthPos.getZ()+.5f) < .5;
-            }
+            windowSouthPos = window.getDirectionPosition(Direction.SOUTH);
+
+            BlockPos a = zombie.getBlockPos();
+            BlockPos b = window.getPos();
+            boolean t = a.getX() == b.getX() && a.getY() == b.getY() && a.getZ() == b.getZ();
+            return (shouldHaveCrawled && t) || //zombie stuck
+                    !this.zombie.isPassedThroughWindow() && zombie.squaredDistanceTo(windowSouthPos.getX() + .5f, windowSouthPos.getY(), windowSouthPos.getZ()+.5f) < .6;
         }
+
         return false;
     }
 
@@ -52,34 +57,31 @@ public class CrawlThroughWindowGoal extends Goal {
 
     @Override
     public void tick() {
-        if (this.isCrawling) {
-            // Keep updating the movement to encourage going through the window
-            if (window.canPassThrough()) {
-                window.onZombiePassedThrough();
-                if (windowDirection != null) {
-                    Vec3d destination = getDestination();
-                    if(destination != null){
-                        this.zombie.teleport(windowSouthPos.getX() + .5f, windowSouthPos.getY(), windowSouthPos.getZ() + .5f);
-                        this.zombie.move(MovementType.SELF, getDestination());
-                        this.zombie.setPassedThroughWindow(true);
-                    }
-                }
-            }
+        BlockPos destinationBP = zombie.getBlockPos().add((int)getDestination().x, (int)getDestination().y, (int)getDestination().z);
+
+        if(shouldHaveCrawled){
+            zombie.teleport(destinationBP.getX(), destinationBP.getY(), destinationBP.getZ());
+            zombie.setPassedThroughWindow(true);
+            return;
         }
+
+        //Allow zombie to pass through the door during 2s.
+        window.onZombiePassedThrough();
+
+        zombie.teleport(windowSouthPos.getX() + .5f, windowSouthPos.getY(), windowSouthPos.getZ() + .5f);
+        zombie.move(MovementType.SELF, getDestination());
+
+        zombie.setPassedThroughWindow(true);
+        shouldHaveCrawled = true;
     }
 
     private Vec3d getDestination(){
-        switch (this.windowDirection) {
-            case NORTH:
-                return new Vec3d(0, 0, -2);
-            case SOUTH:
-                return new Vec3d(0, 0, 2);
-            case EAST:
-                return new Vec3d(2, 0, 0);
-            case WEST:
-                return new Vec3d(-2, 0, 0);
-            default:
-                return null;
-        }
+        return switch (this.windowDirection) {
+            case NORTH -> new Vec3d(0, 0, -2);
+            case SOUTH -> new Vec3d(0, 0, 2);
+            case EAST -> new Vec3d(2, 0, 0);
+            case WEST -> new Vec3d(-2, 0, 0);
+            default -> null;
+        };
     }
 }
