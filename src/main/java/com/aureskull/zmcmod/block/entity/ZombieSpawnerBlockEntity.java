@@ -1,9 +1,9 @@
 package com.aureskull.zmcmod.block.entity;
 
 import com.aureskull.zmcmod.block.ILinkable;
+import com.aureskull.zmcmod.block.entity.window.SmallZombieWindowBlockEntity;
 import com.aureskull.zmcmod.entity.ModEntities;
 import com.aureskull.zmcmod.entity.custom.StandingZombieEntity;
-import com.aureskull.zmcmod.networking.ModMessages;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;

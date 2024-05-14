@@ -1,12 +1,14 @@
-package com.aureskull.zmcmod.block.entity;
+package com.aureskull.zmcmod.block.entity.window;
 
 import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.ILinkable;
-import com.aureskull.zmcmod.block.custom.SmallZombieWindowBlock;
+import com.aureskull.zmcmod.block.custom.window.SmallZombieWindowBlock;
+import com.aureskull.zmcmod.block.entity.ModBlockEntities;
+import com.aureskull.zmcmod.block.entity.ZombieSpawnerBlockEntity;
+import com.aureskull.zmcmod.block.entity.ZoneControllerBlockEntity;
 import com.aureskull.zmcmod.client.InteractionHelper;
 import com.aureskull.zmcmod.client.overlay.MessageHudOverlay;
 import com.aureskull.zmcmod.event.ModKeyInputHandler;
-import com.aureskull.zmcmod.networking.ModMessages;
 import com.aureskull.zmcmod.sound.ModSounds;
 import com.aureskull.zmcmod.util.PlayerData;
 import com.aureskull.zmcmod.util.PlayerHelper;

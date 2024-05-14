@@ -3,6 +3,7 @@ package com.aureskull.zmcmod.block.entity;
 import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.ILinkable;
 import com.aureskull.zmcmod.block.entity.door.DoorBlockEntity;
+import com.aureskull.zmcmod.block.entity.window.SmallZombieWindowBlockEntity;
 import com.aureskull.zmcmod.screen.zonecontroller.ZoneControllerScreenHandler;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;

@@ -2,6 +2,7 @@ package com.aureskull.zmcmod.block.custom;
 
 import com.aureskull.zmcmod.block.entity.*;
 import com.aureskull.zmcmod.block.entity.door.DoorBlockEntity;
+import com.aureskull.zmcmod.block.entity.window.SmallZombieWindowBlockEntity;
 import com.aureskull.zmcmod.item.custom.Linker;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
@@ -15,9 +16,6 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 

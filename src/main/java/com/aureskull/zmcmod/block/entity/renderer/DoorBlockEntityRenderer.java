@@ -1,8 +1,6 @@
 package com.aureskull.zmcmod.block.entity.renderer;
 
 import com.aureskull.zmcmod.ZMCMod;
-import com.aureskull.zmcmod.block.entity.SmallZombieWindowBlockEntity;
-import com.aureskull.zmcmod.block.entity.ZombieSpawnerBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZoneControllerBlockEntity;
 import com.aureskull.zmcmod.block.entity.door.DoorBlockEntity;
 import com.aureskull.zmcmod.item.custom.Linker;
@@ -17,8 +15,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
 import java.util.List;

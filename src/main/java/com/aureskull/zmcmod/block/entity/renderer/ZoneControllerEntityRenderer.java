@@ -1,8 +1,7 @@
 package com.aureskull.zmcmod.block.entity.renderer;
 
-import com.aureskull.zmcmod.block.entity.SmallZombieWindowBlockEntity;
+import com.aureskull.zmcmod.block.entity.window.SmallZombieWindowBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZoneControllerBlockEntity;
-import com.aureskull.zmcmod.block.entity.door.DoorBlockEntity;
 import com.aureskull.zmcmod.event.ModKeyInputHandler;
 import com.aureskull.zmcmod.item.custom.Linker;
 import com.aureskull.zmcmod.item.custom.ZoneStick;

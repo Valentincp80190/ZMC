@@ -1,7 +1,8 @@
 package com.aureskull.zmcmod.block;
 
 import com.aureskull.zmcmod.block.entity.MapControllerBlockEntity;
-import com.aureskull.zmcmod.block.entity.SmallZombieWindowBlockEntity;
+import com.aureskull.zmcmod.block.entity.window.MediumZombieWindowBlockEntity;
+import com.aureskull.zmcmod.block.entity.window.SmallZombieWindowBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZombieSpawnerBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZoneControllerBlockEntity;
 import com.aureskull.zmcmod.block.entity.door.DoorBlockEntity;
@@ -12,6 +13,7 @@ public enum BlockEntityType {
     ZONE_CONTROLLER(ZoneControllerBlockEntity.class),
     DOOR(DoorBlockEntity.class),
     SMALL_ZOMBIE_WINDOW(SmallZombieWindowBlockEntity.class),
+    MEDIUM_ZOMBIE_WINDOW(MediumZombieWindowBlockEntity.class),
     ZOMBIE_SPAWNER(ZombieSpawnerBlockEntity.class);
 
     private final Class<? extends BlockEntity> blockEntityClass;

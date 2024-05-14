@@ -1,6 +1,6 @@
 package com.aureskull.zmcmod.entity.goal;
 
-import com.aureskull.zmcmod.block.entity.SmallZombieWindowBlockEntity;
+import com.aureskull.zmcmod.block.entity.window.SmallZombieWindowBlockEntity;
 import com.aureskull.zmcmod.entity.custom.StandingZombieEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.MovementType;

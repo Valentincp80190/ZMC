@@ -1,0 +1,38 @@
+{
+  "variants": {
+    "planks=0,facing=north": { "model": "zmcmod:block/medium_zombie_window/medium_zombie_window_0", "y": 0 },
+    "planks=0,facing=south": { "model": "zmcmod:block/medium_zombie_window/medium_zombie_window_0", "y": 180 },
+    "planks=0,facing=west": { "model": "zmcmod:block/medium_zombie_window/medium_zombie_window_0", "y": 270 },
+    "planks=0,facing=east": { "model": "zmcmod:block/medium_zombie_window/medium_zombie_window_0", "y": 90 },
+
+    "planks=1,facing=north": { "model": "zmcmod:block/medium_zombie_window/medium_zombie_window_1", "y": 0 },
+    "planks=1,facing=south": { "model": "zmcmod:block/medium_zombie_window/medium_zombie_window_1", "y": 180 },
+    "planks=1,facing=west": { "model": "zmcmod:block/medium_zombie_window/medium_zombie_window_1", "y": 270 },
+    "planks=1,facing=east": { "model": "zmcmod:block/medium_zombie_window/medium_zombie_window_1", "y": 90 },
+
+    "planks=2,facing=north": { "model": "zmcmod:block/medium_zombie_window/medium_zombie_window_2", "y": 0 },
+    "planks=2,facing=south": { "model": "zmcmod:block/medium_zombie_window/medium_zombie_window_2", "y": 180 },
+    "planks=2,facing=west": { "model": "zmcmod:block/medium_zombie_window/medium_zombie_window_2", "y": 270 },
+    "planks=2,facing=east": { "model": "zmcmod:block/medium_zombie_window/medium_zombie_window_2", "y": 90 },
+
+    "planks=3,facing=north": { "model": "zmcmod:block/medium_zombie_window/medium_zombie_window_3", "y": 0 },
+    "planks=3,facing=south": { "model": "zmcmod:block/medium_zombie_window/medium_zombie_window_3", "y": 180 },
+    "planks=3,facing=west": { "model": "zmcmod:block/medium_zombie_window/medium_zombie_window_3", "y": 270 },
+    "planks=3,facing=east": { "model": "zmcmod:block/medium_zombie_window/medium_zombie_window_3", "y": 90 },
+
+    "planks=4,facing=north": { "model": "zmcmod:block/medium_zombie_window/medium_zombie_window_4", "y": 0 },
+    "planks=4,facing=south": { "model": "zmcmod:block/medium_zombie_window/medium_zombie_window_4", "y": 180 },
+    "planks=4,facing=west": { "model": "zmcmod:block/medium_zombie_window/medium_zombie_window_4", "y": 270 },
+    "planks=4,facing=east": { "model": "zmcmod:block/medium_zombie_window/medium_zombie_window_4", "y": 90 },
+
+    "planks=5,facing=north": { "model": "zmcmod:block/medium_zombie_window/medium_zombie_window_5", "y": 0 },
+    "planks=5,facing=south": { "model": "zmcmod:block/medium_zombie_window/medium_zombie_window_5", "y": 180 },
+    "planks=5,facing=west": { "model": "zmcmod:block/medium_zombie_window/medium_zombie_window_5", "y": 270 },
+    "planks=5,facing=east": { "model": "zmcmod:block/medium_zombie_window/medium_zombie_window_5", "y": 90 },
+
+    "planks=6,facing=north": { "model": "zmcmod:block/medium_zombie_window/medium_zombie_window_6", "y": 0 },
+    "planks=6,facing=south": { "model": "zmcmod:block/medium_zombie_window/medium_zombie_window_6", "y": 180 },
+    "planks=6,facing=west": { "model": "zmcmod:block/medium_zombie_window/medium_zombie_window_6", "y": 270 },
+    "planks=6,facing=east": { "model": "zmcmod:block/medium_zombie_window/medium_zombie_window_6", "y": 90 }
+  }
+}

@@ -1,7 +1,7 @@
-package com.aureskull.zmcmod.block.custom;
+package com.aureskull.zmcmod.block.custom.window;
 
 import com.aureskull.zmcmod.block.entity.ModBlockEntities;
-import com.aureskull.zmcmod.block.entity.SmallZombieWindowBlockEntity;
+import com.aureskull.zmcmod.block.entity.window.MediumZombieWindowBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZombieSpawnerBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZoneControllerBlockEntity;
 import com.aureskull.zmcmod.entity.custom.StandingZombieEntity;
@@ -13,6 +13,7 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.state.StateManager.Builder;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Properties;
@@ -25,18 +26,19 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import net.minecraft.state.StateManager.Builder;
 
-public class SmallZombieWindowBlock extends BlockWithEntity implements BlockEntityProvider {
+public class MediumZombieWindowBlock extends BlockWithEntity implements BlockEntityProvider {
     public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
 
     public static final IntProperty PLANKS = IntProperty.of("planks", 0, 6);
 
-    public static final MapCodec<SmallZombieWindowBlock> CODEC = SmallZombieWindowBlock.createCodec(SmallZombieWindowBlock::new);
+    public static final MapCodec<MediumZombieWindowBlock> CODEC = MediumZombieWindowBlock.createCodec(MediumZombieWindowBlock::new);
 
-    public SmallZombieWindowBlock(Settings settings){
+    public MediumZombieWindowBlock(Settings settings){
         super(settings);
-        setDefaultState(this.stateManager.getDefaultState().with(FACING, Direction.NORTH).with(PLANKS, 0));
+        setDefaultState(this.stateManager.getDefaultState()
+                .with(FACING, Direction.NORTH)
+                .with(PLANKS, 0));
     }
 
     @Override
@@ -74,13 +76,13 @@ public class SmallZombieWindowBlock extends BlockWithEntity implements BlockEnti
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state){
-        return new SmallZombieWindowBlockEntity(pos, state);
+        return new MediumZombieWindowBlockEntity(pos, state);
     }
 
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return validateTicker(type, ModBlockEntities.SMALL_ZOMBIE_WINDOW_BLOCK_ENTITY,
+        return validateTicker(type, ModBlockEntities.MEDIUM_ZOMBIE_WINDOW_BLOCK_ENTITY,
                 (world1, pos, state1, blockEntity) -> blockEntity.tick(world1, pos, state1));
     }
 
@@ -93,11 +95,9 @@ public class SmallZombieWindowBlock extends BlockWithEntity implements BlockEnti
     public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         if (!world.isClient()) { // Server side
             BlockEntity be = world.getBlockEntity(pos);
-            if (be instanceof SmallZombieWindowBlockEntity) {
-                SmallZombieWindowBlockEntity smallZombieDoorway = (SmallZombieWindowBlockEntity) be;
-
-                smallZombieDoorway.unlink(be, ZombieSpawnerBlockEntity.class, true);
-                smallZombieDoorway.unlink(be, ZoneControllerBlockEntity.class, true);
+            if (be instanceof MediumZombieWindowBlockEntity mediumZombieWindowBlockEntity) {
+                mediumZombieWindowBlockEntity.unlink(be, ZombieSpawnerBlockEntity.class, true);
+                mediumZombieWindowBlockEntity.unlink(be, ZoneControllerBlockEntity.class, true);
             }
         }
         super.onBreak(world, pos, state, player);
@@ -110,7 +110,7 @@ public class SmallZombieWindowBlock extends BlockWithEntity implements BlockEnti
             BlockEntity be = world.getBlockEntity(pos);
 
             Entity entity = ((EntityShapeContext) context).getEntity();
-            if (be instanceof SmallZombieWindowBlockEntity window && window.getPlank() == 0 && entity instanceof StandingZombieEntity zombie && !zombie.isPassedThroughWindow()) {
+            if (be instanceof MediumZombieWindowBlockEntity window && window.getPlank() == 0 && entity instanceof StandingZombieEntity zombie && !zombie.isPassedThroughWindow()) {
                 return VoxelShapes.empty();
             }
         }

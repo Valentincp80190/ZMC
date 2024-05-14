@@ -3,6 +3,7 @@ package com.aureskull.zmcmod.block.entity;
 import com.aureskull.zmcmod.ZMCMod;
 import com.aureskull.zmcmod.block.ILinkable;
 import com.aureskull.zmcmod.block.entity.door.DoorBlockEntity;
+import com.aureskull.zmcmod.block.entity.window.SmallZombieWindowBlockEntity;
 import com.aureskull.zmcmod.entity.custom.StandingZombieEntity;
 import com.aureskull.zmcmod.management.GamesManager;
 import com.aureskull.zmcmod.management.GamePlayerManager;

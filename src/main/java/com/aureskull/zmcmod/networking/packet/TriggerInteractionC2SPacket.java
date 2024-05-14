@@ -1,6 +1,7 @@
 package com.aureskull.zmcmod.networking.packet;
 
-import com.aureskull.zmcmod.block.entity.SmallZombieWindowBlockEntity;
+import com.aureskull.zmcmod.block.entity.window.MediumZombieWindowBlockEntity;
+import com.aureskull.zmcmod.block.entity.window.SmallZombieWindowBlockEntity;
 import com.aureskull.zmcmod.block.entity.door.DoorBlockEntity;
 import com.aureskull.zmcmod.client.InteractionHelper;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
@@ -32,6 +33,11 @@ public class TriggerInteractionC2SPacket {
 
             if (blockEntity instanceof SmallZombieWindowBlockEntity smallZombieWindowBlockEntity) {
                 smallZombieWindowBlockEntity.rebuild(player);
+                //player.sendMessage(Text.literal("nbr planks : " + ((SmallZombieWindowBlockEntity) mapControllerBlockEntity).plank), false);
+            }
+
+            if (blockEntity instanceof MediumZombieWindowBlockEntity mediumZombieWindowBlockEntity) {
+                mediumZombieWindowBlockEntity.rebuild(player);
                 //player.sendMessage(Text.literal("nbr planks : " + ((SmallZombieWindowBlockEntity) mapControllerBlockEntity).plank), false);
             }
 

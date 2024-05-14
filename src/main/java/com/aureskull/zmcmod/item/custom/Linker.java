@@ -1,12 +1,12 @@
 package com.aureskull.zmcmod.item.custom;
 
 import com.aureskull.zmcmod.block.custom.MapControllerBlock;
-import com.aureskull.zmcmod.block.custom.SmallZombieWindowBlock;
+import com.aureskull.zmcmod.block.custom.window.SmallZombieWindowBlock;
 import com.aureskull.zmcmod.block.custom.ZombieSpawnerBlock;
 import com.aureskull.zmcmod.block.custom.ZoneControllerBlock;
 import com.aureskull.zmcmod.block.custom.door.DoorPartBlock;
 import com.aureskull.zmcmod.block.entity.MapControllerBlockEntity;
-import com.aureskull.zmcmod.block.entity.SmallZombieWindowBlockEntity;
+import com.aureskull.zmcmod.block.entity.window.SmallZombieWindowBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZombieSpawnerBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZoneControllerBlockEntity;
 import com.aureskull.zmcmod.block.entity.door.DoorBlockEntity;

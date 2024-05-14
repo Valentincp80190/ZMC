@@ -1,7 +1,7 @@
 package com.aureskull.zmcmod.block.custom;
 
 import com.aureskull.zmcmod.block.entity.ModBlockEntities;
-import com.aureskull.zmcmod.block.entity.SmallZombieWindowBlockEntity;
+import com.aureskull.zmcmod.block.entity.window.SmallZombieWindowBlockEntity;
 import com.aureskull.zmcmod.block.entity.ZombieSpawnerBlockEntity;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.block.BlockEntityProvider;
