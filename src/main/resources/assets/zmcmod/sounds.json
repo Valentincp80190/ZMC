@@ -77,5 +77,11 @@
       "zmcmod:standing_zombie/amb/amb_4",
       "zmcmod:standing_zombie/amb/amb_5"
     ]
+  },
+  "standing_zombie_sprint": {
+    "subtitle": "sounds.zmcmod.standing_zombie_sprint",
+    "sounds": [
+      "zmcmod:standing_zombie/sprint/sprint_0"
+    ]
   }
 }

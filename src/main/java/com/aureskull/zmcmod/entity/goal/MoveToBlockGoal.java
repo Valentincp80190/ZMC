@@ -16,7 +16,7 @@ public class MoveToBlockGoal extends Goal {
     private final double speed;
     private int recalculatePathTimer = 0;
 
-    public MoveToBlockGoal(MobEntity entity, BlockPos targetPos, double speed) {
+    public MoveToBlockGoal(StandingZombieEntity entity, BlockPos targetPos, double speed) {
         this.entity = entity;
         this.targetPos = targetPos;
         this.speed = speed;

@@ -21,6 +21,7 @@ public class ModSounds {
     //Standing zombie
     public static final SoundEvent STANDING_ZOMBIE_DEATH= registerSoundEvent("standing_zombie_death");
     public static final SoundEvent STANDING_ZOMBIE_AMB= registerSoundEvent("standing_zombie_amb");
+    public static final SoundEvent STANDING_ZOMBIE_SPRINT= registerSoundEvent("standing_zombie_sprint");
 
     //Purchase
     public static final SoundEvent PURCHASE_ACCEPT = registerSoundEvent("purchase_accept");

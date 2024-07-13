@@ -34,6 +34,8 @@ public class StandingZombieEntity extends HostileEntity {
 
     private BlockPos mapControllerBlockPos;
 
+    private final float RUN_THRESHOLD = 2.0f;
+
     public StandingZombieEntity(EntityType<? extends HostileEntity> entityType, World world) {
         super(entityType, world);
     }
@@ -61,7 +63,6 @@ public class StandingZombieEntity extends HostileEntity {
         }
     }
 
-
     @Override
     protected void initGoals() {
         this.goalSelector.add(0, new SwimGoal(this));
@@ -69,22 +70,34 @@ public class StandingZombieEntity extends HostileEntity {
 
         this.goalSelector.add(3, new CrawlThroughWindowGoal(this));
 
-        this.goalSelector.add(3, new AttackNearestPlayerGoal(this, 2.0D, false));
         //Pour attaquer c'est juste un set sur le zombie. On pourrait donc se passer de ce goal si on fait un mix de l'attaque et du MoveToBlockGoal
         this.goalSelector.add(2, new LookAtEntityGoal(this, PlayerEntity.class, 256.0F));
     }
 
     private void initializeDependentTargetBlockGoals() {
+        //When mapControllerBlockPos initialized
+        if (!this.goalSelector.getRunningGoals().anyMatch(goal -> goal.getGoal() instanceof LookAtBlockPosBlockEntityGoal)) {
+            this.goalSelector.add(3, new AttackNearestPlayerGoal(this, speed, false));
+        }
+
         if (!this.goalSelector.getRunningGoals().anyMatch(goal -> goal.getGoal() instanceof LookAtBlockPosBlockEntityGoal)) {
             this.goalSelector.add(1, new LookAtBlockPosBlockEntityGoal(this, this.windowBlockPos));
         }
 
         if (!this.goalSelector.getRunningGoals().anyMatch(goal -> goal.getGoal() instanceof MoveToBlockGoal)) {
-            this.goalSelector.add(3, new MoveToBlockGoal(this, this.windowBlockPos, 1.0D));
+            this.goalSelector.add(3, new MoveToBlockGoal(this, this.windowBlockPos, speed));
         }
 
         if (!this.goalSelector.getRunningGoals().anyMatch(goal -> goal.getGoal() instanceof AttackWindowGoal)) {
             this.goalSelector.add(1, new AttackWindowGoal(this, this.windowBlockPos));
+        }
+    }
+
+    public void updateSpeed(){
+        if(getWorld().getBlockEntity(mapControllerBlockPos) instanceof MapControllerBlockEntity mapControllerBlockEntity){
+            if(mapControllerBlockEntity.getRound() > 4){
+                speed = 2.0f;
+            }else speed = 1.0f;
         }
     }
 
@@ -103,13 +116,12 @@ public class StandingZombieEntity extends HostileEntity {
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
 
-        if (nbt.contains("standing_zombie.target_position")){
+        if (nbt.contains("standing_zombie.target_position"))
             windowBlockPos = NbtHelper.toBlockPos(nbt.getCompound("standing_zombie.target_position"));
-            if(windowBlockPos != null) initializeDependentTargetBlockGoals();
-        }
 
         if(nbt.contains("standing_zombie.map_controller_position"))
-            this.mapControllerBlockPos = NbtHelper.toBlockPos(nbt.getCompound("standing_zombie.map_controller_position"));
+            mapControllerBlockPos = NbtHelper.toBlockPos(nbt.getCompound("standing_zombie.map_controller_position"));
+
     }
 
     public static DefaultAttributeContainer.Builder createStandingZombieAttributes(){
@@ -130,7 +142,10 @@ public class StandingZombieEntity extends HostileEntity {
     @Nullable
     @Override
     protected SoundEvent getAmbientSound() {
-        return ModSounds.STANDING_ZOMBIE_AMB;
+        if(speed >= RUN_THRESHOLD)
+            return ModSounds.STANDING_ZOMBIE_SPRINT;
+        else
+            return ModSounds.STANDING_ZOMBIE_AMB;
     }
 
     @Override
